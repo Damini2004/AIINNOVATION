@@ -17,6 +17,7 @@ import Slider from '@/components/slider';
 import TechnologyArea from '@/components/technology-area';
 import WhoWeAre from '@/components/who-we-are';
 import CollaborationPage from '@/components/collaboration';
+import ProgramsPage from '@/components/programs';
 
 function Showcase() {
   const searchParams = useSearchParams();
@@ -47,6 +48,7 @@ function Showcase() {
       <TechnologyArea />
       <WhoWeAre />
       <CollaborationPage />
+      <ProgramsPage />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         
       </main>
