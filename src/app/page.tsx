@@ -16,12 +16,11 @@ import { Suspense } from 'react';
 import Slider from '@/components/slider';
 import TechnologyArea from '@/components/technology-area';
 import WhoWeAre from '@/components/who-we-are';
+import CollaborationPage from '@/components/collaboration';
 
 function Showcase() {
   const searchParams = useSearchParams();
   const [snippets, setSnippets] = useState<CodeSnippet[]>(initialSnippets);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
   const [selectedSnippet, setSelectedSnippet] = useState<CodeSnippet | null>(null);
 
   useEffect(() => {
@@ -40,24 +39,14 @@ function Showcase() {
     setSnippets((prev) => [snippetWithId, ...prev]);
   };
 
-  const filteredSnippets = useMemo(() => {
-    return snippets.filter((snippet) => {
-      const categoryMatch = activeCategory === 'All' || snippet.tags.includes(activeCategory);
-      const searchMatch =
-        searchTerm === '' ||
-        snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        snippet.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        snippet.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-      return categoryMatch && searchMatch;
-    });
-  }, [snippets, searchTerm, activeCategory]);
-
+  
   return (
     <div className="flex flex-col min-h-screen">
       <AppHeader />
       <Slider />
       <TechnologyArea />
       <WhoWeAre />
+      <CollaborationPage />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         
       </main>
