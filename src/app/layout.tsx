@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './animations.css';
+import './members.css';
 
 export const metadata: Metadata = {
   title: 'Code Showcase',
