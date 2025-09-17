@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './animations.css';
 import './members.css';
+import { Footer } from '@/components/footer';
+import './footer.css';
 
 export const metadata: Metadata = {
   title: 'Code Showcase',
@@ -31,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background light')}>
         {children}
+        <Footer />
         <Toaster />
       </body>
     </html>

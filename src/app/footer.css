@@ -1,0 +1,17 @@
+.link-gradient {
+  background: linear-gradient(
+    to right,
+    hsl(var(--primary)),
+    hsl(var(--primary)) 50%,
+    hsl(var(--muted-foreground)) 50%
+  );
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 200% 100%;
+  background-position: 100%;
+  transition: background-position 0.5s;
+}
+.link-gradient:hover {
+  background-position: 0;
+}
