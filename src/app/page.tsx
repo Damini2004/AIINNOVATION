@@ -19,6 +19,7 @@ import WhoWeAre from '@/components/who-we-are';
 import CollaborationPage from '@/components/collaboration';
 import ProgramsPage from '@/components/programs';
 import CounterSection from '@/components/counter-section';
+import EventsSection from '@/components/events-section';
 
 function Showcase() {
   const searchParams = useSearchParams();
@@ -51,6 +52,7 @@ function Showcase() {
       <CollaborationPage />
       <ProgramsPage />
       <CounterSection />
+      <EventsSection />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         
       </main>

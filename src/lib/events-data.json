@@ -1,0 +1,27 @@
+
+[
+  {
+    "category": "Workshop",
+    "title": "Introduction to Machine Learning with Python",
+    "subtitle": "Online | 2-Day Workshop",
+    "description": "Join our hands-on workshop to learn the fundamentals of Machine Learning. We'll cover everything from data preprocessing to building your first predictive model using Python and popular libraries like Scikit-learn.",
+    "image": "https://picsum.photos/seed/event1/600/400",
+    "link": "#"
+  },
+  {
+    "category": "Conference",
+    "title": "AI for Social Good Global Summit 2024",
+    "subtitle": "Virtual Event | 3 Days",
+    "description": "A global gathering of researchers, innovators, and policymakers to discuss how AI can be leveraged to address the world's most pressing challenges, from climate change to public health.",
+    "image": "https://picsum.photos/seed/event2/600/400",
+    "link": "#"
+  },
+  {
+    "category": "Webinar",
+    "title": "The Ethics of AI: Navigating the Future",
+    "subtitle": "Live Panel Discussion",
+    "description": "A thought-provoking discussion with leading experts on the ethical implications of artificial intelligence. We'll explore topics like bias, privacy, and accountability in AI systems.",
+    "image": "https://picsum.photos/seed/event3/600/400",
+    "link": "#"
+  }
+]
