@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GitBranch, BarChart, Bot } from "lucide-react";
+import VisionSection from "./vision-section";
 
 export default function MissionVisionPage() {
   const missionPoints = [
@@ -90,6 +91,7 @@ export default function MissionVisionPage() {
           </div>
         </div>
       </section>
+      <VisionSection />
     </div>
   );
 }
