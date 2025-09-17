@@ -62,8 +62,8 @@ export function AppHeader() {
               <li><Link href="/">Home</Link></li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  About <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  About <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/aboutus">Overview</Link></li>
@@ -74,8 +74,8 @@ export function AppHeader() {
               </li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  Programs <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  Programs <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/courses">AI Education and Courses</Link></li>
@@ -85,8 +85,8 @@ export function AppHeader() {
               </li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  Events <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  Events <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/upcomingevents">Upcoming Events</Link></li>
@@ -97,8 +97,8 @@ export function AppHeader() {
               </li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  Publications <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  Publications <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/journals">AI Journals</Link></li>
@@ -107,8 +107,8 @@ export function AppHeader() {
               </li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  Resources <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  Resources <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/news">News & Blog</Link></li>
@@ -117,8 +117,8 @@ export function AppHeader() {
               </li>
 
               <li className="dropdown">
-                <a href="#" className="flex items-center">
-                  Membership <ChevronDown className="ms-1 h-4 w-4" />
+                <a href="#" className="flex items-center gap-1">
+                  Membership <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
                   <li><Link href="/join">Join AIIS</Link></li>
