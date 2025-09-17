@@ -15,6 +15,7 @@ import { Search } from 'lucide-react';
 import { Suspense } from 'react';
 import Slider from '@/components/slider';
 import TechnologyArea from '@/components/technology-area';
+import WhoWeAre from '@/components/who-we-are';
 
 function Showcase() {
   const searchParams = useSearchParams();
@@ -56,6 +57,7 @@ function Showcase() {
       <AppHeader />
       <Slider />
       <TechnologyArea />
+      <WhoWeAre />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         <div className="max-w-7xl mx-auto">
           <motion.div
