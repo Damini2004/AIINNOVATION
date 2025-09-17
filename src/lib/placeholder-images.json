@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "slider1-bg",
+      "description": "Abstract background for the hero section",
+      "imageUrl": "https://picsum.photos/seed/slider1/1920/930",
+      "imageHint": "abstract gradient"
+    },
+    {
+      "id": "slider3-main",
+      "description": "Main image for the hero section",
+      "imageUrl": "https://picsum.photos/seed/slider3/600/600",
+      "imageHint": "abstract tech"
+    }
+  ]
 }
