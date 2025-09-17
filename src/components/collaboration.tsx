@@ -25,7 +25,7 @@ export default function CollaborationPage() {
             Research Made Easy
             <span style={{ color: "#f16722" }}> through Collaborations</span>
           </h2>
-          <div className="em_bar_bg mx-auto my-[20px] h-1 w-24 bg-primary" style={{ background: "#f16722" }}></div>
+          <div className="em_bar_bg"></div>
         </div>
 
         {/* Steps */}

@@ -1,0 +1,72 @@
+.em_bar_bg {
+  height: 5px;
+  width: 90px;
+  background: #aec6ef;
+  margin: 20px auto;
+  position: relative;
+  border-radius: 30px;
+}
+.text-left.em_bar_bg {
+  height: 5px;
+  width: 90px;
+  background: #aec6ef;
+  margin: 18px 0 30px;
+  position: relative;
+  border-radius: 30px;
+}
+.em_bar_bg:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -2.7px;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: #f16722;
+  animation-duration: 3s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-name: MOVE-BG;
+}
+.text-left1.em_bar_bg {
+  height: 3px;
+  width: 90px;
+  background: #aec6ef;
+  margin: 16px 0 8px;
+  position: relative;
+  border-radius: 30px;
+}
+.text-left1.em_bar_bg:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -2.7px;
+  height: 9px;
+  width: 9px;
+  border-radius: 50%;
+  background: #f16722;
+  animation-duration: 3s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-name: MOVE-BG;
+}
+@-webkit-keyframes MOVE-BG {
+  from {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  to {
+    -webkit-transform: translateX(88px);
+    transform: translateX(88px);
+  }
+}
+@keyframes MOVE-BG {
+  from {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  to {
+    -webkit-transform: translateX(88px);
+    transform: translateX(88px);
+  }
+}
