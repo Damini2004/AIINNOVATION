@@ -21,6 +21,7 @@ import ProgramsPage from '@/components/programs';
 import CounterSection from '@/components/counter-section';
 import EventsSection from '@/components/events-section';
 import ContactSection from '@/components/contact-section';
+import QuickButtonArea from '@/components/quick-button-area';
 
 function Showcase() {
   const searchParams = useSearchParams();
@@ -55,6 +56,7 @@ function Showcase() {
       <CounterSection />
       <EventsSection />
       <ContactSection />
+      <QuickButtonArea />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         
       </main>
