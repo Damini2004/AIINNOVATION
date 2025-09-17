@@ -1,0 +1,43 @@
+.datatech_nav_manu {
+  background: #fff;
+  margin-top: 5px;
+  margin-bottom: 5px; /* subtle bottom border */
+}
+
+.datatech_menu ul li a {
+  color: #000; /* black text */
+  font-weight: 500;
+  display: block;
+}
+
+.datatech_menu ul li .sub-menu {
+  background: #fff; /* dropdown white */
+  border: 1px solid #eaeaea;
+  border-top: 3px solid rgb(241, 103, 34);
+ 
+  position: absolute;
+  min-width: 200px;
+  display: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  list-style: none;
+  padding: 0;
+  z-index: 1000;
+}
+.datatech_menu ul li .sub-menu :hover {
+  background: rgb(241, 103, 34); /* dropdown white */
+  color: white;
+
+}
+.datatech_menu ul li:hover .sub-menu {
+  display: block;
+}
+
+.datatech_menu ul li .sub-menu li a {
+  padding: 8px 20px;
+  color: #152640; /* dark navy like in screenshot */
+}
+
+.datatech_menu ul li .sub-menu li a:hover {
+ background: rgb(241, 103, 34); /* dropdown white */
+  color: white;
+}

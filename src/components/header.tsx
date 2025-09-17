@@ -1,57 +1,261 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { SubmitSnippetForm } from '@/components/submit-snippet-form';
-import { Icons } from './icons';
-import { Code2, Plus } from 'lucide-react';
-import type { CodeSnippet } from '@/lib/types';
+import { useState } from "react";
+import Link from "next/link";
+import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import "./header.css";
+import { Icons } from "./icons";
 
-interface AppHeaderProps {
-  onSnippetAdded: (snippet: CodeSnippet) => void;
-}
+export function AppHeader() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-export function AppHeader({ onSnippetAdded }: AppHeaderProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const toggleDropdown = (menu: string) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex items-center">
-          <Icons.logo className="h-6 w-6 text-primary" />
-          <span className="font-bold font-headline ml-2">Code Showcase</span>
+    <header
+      id="sticky-header"
+      className="datatech_nav_manu"
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 999,
+        paddingLeft: "20px",
+        paddingRight: "20px",
+        height: "60px",
+        display: "flex",
+        alignItems: "center",
+        background: "#fff",
+      }}
+    >
+      <div className="container w-full mx-auto">
+        {/* Navbar wrapper */}
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center" title="datatech">
+            <Icons.logo className="h-10 w-auto text-black" />
+          </Link>
+
+          {/* Hamburger button */}
+          <button
+            className="lg:hidden text-2xl text-black"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X /> : <Menu />}
+          </button>
+
+          {/* Desktop Menu */}
+          <nav className="hidden lg:block datatech_menu">
+            <ul
+              className="nav_scroll d-flex align-items-center"
+              style={{
+                listStyle: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+                gap: "15px",
+                padding: 0,
+              }}
+            >
+              <li><Link href="/">Home</Link></li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  About <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/aboutus">Overview</Link></li>
+                  <li><Link href="/missionvision">Mission & Vision</Link></li>
+                  <li><Link href="/ourteam">Our Members</Link></li>
+                  <li><Link href="/partners">Partners</Link></li>
+                </ul>
+              </li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  Programs <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/courses">AI Education and Courses</Link></li>
+                  <li><Link href="/studentinternships">Student Internships</Link></li>
+                  <li><Link href="/curriculumsupport">Curriculum Support</Link></li>
+                </ul>
+              </li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  Events <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/upcomingevents">Upcoming Events</Link></li>
+                  <li><Link href="/pastevents">Past Events</Link></li>
+                  <li><Link href="/hostevent">Host an Event</Link></li>
+                  <li><Link href="/submitproposal">Submit Proposal</Link></li>
+                </ul>
+              </li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  Publications <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/journals">AI Journals</Link></li>
+                  <li><Link href="/ethics">Ethics and Policies</Link></li>
+                </ul>
+              </li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  Resources <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/news">News & Blog</Link></li>
+                  <li><Link href="/researchhighlights">Research Highlights</Link></li>
+                </ul>
+              </li>
+
+              <li className="dropdown">
+                <a href="#" className="flex items-center">
+                  Membership <ChevronDown className="ms-1 h-4 w-4" />
+                </a>
+                <ul className="sub-menu">
+                  <li><Link href="/join">Join AIIS</Link></li>
+                  <li><Link href="/institutional">Institutional Membership</Link></li>
+                  <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
+                </ul>
+              </li>
+
+              <li><Link href="/contact-us">Contact</Link></li>
+            </ul>
+          </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> New Snippet
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
-              <DialogHeader>
-                <DialogTitle>Add a New Code Snippet</DialogTitle>
-                <DialogDescription>
-                  Fill out the form to add your code snippet to the showcase. You can also use AI to generate a description.
-                </DialogDescription>
-              </DialogHeader>
-              <SubmitSnippetForm
-                onSuccess={(newSnippet) => {
-                  onSnippetAdded(newSnippet as CodeSnippet);
-                  setIsDialogOpen(false);
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+
+        {/* Mobile Menu with dropdowns */}
+        {isOpen && (
+          <nav className="lg:hidden absolute left-0 top-[60px] w-full bg-white shadow-lg datatech_menu">
+            <ul
+              style={{
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                padding: "10px 20px",
+                gap: "10px",
+              }}
+            >
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <Link href="/">Home</Link>
+              </li>
+
+              {/* About */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("about")}
+                >
+                  About {openDropdown === "about" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "about" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/aboutus">Overview</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/missionvision">Mission & Vision</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ourteam">Our Members</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/partners">Partners</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Programs */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("programs")}
+                >
+                  Programs {openDropdown === "programs" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "programs" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/courses">AI Education and Courses</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/studentinternships">Student Internships</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/curriculumsupport">Curriculum Support</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Events */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("events")}
+                >
+                  Events {openDropdown === "events" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "events" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/upcomingevents">Upcoming Events</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/pastevents">Past Events</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostevent">Host an Event</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/submitproposal">Submit Proposal</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Publications */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("publications")}
+                >
+                  Publications {openDropdown === "publications" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "publications" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/journals">AI Journals</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ethics">Ethics and Policies</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Resources */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("resources")}
+                >
+                  Resources {openDropdown === "resources" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "resources" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/news">News & Blog</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/researchhighlights">Research Highlights</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Membership */}
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <button
+                  className="flex justify-between w-full font-medium"
+                  onClick={() => toggleDropdown("membership")}
+                >
+                  Membership {openDropdown === "membership" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openDropdown === "membership" && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/join">Join AIIS</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/institutional">Institutional Membership</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <Link href="/contact-us">Contact</Link>
+              </li>
+            </ul>
+          </nav>
+        )}
       </div>
     </header>
   );

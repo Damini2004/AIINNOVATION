@@ -51,7 +51,7 @@ function Showcase() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AppHeader onSnippetAdded={handleAddSnippet} />
+      <AppHeader />
       <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
         <div className="max-w-7xl mx-auto">
           <motion.div
