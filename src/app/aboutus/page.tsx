@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -5,6 +6,7 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import WhatWeDo from "./what-we-do";
 import "./what-we-do.css";
+import { motion } from "framer-motion";
 
 export default function AboutUsPage() {
   const steps = [
@@ -13,6 +15,28 @@ export default function AboutUsPage() {
     "Take up duties as trainer or researcher and publish research for free.",
     "Enjoy benefits of members and get invited to events.",
   ];
+
+  const listVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
@@ -50,14 +74,20 @@ export default function AboutUsPage() {
             </p>
             <div className="mt-8">
               <h4 className="text-xl font-bold mb-4">Easy Steps to Get Started</h4>
-              <ul className="space-y-3">
+              <motion.ul
+                className="space-y-3"
+                variants={listVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.5 }}
+              >
                 {steps.map((step, index) => (
-                  <li key={index} className="flex items-start">
+                  <motion.li key={index} className="flex items-start" variants={itemVariants}>
                     <CheckCircle className="w-5 h-5 text-primary mr-3 mt-1 flex-shrink-0" />
                     <span>{step}</span>
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
             </div>
           </div>
 
