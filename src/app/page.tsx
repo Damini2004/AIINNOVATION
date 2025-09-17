@@ -48,7 +48,6 @@ function Showcase() {
   
   return (
     <div className="flex flex-col min-h-screen">
-      <AppHeader />
       <Slider />
       <TechnologyArea />
       <WhoWeAre />

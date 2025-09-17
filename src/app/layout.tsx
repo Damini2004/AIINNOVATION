@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import './animations.css';
 import './members.css';
 import { Footer } from '@/components/footer';
+import { AppHeader } from '@/components/header';
 import './footer.css';
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background light')}>
+        <AppHeader />
         {children}
         <Footer />
         <Toaster />
