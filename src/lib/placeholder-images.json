@@ -11,6 +11,18 @@
       "description": "Main image for the hero section",
       "imageUrl": "https://picsum.photos/seed/slider3/600/600",
       "imageHint": "abstract tech"
+    },
+    {
+      "id": "feature1-bg",
+      "description": "Background for feature card",
+      "imageUrl": "https://picsum.photos/seed/feature1/400/300",
+      "imageHint": "education abstract"
+    },
+    {
+      "id": "feature2-bg",
+      "description": "Background for another feature card",
+      "imageUrl": "https://picsum.photos/seed/feature2/400/300",
+      "imageHint": "community abstract"
     }
   ]
 }
