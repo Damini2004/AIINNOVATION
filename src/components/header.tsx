@@ -55,7 +55,7 @@ export function AppHeader() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-around",
-                gap: "15px",
+                gap: "25px",
                 padding: 0,
               }}
             >
