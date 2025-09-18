@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
+import { getEvents } from "@/app/admin/actions";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,16 +24,8 @@ export default function EventsSection() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        if (!db) {
-          console.log("Firestore not initialized");
-          setLoading(false);
-          return;
-        }
-        const querySnapshot = await getDocs(collection(db, "events"));
-        const eventsData: EventType[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as EventType[];
+        setLoading(true);
+        const eventsData = await getEvents();
         setEvents(eventsData);
       } catch (error) {
         console.error("Error fetching events:", error);

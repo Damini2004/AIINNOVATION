@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,21 +17,60 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  addOrUpdateCourse,
+  addOrUpdatePartner,
+  addOrUpdateEvent,
+  getCourses,
+  getPartners,
+  getEvents,
+  deleteCourse,
+  deletePartner,
+  deleteEvent,
+} from "./actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-// Zod Schemas for validation
+import { Loader2, Trash2, Edit } from "lucide-react";
+import Image from "next/image";
+
+// Zod Schemas
 const courseSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   duration: z.string().min(1, "Duration is required"),
   category: z.string().min(1, "Category is required"),
+  img: z.string().url("Must be a valid URL"),
 });
 
 const partnerSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   logoUrl: z.string().url("Must be a valid URL"),
 });
 
 const eventSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   subtitle: z.string().min(1, "Subtitle is required"),
   description: z.string().min(1, "Description is required"),
@@ -39,57 +79,225 @@ const eventSchema = z.object({
   link: z.string().url("Must be a valid URL for the event"),
 });
 
-type CourseInputs = z.infer<typeof courseSchema>;
-type PartnerInputs = z.infer<typeof partnerSchema>;
-type EventInputs = z.infer<typeof eventSchema>;
+type Course = z.infer<typeof courseSchema>;
+type Partner = z.infer<typeof partnerSchema>;
+type Event = z.infer<typeof eventSchema>;
+
+function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
+  const { toast } = useToast();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<Course>({
+    resolver: zodResolver(courseSchema),
+    defaultValues: course || { category: 'ug' },
+  });
+
+  const onSubmit: SubmitHandler<Course> = async (data) => {
+    const result = await addOrUpdateCourse(data);
+    if (result.success) {
+      toast({ title: "Success", description: `Course ${course ? 'updated' : 'added'}.` });
+      onSave();
+      reset();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Input type="hidden" {...register("id")} />
+      <div>
+        <Label htmlFor="courseTitle">Title</Label>
+        <Input id="courseTitle" {...register("title")} />
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="courseDescription">Description</Label>
+        <Textarea id="courseDescription" {...register("description")} />
+        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="courseDuration">Duration</Label>
+        <Input id="courseDuration" {...register("duration")} />
+        {errors.duration && <p className="text-red-500 text-sm">{errors.duration.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="courseCategory">Category</Label>
+        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...register("category")} />
+        {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
+      </div>
+       <div>
+        <Label htmlFor="courseImg">Image URL</Label>
+        <Input id="courseImg" placeholder="https://picsum.photos/seed/course/400/300" {...register("img")} />
+        {errors.img && <p className="text-red-500 text-sm">{errors.img.message}</p>}
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost">Cancel</Button>
+        </DialogClose>
+        <Button type="submit">Save Course</Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => void }) {
+  const { toast } = useToast();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<Partner>({
+    resolver: zodResolver(partnerSchema),
+    defaultValues: partner,
+  });
+
+  const onSubmit: SubmitHandler<Partner> = async (data) => {
+    const result = await addOrUpdatePartner(data);
+    if (result.success) {
+      toast({ title: "Success", description: `Partner ${partner ? 'updated' : 'added'}.` });
+      onSave();
+      reset();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Input type="hidden" {...register("id")} />
+      <div>
+        <Label htmlFor="partnerName">Partner Name</Label>
+        <Input id="partnerName" {...register("name")} />
+        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="partnerLogoUrl">Logo URL</Label>
+        <Input id="partnerLogoUrl" {...register("logoUrl")} />
+        {errors.logoUrl && <p className="text-red-500 text-sm">{errors.logoUrl.message}</p>}
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost">Cancel</Button>
+        </DialogClose>
+        <Button type="submit">Save Partner</Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
+  const { toast } = useToast();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<Event>({
+    resolver: zodResolver(eventSchema),
+    defaultValues: event,
+  });
+
+  const onSubmit: SubmitHandler<Event> = async (data) => {
+    const result = await addOrUpdateEvent(data);
+    if (result.success) {
+      toast({ title: "Success", description: `Event ${event ? 'updated' : 'added'}.` });
+      onSave();
+      reset();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+       <Input type="hidden" {...register("id")} />
+       <div>
+        <Label htmlFor="eventTitle">Title</Label>
+        <Input id="eventTitle" {...register("title")} />
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+      </div>
+        <div>
+        <Label htmlFor="eventSubtitle">Subtitle</Label>
+        <Input id="eventSubtitle" {...register("subtitle")} />
+        {errors.subtitle && <p className="text-red-500 text-sm">{errors.subtitle.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="eventDescription">Description</Label>
+        <Textarea id="eventDescription" {...register("description")} />
+        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="eventCategory">Category</Label>
+        <Input id="eventCategory" {...register("category")} />
+        {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="eventImage">Image URL</Label>
+        <Input id="eventImage" {...register("image")} />
+        {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="eventLink">Event Link</Label>
+        <Input id="eventLink" {...register("link")} />
+        {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost">Cancel</Button>
+        </DialogClose>
+        <Button type="submit">Save Event</Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
 
 export default function AdminPage() {
   const { toast } = useToast();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const {
-    register: registerCourse,
-    handleSubmit: handleCourseSubmit,
-    formState: { errors: courseErrors },
-    reset: resetCourseForm,
-  } = useForm<CourseInputs>({
-    resolver: zodResolver(courseSchema),
-  });
-
-  const {
-    register: registerPartner,
-    handleSubmit: handlePartnerSubmit,
-    formState: { errors: partnerErrors },
-    reset: resetPartnerForm,
-  } = useForm<PartnerInputs>({
-    resolver: zodResolver(partnerSchema),
-  });
-
-  const {
-    register: registerEvent,
-    handleSubmit: handleEventSubmit,
-    formState: { errors: eventErrors },
-    reset: resetEventForm,
-  } = useForm<EventInputs>({
-    resolver: zodResolver(eventSchema),
-  });
-
-  const onCourseSubmit: SubmitHandler<CourseInputs> = (data) => {
-    console.log("New Course Data:", data);
-    toast({ title: "Course Submitted", description: "Check console for data." });
-    resetCourseForm();
+  const fetchData = async () => {
+    setLoading(true);
+    const [coursesData, partnersData, eventsData] = await Promise.all([
+      getCourses(),
+      getPartners(),
+      getEvents(),
+    ]);
+    setCourses(coursesData);
+    setPartners(partnersData);
+    setEvents(eventsData);
+    setLoading(false);
   };
 
-  const onPartnerSubmit: SubmitHandler<PartnerInputs> = (data) => {
-    console.log("New Partner Data:", data);
-    toast({ title: "Partner Submitted", description: "Check console for data." });
-    resetPartnerForm();
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const onEventSubmit: SubmitHandler<EventInputs> = (data) => {
-    console.log("New Event Data:", data);
-    toast({ title: "Event Submitted", description: "Check console for data. NOTE: This will not yet update Firestore." });
-    resetEventForm();
-  };
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events', id: string) => {
+    let result;
+    if (collection === 'courses') result = await deleteCourse(id);
+    if (collection === 'partners') result = await deletePartner(id);
+    if (collection === 'events') result = await deleteEvent(id);
+
+    if (result?.success) {
+      toast({ title: "Success", description: "Item deleted successfully." });
+      fetchData();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result?.error });
+    }
+  }
+
+  if (loading) {
+    return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -97,109 +305,205 @@ export default function AdminPage() {
 
       <Tabs defaultValue="courses" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="courses">Add Course</TabsTrigger>
-          <TabsTrigger value="partners">Add Partner</TabsTrigger>
-          <TabsTrigger value="events">Add Event</TabsTrigger>
+          <TabsTrigger value="courses">Manage Courses</TabsTrigger>
+          <TabsTrigger value="partners">Manage Partners</TabsTrigger>
+          <TabsTrigger value="events">Manage Events</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
           <Card>
-            <CardHeader>
-              <CardTitle>Add New Course</CardTitle>
-              <CardDescription>Fill out the form to add a new course.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Courses</CardTitle>
+                <CardDescription>Add, edit, or delete courses.</CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Course</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Course</DialogTitle>
+                  </DialogHeader>
+                  <CourseForm onSave={() => fetchData()} />
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleCourseSubmit(onCourseSubmit)} className="space-y-4">
-                <div>
-                  <Label htmlFor="courseTitle">Title</Label>
-                  <Input id="courseTitle" {...registerCourse("title")} />
-                  {courseErrors.title && <p className="text-red-500 text-sm">{courseErrors.title.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="courseDescription">Description</Label>
-                  <Textarea id="courseDescription" {...registerCourse("description")} />
-                  {courseErrors.description && <p className="text-red-500 text-sm">{courseErrors.description.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="courseDuration">Duration</Label>
-                  <Input id="courseDuration" {...registerCourse("duration")} />
-                  {courseErrors.duration && <p className="text-red-500 text-sm">{courseErrors.duration.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="courseCategory">Category</Label>
-                  <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...registerCourse("category")} />
-                  {courseErrors.category && <p className="text-red-500 text-sm">{courseErrors.category.message}</p>}
-                </div>
-                <Button type="submit">Add Course</Button>
-              </form>
+              <div className="space-y-4">
+                {courses.map((course) => (
+                  <div key={course.id} className="flex items-center justify-between p-2 border rounded-md">
+                     <div className="flex items-center gap-4">
+                        <Image src={course.img} alt={course.title} width={60} height={45} className="rounded-md" />
+                        <div>
+                          <p className="font-semibold">{course.title}</p>
+                          <p className="text-sm text-muted-foreground">{course.category} - {course.duration}</p>
+                        </div>
+                     </div>
+                    <div className="flex items-center gap-2">
+                       <Dialog>
+                        <DialogTrigger asChild>
+                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Course</DialogTitle>
+                          </DialogHeader>
+                          <CourseForm course={course} onSave={() => fetchData()} />
+                        </DialogContent>
+                      </Dialog>
+                       <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the course.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('courses', course.id!)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="partners">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add New Partner</CardTitle>
-              <CardDescription>Fill out the form to add a new partner.</CardDescription>
+           <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+               <div>
+                <CardTitle>Partners</CardTitle>
+                <CardDescription>Add, edit, or delete partners.</CardDescription>
+              </div>
+               <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Partner</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Partner</DialogTitle>
+                  </DialogHeader>
+                  <PartnerForm onSave={() => fetchData()} />
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handlePartnerSubmit(onPartnerSubmit)} className="space-y-4">
-                <div>
-                  <Label htmlFor="partnerName">Partner Name</Label>
-                  <Input id="partnerName" {...registerPartner("name")} />
-                  {partnerErrors.name && <p className="text-red-500 text-sm">{partnerErrors.name.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="partnerLogoUrl">Logo URL</Label>
-                  <Input id="partnerLogoUrl" {...registerPartner("logoUrl")} />
-                  {partnerErrors.logoUrl && <p className="text-red-500 text-sm">{partnerErrors.logoUrl.message}</p>}
-                </div>
-                <Button type="submit">Add Partner</Button>
-              </form>
+              <div className="space-y-4">
+                {partners.map((partner) => (
+                  <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md">
+                     <div className="flex items-center gap-4">
+                        <Image src={partner.logoUrl} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
+                        <p className="font-semibold">{partner.name}</p>
+                     </div>
+                    <div className="flex items-center gap-2">
+                       <Dialog>
+                        <DialogTrigger asChild>
+                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Partner</DialogTitle>
+                          </DialogHeader>
+                          <PartnerForm partner={partner} onSave={() => fetchData()} />
+                        </DialogContent>
+                      </Dialog>
+                       <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the partner.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('partners', partner.id!)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="events">
            <Card>
-            <CardHeader>
-              <CardTitle>Add New Event</CardTitle>
-              <CardDescription>Fill out the form to add a new event. Note: this does not currently save to the database.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Events</CardTitle>
+                <CardDescription>Add, edit, or delete events.</CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Event</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Event</DialogTitle>
+                  </DialogHeader>
+                  <EventForm onSave={() => fetchData()} />
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleEventSubmit(onEventSubmit)} className="space-y-4">
-                <div>
-                  <Label htmlFor="eventTitle">Title</Label>
-                  <Input id="eventTitle" {...registerEvent("title")} />
-                  {eventErrors.title && <p className="text-red-500 text-sm">{eventErrors.title.message}</p>}
-                </div>
-                 <div>
-                  <Label htmlFor="eventSubtitle">Subtitle</Label>
-                  <Input id="eventSubtitle" {...registerEvent("subtitle")} />
-                  {eventErrors.subtitle && <p className="text-red-500 text-sm">{eventErrors.subtitle.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="eventDescription">Description</Label>
-                  <Textarea id="eventDescription" {...registerEvent("description")} />
-                  {eventErrors.description && <p className="text-red-500 text-sm">{eventErrors.description.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="eventCategory">Category</Label>
-                  <Input id="eventCategory" {...registerEvent("category")} />
-                  {eventErrors.category && <p className="text-red-500 text-sm">{eventErrors.category.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="eventImage">Image URL</Label>
-                  <Input id="eventImage" {...registerEvent("image")} />
-                  {eventErrors.image && <p className="text-red-500 text-sm">{eventErrors.image.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="eventLink">Event Link</Label>
-                  <Input id="eventLink" {...registerEvent("link")} />
-                  {eventErrors.link && <p className="text-red-500 text-sm">{eventErrors.link.message}</p>}
-                </div>
-                <Button type="submit">Add Event</Button>
-              </form>
+              <div className="space-y-4">
+                {events.map((event) => (
+                  <div key={event.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div className="flex items-center gap-4">
+                        <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md" />
+                        <div>
+                          <p className="font-semibold">{event.title}</p>
+                           <p className="text-sm text-muted-foreground">{event.category} - {event.subtitle}</p>
+                        </div>
+                     </div>
+                    <div className="flex items-center gap-2">
+                       <Dialog>
+                        <DialogTrigger asChild>
+                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Event</DialogTitle>
+                          </DialogHeader>
+                          <EventForm event={event} onSave={() => fetchData()} />
+                        </DialogContent>
+                      </Dialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the event.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('events', event.id!)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

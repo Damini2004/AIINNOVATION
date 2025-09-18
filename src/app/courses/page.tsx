@@ -1,112 +1,25 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ImageIcon, LinkIcon } from "lucide-react";
+import { ImageIcon, LinkIcon, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import "./courses.css";
+import { getCourses } from "../admin/actions";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const courses = [
-  {
-    category: ["school", "ug", "pgphd"],
-    title: "Introduction to Artificial Intelligence",
-    description: "Simple, Conceptual Introduction to AI, Robotics, and Intelligent Systems.",
-    duration: "6–8 Weeks",
-    img: "https://picsum.photos/seed/course1/400/300",
-    link: "#",
-  },
-  {
-    category: ["school"],
-    title: "AI in Everyday Life",
-    description: "Use cases like chatbots, navigation, recommendation engines, voice assistants.",
-    duration: "10-12 Weeks",
-    img: "https://picsum.photos/seed/course2/400/300",
-    link: "#",
-  },
-  {
-    category: ["school"],
-    title: "Ethics in AI for Teens",
-    description: "Exploring bias, privacy, and decision-making in machines with real-world examples.",
-    duration: "4 Weeks",
-    img: "https://picsum.photos/seed/course3/400/300",
-    link: "#",
-  },
-  {
-    category: ["school"],
-    title: "Coding with Python for AI",
-    description: "Hands-on coding with Python basics and logic building focused on AI readiness.",
-    duration: "14-18 Weeks",
-    img: "https://picsum.photos/seed/course4/400/300",
-    link: "#",
-  },
-  {
-    category: ["school"],
-    title: "AI for Social Good (SDG)",
-    description: "Learn how AI is solving global challenges like hunger, health, and climate.",
-    duration: "4 Weeks",
-    img: "https://picsum.photos/seed/course5/400/300",
-    link: "#",
-  },
-  {
-    category: ["ug"],
-    title: "Creative AI",
-    description: "Exploring how AI creates paintings, poems, music, and interactive games.",
-    duration: "21-24 Weeks",
-    img: "https://picsum.photos/seed/course6/400/300",
-    link: "#",
-  },
-  {
-    category: ["ug"],
-    title: "Machine Learning Fundamentals",
-    description: "Supervised and unsupervised learning, regression, classification, evaluation.",
-    duration: "12-14 Weeks",
-    img: "https://picsum.photos/seed/course7/400/300",
-    link: "#",
-  },
-  {
-    category: ["ug"],
-    title: "Natural Language Processing (NLP)",
-    description: "Text preprocessing, sentiment analysis, chatbots, and language models.",
-    duration: "8-10 Weeks",
-    img: "https://picsum.photos/seed/course8/400/300",
-    link: "#",
-  },
-  {
-    category: ["pgphd"],
-    title: "AI for Business and Society",
-    description: "AI in banking, healthcare, retail, smart cities; includes real-world case studies.",
-    duration: "12-14 Weeks",
-    img: "https://picsum.photos/seed/course9/400/300",
-    link: "#",
-  },
-  {
-    category: ["pgphd"],
-    title: "AI and Ethics in Practice",
-    description: "Hands-on evaluation of AI bias, explainability, fairness frameworks.",
-    duration: "6 Weeks",
-    img: "https://picsum.photos/seed/course10/400/300",
-    link: "#",
-  },
-  {
-    category: ["pgphd"],
-    title: "Data Science for AI",
-    description: "Data collection, wrangling, visualization, and exploration with tools like Pandas.",
-    duration: "8-10 Weeks",
-    img: "https://picsum.photos/seed/course11/400/300",
-    link: "#",
-  },
-  {
-    category: ["rm"],
-    title: "AI-Enabled Robotics",
-    description: "Basics of sensors, actuators, and decision-making using AI in robotics.",
-    duration: "6-8 Weeks",
-    img: "https://picsum.photos/seed/course12/400/300",
-    link: "#",
-  },
-];
+type Course = {
+  id?: string;
+  category: string;
+  title: string;
+  description: string;
+  duration: string;
+  img: string;
+  link?: string;
+};
 
 const filters = [
   { label: "Show All", value: "*" },
@@ -118,11 +31,26 @@ const filters = [
 
 export default function CoursesPage() {
   const [activeFilter, setActiveFilter] = useState("*");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      const coursesData = await getCourses();
+      // The category in the db is a string, but the filter logic expects an array
+      const formattedCourses = coursesData.map(c => ({...c, category: c.category.split(',').map(s => s.trim())}));
+      setCourses(formattedCourses as any);
+      setLoading(false);
+    };
+    fetchCourses();
+  }, []);
+
 
   const filteredCourses =
     activeFilter === "*"
       ? courses
-      : courses.filter((course) => course.category.includes(activeFilter));
+      : courses.filter((course) => (course.category as any).includes(activeFilter));
 
   return (
     <div className="bg-background text-foreground">
@@ -176,52 +104,68 @@ export default function CoursesPage() {
           </div>
 
           {/* Course Grid */}
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence>
-              {filteredCourses.map((course, index) => (
-                <motion.div
-                  key={course.title}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.3 }}
-                  className="single_portfolio"
-                >
-                  <div className="single_portfolio_inner">
-                    <div className="single_portfolio_thumb">
-                      <Image
-                        src={course.img}
-                        alt={course.title}
-                        width={400}
-                        height={300}
-                        className="rounded-t-lg w-full"
-                        data-ai-hint="course illustration"
-                      />
-                      <div className="portfolio-icon">
-                        <a href={course.img} target="_blank" rel="noopener noreferrer" className="portfolio-icon-link">
-                          <ImageIcon />
-                        </a>
-                        <Link href={course.link} className="portfolio-icon-link">
-                          <LinkIcon />
-                        </Link>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {Array.from({length: 6}).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-48 w-full" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                   <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <AnimatePresence>
+                {filteredCourses.map((course, index) => (
+                  <motion.div
+                    key={course.title}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                    className="single_portfolio"
+                  >
+                    <div className="single_portfolio_inner">
+                      <div className="single_portfolio_thumb">
+                        <Image
+                          src={course.img}
+                          alt={course.title}
+                          width={400}
+                          height={300}
+                          className="rounded-t-lg w-full"
+                          data-ai-hint="course illustration"
+                        />
+                        <div className="portfolio-icon">
+                          <a href={course.img} target="_blank" rel="noopener noreferrer" className="portfolio-icon-link">
+                            <ImageIcon />
+                          </a>
+                          {course.link && 
+                            <Link href={course.link} className="portfolio-icon-link">
+                              <LinkIcon />
+                            </Link>
+                          }
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="single_portfolio_content">
-                    <span><strong>{course.title}</strong></span>
-                    <p>
-                      <Link href={course.link}>{course.description}</Link>
-                      <br />
-                      Duration: {course.duration}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                    <div className="single_portfolio_content">
+                      <span><strong>{course.title}</strong></span>
+                      <p>
+                        {course.link ? <Link href={course.link}>{course.description}</Link> : course.description}
+                        <br />
+                        Duration: {course.duration}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </main>
     </div>
   );
 }
+

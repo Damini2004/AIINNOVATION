@@ -1,0 +1,98 @@
+"use server";
+
+import { z } from "zod";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import { revalidatePath } from "next/cache";
+
+// Zod Schemas
+const courseSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  duration: z.string().min(1, "Duration is required"),
+  category: z.string().min(1, "Category is required"),
+  img: z.string().url("Must be a valid URL"),
+});
+
+const partnerSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Partner name is required"),
+  logoUrl: z.string().url("Must be a valid URL"),
+});
+
+const eventSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  subtitle: z.string().min(1, "Subtitle is required"),
+  description: z.string().min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  image: z.string().url("Must be a valid URL for the image"),
+  link: z.string().url("Must be a valid URL for the event"),
+});
+
+type Course = z.infer<typeof courseSchema>;
+type Partner = z.infer<typeof partnerSchema>;
+type Event = z.infer<typeof eventSchema>;
+
+// Generic function to add or update a document
+async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string, data: T, schema: z.ZodType<T>) {
+  try {
+    const validatedData = schema.parse(data);
+    const { id, ...docData } = validatedData;
+
+    if (id) {
+      const docRef = doc(db, collectionName, id);
+      await updateDoc(docRef, docData);
+    } else {
+      await addDoc(collection(db, collectionName), docData);
+    }
+    revalidatePath('/admin');
+    revalidatePath(`/${collectionName}`);
+    if (collectionName === 'events') revalidatePath('/');
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Generic function to fetch documents
+async function getDocsFromCollection<T>(collectionName: string): Promise<T[]> {
+  try {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as T[];
+  } catch (error) {
+    console.error(`Error fetching ${collectionName}:`, error);
+    return [];
+  }
+}
+
+// Generic function to delete a document
+async function deleteDocFromCollection(collectionName: string, id: string) {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await deleteDoc(docRef);
+    revalidatePath('/admin');
+    revalidatePath(`/${collectionName}`);
+     if (collectionName === 'events') revalidatePath('/');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Course Actions
+export async function addOrUpdateCourse(data: Course) { return addOrUpdateDoc('courses', data, courseSchema); }
+export async function getCourses(): Promise<Course[]> { return getDocsFromCollection<Course>('courses'); }
+export async function deleteCourse(id: string) { return deleteDocFromCollection('courses', id); }
+
+// Partner Actions
+export async function addOrUpdatePartner(data: Partner) { return addOrUpdateDoc('partners', data, partnerSchema); }
+export async function getPartners(): Promise<Partner[]> { return getDocsFromCollection<Partner>('partners'); }
+export async function deletePartner(id: string) { return deleteDocFromCollection('partners', id); }
+
+// Event Actions
+export async function addOrUpdateEvent(data: Event) { return addOrUpdateDoc('events', data, eventSchema); }
+export async function getEvents(): Promise<Event[]> { return getDocsFromCollection<Event>('events'); }
+export async function deleteEvent(id: string) { return deleteDocFromCollection('events', id); }
