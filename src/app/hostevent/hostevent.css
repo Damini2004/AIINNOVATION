@@ -1,0 +1,148 @@
+
+.slider-area-two {
+    background-color: hsl(var(--secondary));
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+}
+
+.bounce-animate {
+  animation: bounce 2s infinite;
+}
+
+.shape-image {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.em_bar_bg {
+  height: 5px;
+  width: 90px;
+  background: #aec6ef;
+  margin: 20px auto;
+  position: relative;
+  border-radius: 30px;
+}
+.text-left.em_bar_bg {
+  margin: 18px 0 30px;
+}
+.em_bar_bg:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -2.7px;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  animation: MOVE-BG 3s linear infinite;
+}
+
+@keyframes MOVE-BG {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(88px);
+  }
+}
+
+/* Process Section */
+.process-box {
+    position: relative;
+    padding: 2rem;
+    border-radius: var(--radius);
+    background: hsl(var(--card));
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.process-box:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.process-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.process-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.process-number {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid hsl(var(--background));
+}
+
+/* Benefits Section */
+.service-box-three {
+    padding: 2rem;
+    background: hsl(var(--secondary));
+    border-radius: var(--radius);
+    text-align: center;
+    transition: transform 0.3s, background-color 0.3s;
+}
+.service-box-three:hover {
+    transform: translateY(-10px);
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.service-box-three:hover .service-icon,
+.service-box-three:hover h3,
+.service-box-three:hover p {
+    color: hsl(var(--primary-foreground));
+}
+.service-box-three:hover .service-icon svg {
+    color: hsl(var(--primary-foreground));
+}
+
+.service-box-three .service-icon {
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+/* Counter Section */
+.counter-area-two {
+    background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+}
+
+.counter-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    text-align: left;
+}
+
+.counter-icon {
+    font-size: 3rem;
+}

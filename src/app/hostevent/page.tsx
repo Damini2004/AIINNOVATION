@@ -1,0 +1,195 @@
+
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { FileText, Lightbulb, Calendar, Handshake, Star, BarChart, ShieldCheck, Users } from "lucide-react";
+import "./hostevent.css";
+
+export default function HostEventPage() {
+  const processSteps = [
+    {
+      icon: <FileText className="w-10 h-10" />,
+      title: "Event Information",
+      description: "Provide a brief overview of the event.",
+    },
+    {
+      icon: <Lightbulb className="w-10 h-10" />,
+      title: "Motive",
+      description: "Explain the motive and vision of the event.",
+    },
+    {
+      icon: <Calendar className="w-10 h-10" />,
+      title: "Timelines",
+      description: "Expected Timelines and possible deadlines of event.",
+    },
+    {
+      icon: <Handshake className="w-10 h-10" />,
+      title: "Contribution to Society",
+      description: "Explain how the event contributes to the society and sustainable development goals",
+    },
+  ];
+
+  const benefits = [
+      {
+          icon: <Star className="w-10 h-10 text-primary" />,
+          title: "Global Research Visibility",
+          description: "Expand your reach with international exposure through AIIS’s strong academic and professional network worldwide."
+      },
+      {
+          icon: <ShieldCheck className="w-10 h-10 text-primary" />,
+          title: "Expert Curation & Quality Assurance",
+          description: "Benefit from expert keynote speakers, reviewers, and peer-review processes ensuring academic excellence and credibility."
+      },
+      {
+          icon: <Users className="w-10 h-10 text-primary" />,
+          title: "End-to-End Event Support",
+          description: "From event planning to publication management and promotions, AIIS provides complete support for smooth execution."
+      },
+      {
+          icon: <FileText className="w-10 h-10 text-primary" />,
+          title: "Publication Opportunities",
+          description: "Gain access to Scopus-indexed proceedings, peer-reviewed journals, and special issues for high-impact research publishing."
+      },
+      {
+          icon: <Handshake className="w-10 h-10 text-primary" />,
+          title: "SDG & Policy Alignment",
+          description: "Ensure events are aligned with UN Sustainable Development Goals, enhancing institutional rankings and global relevance."
+      },
+      {
+          icon: <BarChart className="w-10 h-10 text-primary" />,
+          title: "Collaborative Networking",
+          description: "Connect with universities, industries, and policymakers to foster MoUs, joint projects, patents, and funded collaborations."
+      },
+  ];
+
+  const stats = [
+    { icon: <Users className="w-10 h-10" />, number: "8000+", label: "Members" },
+    { icon: <Star className="w-10 h-10" />, number: "100K", label: "Global Reach" },
+    { icon: <Calendar className="w-10 h-10" />, number: "47", label: "Events Collaborated every year" },
+    { icon: <Handshake className="w-10 h-10" />, number: "1000+", label: "Testimonials" },
+  ];
+
+  return (
+    <div className="bg-background text-foreground">
+      {/* Hero Section */}
+      <section className="slider-area-two py-20 bg-secondary relative">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="text-center md:text-left">
+              <h1 className="text-sm font-bold text-primary uppercase">Collaborate</h1>
+              <h2 className="text-4xl font-bold mt-2">Host an Event with AI Innovation Society</h2>
+              <p className="mt-4 text-muted-foreground">Partner with Us to Shape the Future of Responsible AI</p>
+              <Button asChild className="mt-6">
+                <Link href="/submitproposal">Submit Proposal</Link>
+              </Button>
+            </div>
+            <div className="relative flex justify-center">
+               <Image src="https://picsum.photos/seed/host-event-shape/500/500" alt="Abstract Shape" width={400} height={400} className="bounce-animate" data-ai-hint="abstract shape" />
+               <Image src="https://picsum.photos/seed/host-event-home/400/400" alt="Home" width={350} height={350} className="absolute shape-image" data-ai-hint="tech event" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <iframe 
+                width="100%" 
+                height="315" 
+                src="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv" 
+                title="YouTube video player" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                className="rounded-lg shadow-xl">
+              </iframe>
+            </div>
+            <div>
+              <h5 className="text-primary font-semibold">Host an Event with AI Innovation Society</h5>
+              <div className="em_bar_bg text-left my-4"></div>
+              <p className="text-muted-foreground text-justify">
+                The AI Innovation Society (AIIS) invites universities, research institutions, and professional organizations to collaborate with us in hosting seminars, webinars, conferences, and special sessions. Together, we can create platforms that spark innovation, encourage interdisciplinary dialogue, and empower researchers, educators, and industry leaders in the field of Artificial Intelligence.
+              </p>
+              <p className="mt-4 text-muted-foreground text-justify">
+                <strong>Types of Events We Support</strong><br/>
+                Academic Seminars & Webinars – Focused sessions for students, researchers, and faculty.<br/>
+                International Conferences – Flagship events with keynote speakers, technical sessions, and publication opportunities.<br/>
+                Special Sessions & Workshops – Theme-based tracks within larger conferences, hosted under AIIS branding.<br/>
+                Institutional Collaborations – Partner events co-branded with universities and research centers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="process-area-two py-24 bg-secondary">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h5 className="text-primary font-semibold uppercase">How to Apply</h5>
+            <h2 className="text-3xl font-bold">Keep it Simple and <span className="text-primary">Clean</span></h2>
+            <div className="em_bar_bg mt-4"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {processSteps.map((step, index) => (
+              <div key={index} className="process-box text-center">
+                <div className="process-icon-wrapper">
+                  <div className="process-icon">{step.icon}</div>
+                  <span className="process-number">{`0${index + 1}`}</span>
+                </div>
+                <div className="process-content">
+                  <h3 className="text-xl font-bold mt-4">{step.title}</h3>
+                  <p className="text-muted-foreground mt-2">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="service-area-two py-24">
+          <div className="container mx-auto px-6">
+              <div className="text-center mb-12">
+                  <h5 className="text-primary font-semibold uppercase">Why Us?</h5>
+                  <h2 className="text-3xl font-bold">Benefits of Collaboration with AI Innovation Society</h2>
+                  <div className="em_bar_bg mt-4"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {benefits.map((benefit, index) => (
+                      <div key={index} className="service-box-three">
+                          <div className="service-box-inner">
+                              <div className="service-icon">{benefit.icon}</div>
+                              <h3 className="text-xl font-bold my-4">{benefit.title}</h3>
+                              <p className="text-muted-foreground">{benefit.description}</p>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </div>
+      </section>
+
+      {/* Counter Section */}
+      <section className="counter-area-two py-20 text-white">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="counter-box">
+                <div className="counter-icon">{stat.icon}</div>
+                <div className="counter-content">
+                  <h3 className="text-4xl font-bold">{stat.number}</h3>
+                  <p className="text-lg">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
