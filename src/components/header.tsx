@@ -28,7 +28,7 @@ export function AppHeader() {
   };
 
   const AdminLink = () => {
-    if (!isClient) return null; // Don't render on server or initial client render
+    if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
     return (
      <li>
         <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
@@ -292,9 +292,11 @@ export function AppHeader() {
               </li>
 
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
-                 {isClient && <Link href={isAdminLoggedIn ? "/admin" : "/login"}>Admin</Link>}
-              </li>
+               {isClient ? (
+                <li className="hover:bg-gray-100 rounded px-3 py-2">
+                  <Link href={isAdminLoggedIn ? "/admin" : "/login"}>Admin</Link>
+                </li>
+              ) :  <li style={{display: 'none'}} /> }
             </ul>
           </nav>
         )}
@@ -302,3 +304,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
