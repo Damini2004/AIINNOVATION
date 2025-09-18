@@ -34,10 +34,14 @@
 
 .datatech_menu ul li .sub-menu li a {
   padding: 8px 20px;
-  color: #152640; /* dark navy like in screenshot */
+  color: #000; 
 }
 
 .datatech_menu ul li .sub-menu li a:hover {
  background: rgb(241, 103, 34); /* dropdown white */
   color: white;
+}
+
+.datatech_menu ul li button {
+    color: #000;
 }
