@@ -92,7 +92,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
     reset,
   } = useForm<Course>({
     resolver: zodResolver(courseSchema),
-    defaultValues: course || { category: 'ug' },
+    defaultValues: course || { category: 'ug', img: `https://picsum.photos/seed/${Math.random()}/400/300` },
   });
 
   const onSubmit: SubmitHandler<Course> = async (data) => {
@@ -153,7 +153,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
     reset,
   } = useForm<Partner>({
     resolver: zodResolver(partnerSchema),
-    defaultValues: partner,
+    defaultValues: partner || { logoUrl: `https://picsum.photos/seed/${Math.random()}/150/80`},
   });
 
   const onSubmit: SubmitHandler<Partner> = async (data) => {
@@ -199,7 +199,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     reset,
   } = useForm<Event>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event,
+    defaultValues: event || { image: `https://picsum.photos/seed/${Math.random()}/600/400` },
   });
 
   const onSubmit: SubmitHandler<Event> = async (data) => {
