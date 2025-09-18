@@ -133,10 +133,14 @@ export default function HostEventPage() {
       </section>
 
       {/* About Section */}
-      <section className="slider-area-two py-24">
+      <section 
+        className="slider-area-two py-24 bg-cover bg-center relative"
+        style={{ backgroundImage: 'url(/assests/images/slider.jpg)'}}
+        data-ai-hint="geometric shape"
+      >
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white space-y-6">
+            <div className="text-white space-y-6 z-10">
               <h1 className="text-4xl font-bold">Collaborate</h1>
               <h2 className="text-3xl font-semibold">Host an Event with AI Innovation Society</h2>
               <p>Partner with Us to Shape the Future of Responsible AI</p>
@@ -145,11 +149,8 @@ export default function HostEventPage() {
                </Button>
             </div>
              <div className="relative flex justify-center items-center">
-                <div className="absolute top-0 left-0 w-full h-full bounce-animate">
-                    <Image src="/assests/images/slider/slider-shape.png" alt="shape" layout="fill" objectFit="contain" data-ai-hint="geometric shape"/>
-                </div>
-                <div className="relative z-10">
-                    <Image src="/assests/images/slider/home.png" alt="collaboration" width={500} height={500} data-ai-hint="collaboration abstract"/>
+                <div className="relative z-10 bounce-animate">
+                    <Image src="/assests/images/slider-shape.png" alt="collaboration" width={500} height={500} data-ai-hint="collaboration abstract"/>
                 </div>
             </div>
           </div>
