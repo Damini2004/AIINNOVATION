@@ -157,6 +157,28 @@ export default function HostEventPage() {
         </div>
       </section>
 
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <iframe width="100%" height="500px" src="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv&autoplay=1&mute=0" allow="autoplay" allowFullScreen></iframe>
+            </div>
+            <div>
+                <h5 className="text-primary font-semibold text-lg">Host an Event with AI Innovation Society</h5>
+                <div className="em_bar_bg text-left"></div>
+                <p className="text-justify text-muted-foreground">The AI Innovation Society (AIIS) invites universities, research institutions, and professional organizations to collaborate with us in hosting seminars, webinars, conferences, and special sessions. Together, we can create platforms that spark innovation, encourage interdisciplinary dialogue, and empower researchers, educators, and industry leaders in the field of Artificial Intelligence.</p>
+                <p className="text-justify text-muted-foreground mt-4">
+                  <strong>Types of Events We Support</strong><br/>
+                  Academic Seminars & Webinars – Focused sessions for students, researchers, and faculty.<br/>
+                  International Conferences – Flagship events with keynote speakers, technical sessions, and publication opportunities.<br/>
+                  Special Sessions & Workshops – Theme-based tracks within larger conferences, hosted under AIIS branding.<br/>
+                  Institutional Collaborations – Partner events co-branded with universities and research centers.
+                </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* Process Section */}
       <section className="process-area-two py-24 bg-secondary">
