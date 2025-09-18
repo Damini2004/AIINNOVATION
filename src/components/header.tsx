@@ -257,9 +257,7 @@ export function AppHeader() {
                 )}
               </li>
 
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
-                <Link href="/contact-us">Contact</Link>
-              </li>
+              <li><Link href="/contact-us">Contact</Link></li>
             </ul>
           </nav>
         )}
