@@ -177,6 +177,7 @@ export function AppHeader() {
               {/* About */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("about")}
                 >
@@ -195,6 +196,7 @@ export function AppHeader() {
               {/* Programs */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("programs")}
                 >
@@ -212,6 +214,7 @@ export function AppHeader() {
               {/* Events */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("events")}
                 >
@@ -230,6 +233,7 @@ export function AppHeader() {
               {/* Research */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("research")}
                 >
@@ -246,6 +250,7 @@ export function AppHeader() {
               {/* Resources */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("resources")}
                 >
@@ -262,6 +267,7 @@ export function AppHeader() {
               {/* Membership */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
+                  type="button"
                   className="flex justify-between w-full font-medium"
                   onClick={() => toggleDropdown("membership")}
                 >
@@ -276,7 +282,7 @@ export function AppHeader() {
                 )}
               </li>
 
-              <li><Link href="/contact-us">Contact</Link></li>
+              <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
                     Admin
