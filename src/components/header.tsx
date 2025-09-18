@@ -138,6 +138,9 @@ export function AppHeader() {
                 <ul className="sub-menu">
                   <li><Link href="/news">News & Blog</Link></li>
                   <li><Link href="/researchhighlights">Research Highlights</Link></li>
+                  <li><Link href="/digitallibrary">Digital Library</Link></li>
+                  <li><Link href="/educationalresources">Educational Resources</Link></li>
+                  <li><Link href="/freecourses">Free Courses</Link></li>
                 </ul>
               </li>
 
@@ -146,8 +149,8 @@ export function AppHeader() {
                   Membership <ChevronDown className="h-4 w-4" />
                 </button>
                 <ul className="sub-menu">
-                  <li><Link href="/join">Join AIIS</Link></li>
-                  <li><Link href="/institutional">Institutional Membership</Link></li>
+                  <li><Link href="/become-a-member">Become a Member</Link></li>
+                  <li><Link href="/institution-chapter">Institution Chapter</Link></li>
                   <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
                 </ul>
               </li>
@@ -260,6 +263,9 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/news">News & Blog</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/researchhighlights">Research Highlights</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/digitallibrary">Digital Library</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/educationalresources">Educational Resources</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/freecourses">Free Courses</Link></li>
                   </ul>
                 )}
               </li>
@@ -275,8 +281,8 @@ export function AppHeader() {
                 </button>
                 {openDropdown === "membership" && (
                   <ul className="pl-4 mt-2 space-y-2">
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/join">Join AIIS</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/institutional">Institutional Membership</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/become-a-member">Become a Member</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/institution-chapter">Institution Chapter</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
                   </ul>
                 )}
