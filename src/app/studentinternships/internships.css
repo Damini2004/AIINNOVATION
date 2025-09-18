@@ -1,39 +1,53 @@
 
+
 .internship-details-area {
     background-color: var(--background);
 }
 
-.portfolio-thumb img {
-    border-radius: var(--radius);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.internship-info-card {
+.internship-card-container {
+    display: grid;
+    grid-template-columns: 1fr;
     background-color: hsl(var(--card));
-    padding: 2rem;
     border-radius: var(--radius);
     border: 1px solid hsl(var(--border));
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
-.internship-info-card h3 {
+@media (min-width: 1024px) {
+    .internship-card-container {
+        grid-template-columns: 3fr 2fr;
+    }
+}
+
+
+.internship-card-image {
+    min-height: 250px;
+}
+
+.internship-info-content {
+    padding: 2rem;
+}
+
+
+.internship-info-content h3 {
     color: hsl(var(--primary));
     border-bottom: 2px solid hsl(var(--border));
     padding-bottom: 1rem;
 }
 
-.internship-info-card ul {
+.internship-info-content ul {
     list-style: none;
     padding: 0;
     margin-top: 1rem;
     space-y: 0.75rem;
 }
 
-.internship-info-card ul li {
+.internship-info-content ul li {
     color: hsl(var(--foreground));
 }
 
-.internship-info-card ul li b {
+.internship-info-content ul li b {
     color: hsl(var(--foreground));
     font-weight: 600;
     margin-right: 0.5rem;

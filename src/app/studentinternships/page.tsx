@@ -39,18 +39,18 @@ export default function StudentInternshipsPage() {
       {/* Main Content */}
       <main className="internship-details-area py-24">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12 items-start mb-12">
-            <div className="lg:col-span-3 portfolio-thumb">
+          <div className="internship-card-container mb-12">
+            <div className="internship-card-image">
               <Image
                 src="https://picsum.photos/seed/internship/600/400"
                 alt="Internship"
                 width={600}
                 height={400}
-                className="rounded-lg shadow-lg w-full"
+                className="rounded-l-lg object-cover h-full w-full"
                 data-ai-hint="students collaborating"
               />
             </div>
-            <div className="lg:col-span-2 internship-info-card">
+            <div className="internship-info-content">
               <h3 className="text-2xl font-bold mb-4">Internship Information</h3>
               <ul>
                 <li>
@@ -98,7 +98,8 @@ export default function StudentInternshipsPage() {
               vision, NLP, generative AI, healthcare AI, and sustainable
               technology. Our structured framework ensures measurable outcomes
               through weekly deliverables, skill assessments, and capstone
-              projects.
+
+ projects.
             </p>
             <h3 className="text-2xl font-bold mb-4">Program Highlights</h3>
             <ul className="space-y-2">
