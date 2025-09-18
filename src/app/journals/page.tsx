@@ -14,6 +14,7 @@ type Journal = {
   title: string;
   description: string;
   image: string;
+  link?: string;
 };
 
 export default function JournalsPage() {
@@ -49,6 +50,42 @@ export default function JournalsPage() {
     "Potential administrative overhead in coordinating with AIIS.",
     "Adherence to AIIS's overarching publication policies required.",
   ];
+
+  const JournalCard = ({ journal }: { journal: Journal }) => {
+    const cardContent = (
+      <div
+        className="bg-card border rounded-lg overflow-hidden group h-full flex flex-col"
+      >
+        <div className="relative w-full h-48">
+          <Image
+            src={journal.image}
+            alt={journal.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            data-ai-hint="journal cover"
+          />
+        </div>
+        <div className="p-6 flex flex-col flex-grow">
+          <h3 className="text-xl font-bold mb-2 group-hover:text-primary">
+            {journal.title}
+          </h3>
+          <p className="text-muted-foreground text-sm line-clamp-3 flex-grow">
+            {journal.description}
+          </p>
+        </div>
+      </div>
+    );
+
+    if (journal.link) {
+      return (
+        <Link href={journal.link} target="_blank" rel="noopener noreferrer" className="h-full block">
+          {cardContent}
+        </Link>
+      );
+    }
+
+    return cardContent;
+  };
 
 
   return (
@@ -151,28 +188,7 @@ export default function JournalsPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {journals.map((journal) => (
-                  <div
-                    key={journal.id}
-                    className="bg-card border rounded-lg overflow-hidden group"
-                  >
-                    <div className="relative w-full h-48">
-                      <Image
-                        src={journal.image}
-                        alt={journal.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        data-ai-hint="journal cover"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold mb-2 group-hover:text-primary">
-                        {journal.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-3">
-                        {journal.description}
-                      </p>
-                    </div>
-                  </div>
+                  <JournalCard key={journal.id} journal={journal} />
                 ))}
               </div>
             )}

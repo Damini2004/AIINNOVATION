@@ -95,6 +95,7 @@ const journalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   image: z.string().min(1, "Image is required"),
+  link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
 
 type Course = z.infer<typeof courseSchema>;
@@ -515,6 +516,11 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
         <Label htmlFor="journalDescription">Description</Label>
         <Textarea id="journalDescription" {...register("description")} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="journalLink">Link</Label>
+        <Input id="journalLink" placeholder="https://example.com/journal-details" {...register("link")} />
+        {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
       <div>
         <Label htmlFor="journalImgFile">Upload Image</Label>
