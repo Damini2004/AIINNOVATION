@@ -188,7 +188,7 @@ export default function CurriculumSupportPage() {
 
             {/* Right Column */}
             <div className="lg:col-span-4">
-              <div className="side-details-box space-y-4">
+              <div className="side-details-box space-y-2">
                 {analysisItems.map((item, index) => (
                   <div key={index} className="career-analysis-card">
                     <div className="career-icon">

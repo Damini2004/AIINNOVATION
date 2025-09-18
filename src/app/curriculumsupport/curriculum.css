@@ -1,4 +1,5 @@
 
+
 .career-details {
     background-color: var(--background);
 }
@@ -33,17 +34,19 @@
 .side-details-box {
     position: sticky;
     top: 8rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1rem;
+    background-color: hsl(var(--card));
 }
 
 .career-analysis-card {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 1rem;
     background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -55,4 +58,5 @@
 .career-icon {
     flex-shrink: 0;
 }
+
 
