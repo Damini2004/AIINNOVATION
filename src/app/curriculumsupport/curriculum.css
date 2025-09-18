@@ -1,4 +1,18 @@
 
+@keyframes dance {
+  0%, 100% {
+    transform: rotate(0) scale(1);
+  }
+  25% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(5deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+}
 
 .career-details {
     background-color: var(--background);
@@ -60,10 +74,5 @@
 }
 
 .career-icon > svg {
-    transition: transform 0.3s ease;
+    animation: dance 3s infinite ease-in-out;
 }
-
-.career-analysis-card:hover .career-icon > svg {
-    transform: scale(1.15);
-}
-
