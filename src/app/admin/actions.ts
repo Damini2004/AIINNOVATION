@@ -21,7 +21,7 @@ const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   designation: z.string().min(1, "Designation is required"),
-  logo: z.string().url("Logo is required"),
+  logo: z.string().min(1, "Logo is required"),
   facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
@@ -102,3 +102,5 @@ export async function deletePartner(id: string) { return deleteDocFromCollection
 export async function addOrUpdateEvent(data: Event) { return addOrUpdateDoc('events', data, eventSchema); }
 export async function getEvents(): Promise<Event[]> { return getDocsFromCollection<Event>('events'); }
 export async function deleteEvent(id: string) { return deleteDocFromCollection('events', id); }
+
+    

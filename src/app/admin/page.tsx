@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
@@ -69,7 +70,7 @@ const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   designation: z.string().min(1, "Designation is required"),
-  logo: z.string().url("Logo is required"),
+  logo: z.string().min(1, "Logo is required"),
   facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
@@ -163,47 +164,57 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
 
 function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => void }) {
   const { toast } = useToast();
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-
-  const form = useForm<Partner>({
-    resolver: zodResolver(partnerSchema),
-    defaultValues: partner || { logo: `https://picsum.photos/seed/${Math.random()}/150/80`},
-  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(partner?.logo || null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
-    setValue
-  } = form;
-
-  const logoValue = watch("logo");
+    setValue,
+  } = useForm<Partner>({
+    resolver: zodResolver(partnerSchema),
+    defaultValues: partner || { logo: '' },
+  });
+  
+  useEffect(() => {
+    if (partner) {
+        setValue('logo', partner.logo);
+        setPreview(partner.logo)
+    }
+  }, [partner, setValue]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file);
-      // In a real app, you'd upload the file and set the URL.
-      // For this demo, we'll use a placeholder.
-      setValue("logo", `https://picsum.photos/seed/${Math.random()}/150/80`);
-      toast({ title: "Info", description: "File upload is a demo. Using a placeholder image." });
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setValue("logo", base64String, { shouldValidate: true });
+        setPreview(base64String);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+         toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+         setIsUploading(false);
+      }
+      reader.readAsDataURL(file);
     }
   };
 
   const onSubmit: SubmitHandler<Partner> = async (data) => {
-    if (!data.logo && !logoFile) {
+     if (!data.logo) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload a logo file." });
         return;
     }
-
     const result = await addOrUpdatePartner(data);
     if (result.success) {
       toast({ title: "Success", description: `Partner ${partner ? 'updated' : 'added'}.` });
       onSave();
       reset();
-      setLogoFile(null);
+      setPreview(null);
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -212,7 +223,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input type="hidden" {...register("id")} />
-       <Input type="hidden" {...register("logo")} />
+      <Input type="hidden" {...register("logo")} />
       <div>
         <Label htmlFor="partnerName">Partner Name</Label>
         <Input id="partnerName" {...register("name")} />
@@ -225,10 +236,18 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
       </div>
        <div>
         <Label htmlFor="logoFile">Upload Logo</Label>
-        <Input id="logoFile" type="file" onChange={handleFileChange} />
+        <Input id="logoFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading} />
         {errors.logo && <p className="text-red-500 text-sm">{errors.logo.message}</p>}
-        <p className="text-sm text-muted-foreground pt-1">File upload is a demo.</p>
+        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
+       {preview && (
+        <div className="mt-4">
+          <Label>Logo Preview</Label>
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-24">
+             <Image src={preview} alt="Logo preview" width={150} height={80} className="object-contain max-h-full" />
+          </div>
+        </div>
+      )}
       <div>
         <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
         <Input id="partnerFacebookUrl" {...register("facebookUrl")} />
@@ -248,7 +267,10 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
         <DialogClose asChild>
           <Button variant="ghost">Cancel</Button>
         </DialogClose>
-        <Button type="submit">Save Partner</Button>
+        <Button type="submit" disabled={isUploading}>
+          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save Partner
+        </Button>
       </DialogFooter>
     </form>
   );
@@ -606,3 +628,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
