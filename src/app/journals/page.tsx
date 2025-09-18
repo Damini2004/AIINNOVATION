@@ -109,17 +109,26 @@ export default function JournalsPage() {
         <div className="container mx-auto px-6">
           
           <section className="mb-20">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
                 <div>
-                    <Card>
+                    <Card className="h-full">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-primary">
                             <ThumbsUp /> Benefits of Collaboration
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="space-y-4">
+                            <p className="text-muted-foreground">
+                                Partnering with the AI Innovation Society to host your institutional journal opens up a world of opportunities. Our collaboration is designed to amplify your journal's impact, enhance its credibility, and connect your contributors to a vibrant global network. We provide comprehensive support, from streamlining the peer-review process to promoting your publications to a worldwide audience, ensuring your research reaches the minds that matter.
+                            </p>
                             <ul className="space-y-3">
-                            {benefits.map((item, index) => (
+                            {[
+                                "Global Visibility & Wider Reach",
+                                "Enhanced Credibility & Prestige",
+                                "Expert Reviewer & Editor Access",
+                                "Streamlined Peer-Review Management",
+                                "Targeted Marketing & Promotion"
+                            ].map((item, index) => (
                                 <li key={index} className="flex items-start">
                                 <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
                                 <span>{item}</span>
@@ -223,5 +232,3 @@ export default function JournalsPage() {
     </div>
   );
 }
-
-    
