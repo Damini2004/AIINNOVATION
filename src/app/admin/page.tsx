@@ -68,8 +68,13 @@ const courseSchema = z.object({
 const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
+  designation: z.string().min(1, "Designation is required"),
   logoUrl: z.string().url("Must be a valid URL"),
+  facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
+
 
 const eventSchema = z.object({
   id: z.string().optional(),
@@ -188,9 +193,29 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
         {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
       </div>
       <div>
+        <Label htmlFor="partnerDesignation">Designation</Label>
+        <Input id="partnerDesignation" {...register("designation")} />
+        {errors.designation && <p className="text-red-500 text-sm">{errors.designation.message}</p>}
+      </div>
+      <div>
         <Label htmlFor="partnerLogoUrl">Logo URL</Label>
         <Input id="partnerLogoUrl" {...register("logoUrl")} />
         {errors.logoUrl && <p className="text-red-500 text-sm">{errors.logoUrl.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
+        <Input id="partnerFacebookUrl" {...register("facebookUrl")} />
+        {errors.facebookUrl && <p className="text-red-500 text-sm">{errors.facebookUrl.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="partnerTwitterUrl">Twitter URL</Label>
+        <Input id="partnerTwitterUrl" {...register("twitterUrl")} />
+        {errors.twitterUrl && <p className="text-red-500 text-sm">{errors.twitterUrl.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="partnerPinterestUrl">Pinterest URL</Label>
+        <Input id="partnerPinterestUrl" {...register("pinterestUrl")} />
+        {errors.pinterestUrl && <p className="text-red-500 text-sm">{errors.pinterestUrl.message}</p>}
       </div>
       <DialogFooter>
         <DialogClose asChild>
@@ -442,7 +467,10 @@ export default function AdminPage() {
                   <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md">
                      <div className="flex items-center gap-4">
                         <Image src={partner.logoUrl} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
-                        <p className="font-semibold">{partner.name}</p>
+                        <div>
+                          <p className="font-semibold">{partner.name}</p>
+                          <p className="text-sm text-muted-foreground">{partner.designation}</p>
+                        </div>
                      </div>
                     <div className="flex items-center gap-2">
                        <Dialog>
@@ -551,5 +579,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
