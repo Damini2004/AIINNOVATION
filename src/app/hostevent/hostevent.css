@@ -139,6 +139,11 @@
 .service-box-three .service-icon {
     display: inline-block;
     margin-bottom: 1rem;
+    transition: transform 0.3s ease-in-out;
+}
+
+.service-box-three:hover .service-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 /* Counter Section */
