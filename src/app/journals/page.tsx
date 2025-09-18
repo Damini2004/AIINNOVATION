@@ -109,23 +109,36 @@ export default function JournalsPage() {
         <div className="container mx-auto px-6">
           
           <section className="mb-20">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
-                  <ThumbsUp /> Benefits of Collaboration
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {benefits.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-12">
+                <div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-primary">
+                            <ThumbsUp /> Benefits of Collaboration
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-3">
+                            {benefits.map((item, index) => (
+                                <li key={index} className="flex items-start">
+                                <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
+                                <span>{item}</span>
+                                </li>
+                            ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
+                 <div className="relative h-full min-h-[300px] lg:min-h-full">
+                    <Image 
+                        src="https://picsum.photos/seed/benefits/600/500"
+                        alt="Benefits Collaboration"
+                        fill
+                        className="rounded-lg object-cover"
+                        data-ai-hint="collaboration meeting"
+                    />
+                </div>
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div className="space-y-8">
@@ -210,3 +223,5 @@ export default function JournalsPage() {
     </div>
   );
 }
+
+    
