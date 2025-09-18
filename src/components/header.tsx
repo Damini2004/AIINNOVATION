@@ -12,25 +12,32 @@ export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
+    setIsClient(true);
     setIsAdminLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true");
      // Close mobile menu on navigation
     setIsOpen(false);
   }, [pathname]);
 
+
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
 
-  const AdminLink = () => (
+  const AdminLink = () => {
+    if (!isClient) return null; // Don't render on server or initial client render
+    return (
      <li>
         <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
           Admin
         </Link>
       </li>
-  );
+    )
+  };
+
 
   return (
     <header
@@ -286,9 +293,7 @@ export function AppHeader() {
 
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
               <li className="hover:bg-gray-100 rounded px-3 py-2">
-                <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
-                    Admin
-                </Link>
+                 {isClient && <Link href={isAdminLoggedIn ? "/admin" : "/login"}>Admin</Link>}
               </li>
             </ul>
           </nav>
