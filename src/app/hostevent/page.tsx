@@ -115,7 +115,7 @@ export default function HostEventPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
-      <section
+       <section
         className="py-20 bg-secondary relative bg-cover bg-center"
         style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
@@ -133,41 +133,29 @@ export default function HostEventPage() {
       </section>
 
       {/* About Section */}
-      <section className="py-24">
+      <section className="slider-area-two py-24">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <iframe 
-                width="100%" 
-                height="315" 
-                src="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv" 
-                title="YouTube video player" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-                className="rounded-lg shadow-xl">
-              </iframe>
+            <div className="text-white space-y-6">
+              <h1 className="text-4xl font-bold">Collaborate</h1>
+              <h2 className="text-3xl font-semibold">Host an Event with AI Innovation Society</h2>
+              <p>Partner with Us to Shape the Future of Responsible AI</p>
+               <Button asChild className="mt-6">
+                  <Link href="/submitproposal">Submit Proposal</Link>
+               </Button>
             </div>
-            <div>
-              <h5 className="text-primary font-semibold">Host an Event with AI Innovation Society</h5>
-              <div className="em_bar_bg text-left my-4"></div>
-              <p className="text-muted-foreground text-justify">
-                The AI Innovation Society (AIIS) invites universities, research institutions, and professional organizations to collaborate with us in hosting seminars, webinars, conferences, and special sessions. Together, we can create platforms that spark innovation, encourage interdisciplinary dialogue, and empower researchers, educators, and industry leaders in the field of Artificial Intelligence.
-              </p>
-              <p className="mt-4 text-muted-foreground text-justify">
-                <strong>Types of Events We Support</strong><br/>
-                Academic Seminars & Webinars – Focused sessions for students, researchers, and faculty.<br/>
-                International Conferences – Flagship events with keynote speakers, technical sessions, and publication opportunities.<br/>
-                Special Sessions & Workshops – Theme-based tracks within larger conferences, hosted under AIIS branding.<br/>
-                Institutional Collaborations – Partner events co-branded with universities and research centers.
-              </p>
-                 <Button asChild className="mt-6">
-                    <Link href="/submitproposal">Submit Proposal</Link>
-                 </Button>
+             <div className="relative flex justify-center items-center">
+                <div className="absolute top-0 left-0 w-full h-full bounce-animate">
+                    <Image src="/assests/images/slider/slider-shape.png" alt="shape" layout="fill" objectFit="contain" data-ai-hint="geometric shape"/>
+                </div>
+                <div className="relative z-10">
+                    <Image src="/assests/images/slider/home.png" alt="collaboration" width={500} height={500} data-ai-hint="collaboration abstract"/>
+                </div>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Process Section */}
       <section className="process-area-two py-24 bg-secondary">
@@ -237,3 +225,5 @@ export default function HostEventPage() {
     </div>
   );
 }
+
+    
