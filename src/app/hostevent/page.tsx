@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,46 @@ export default function HostEventPage() {
     { icon: <Calendar className="w-10 h-10" />, number: "47", label: "Events Collaborated every year" },
     { icon: <Handshake className="w-10 h-10" />, number: "1000+", label: "Testimonials" },
   ];
+
+  const [animatedStats, setAnimatedStats] = useState(stats.map(() => 0));
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const targetIndex = parseInt(entry.target.getAttribute('data-index') || '0', 10);
+            const targetNumber = parseInt(stats[targetIndex].number.replace(/[^0-9]/g, ''), 10);
+
+            let start = 0;
+            const duration = 1500;
+            const increment = targetNumber / (duration / 16);
+
+            const timer = setInterval(() => {
+              start += increment;
+              if (start >= targetNumber) {
+                start = targetNumber;
+                clearInterval(timer);
+              }
+              setAnimatedStats(prev => {
+                const newStats = [...prev];
+                newStats[targetIndex] = Math.floor(start);
+                return newStats;
+              });
+            }, 16);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    const elements = document.querySelectorAll('.counter-box');
+    elements.forEach(el => observer.observe(el));
+
+    return () => elements.forEach(el => observer.unobserve(el));
+  }, [stats]);
+
 
   return (
     <div className="bg-background text-foreground">
@@ -179,10 +220,12 @@ export default function HostEventPage() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="counter-box">
+              <div key={index} className="counter-box" data-index={index}>
                 <div className="counter-icon">{stat.icon}</div>
                 <div className="counter-content">
-                  <h3 className="text-4xl font-bold">{stat.number}</h3>
+                  <h3 className="text-4xl font-bold">
+                    {animatedStats[index]}{stat.number.replace(/[0-9]/g, '')}
+                  </h3>
                   <p className="text-lg">{stat.label}</p>
                 </div>
               </div>
