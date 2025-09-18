@@ -1,5 +1,7 @@
+
 .pulse-btn {
   position: relative;
+  z-index: 1;
 }
 
 .pulse-btn::before {
@@ -26,3 +28,5 @@
     opacity: 0;
   }
 }
+
+    

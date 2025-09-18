@@ -43,7 +43,7 @@ export default function StudentInternshipsPage() {
           <div className="internship-card-container mb-12">
             <div className="internship-card-image">
               <Image
-                src="https://picsum.photos/seed/internship/600/400"
+                src="/assests/images/internship.jpg"
                 alt="Internship"
                 width={600}
                 height={400}
