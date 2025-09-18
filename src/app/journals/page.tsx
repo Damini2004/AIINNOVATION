@@ -8,6 +8,8 @@ import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { getJournals } from "@/app/admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 type Journal = {
   id: string;
@@ -109,59 +111,70 @@ export default function JournalsPage() {
         <div className="container mx-auto px-6">
           {/* Benefits/Pros/Cons Section */}
           <section className="mb-20">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-600">
-                    <ThumbsUp /> Benefits
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {benefits.map((item, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-blue-600">
-                    <ThumbsUp /> Pros
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {pros.map((item, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-600">
-                    <ThumbsDown /> Cons
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {cons.map((item, index) => (
-                      <li key={index} className="flex items-start">
-                        <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
+             <Tabs defaultValue="benefits" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="benefits">Benefits</TabsTrigger>
+                <TabsTrigger value="pros">Pros</TabsTrigger>
+                <TabsTrigger value="cons">Cons</TabsTrigger>
+              </TabsList>
+              <TabsContent value="benefits">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-green-600">
+                      <ThumbsUp /> Benefits of Collaboration
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {benefits.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="pros">
+                <Card>
+                   <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-blue-600">
+                      <ThumbsUp /> Pros for Journals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {pros.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="cons">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-red-600">
+                      <ThumbsDown /> Potential Considerations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {cons.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </section>
 
           {/* Journals Section */}
