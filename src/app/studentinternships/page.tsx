@@ -38,7 +38,7 @@ export default function StudentInternshipsPage() {
 
       {/* Main Content */}
       <main className="internship-details-area py-24">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-6 md:px-12">
           <div className="internship-card-container mb-12">
             <div className="internship-card-image">
               <Image
