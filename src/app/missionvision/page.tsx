@@ -29,7 +29,7 @@ export default function MissionVisionPage() {
       {/* Breadcrumb Section */}
       <section
         className="py-20 bg-secondary relative bg-cover bg-center"
-        style={{ backgroundImage: "url(https://picsum.photos/seed/mission-hero/1920/300)" }}
+        style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
       >
         <div className="container mx-auto px-6 text-center">

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -22,8 +23,8 @@ export default function OurTeamPage() {
       {/* Hero Section */}
       <section
         className="py-20 bg-secondary relative bg-cover bg-center"
-        style={{ backgroundImage: "url(https://picsum.photos/seed/team-hero/1920/300)" }}
-        data-ai-hint="abstract dots"
+        style={{ backgroundImage: "url(/assests/images/brid.png)" }}
+        data-ai-hint="abstract geometric"
       >
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold">Those Who Made it Possible..</h1>
