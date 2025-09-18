@@ -6,7 +6,6 @@
 
 .internship-card-container {
     display: grid;
-    grid-template-columns: 1fr;
     background-color: hsl(var(--card));
     border-radius: var(--radius);
     border: 1px solid hsl(var(--border));
@@ -16,7 +15,7 @@
 
 @media (min-width: 1024px) {
     .internship-card-container {
-        grid-template-columns: 3fr 2fr;
+        grid-template-columns: 2fr 3fr;
     }
 }
 
@@ -27,6 +26,9 @@
 
 .internship-info-content {
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 
