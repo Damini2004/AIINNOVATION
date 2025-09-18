@@ -62,7 +62,7 @@ const courseSchema = z.object({
   description: z.string().min(1, "Description is required"),
   duration: z.string().min(1, "Duration is required"),
   category: z.string().min(1, "Category is required"),
-  img: z.string().url("Must be a valid URL"),
+  img: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
 
@@ -93,22 +93,57 @@ type Event = z.infer<typeof eventSchema>;
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(course?.img || null);
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<Course>({
     resolver: zodResolver(courseSchema),
-    defaultValues: course || { category: 'ug', img: `https://picsum.photos/seed/${Math.random()}/400/300` },
+    defaultValues: course || { category: 'ug', img: '' },
   });
 
+  useEffect(() => {
+    if (course) {
+        setValue('img', course.img);
+        setPreview(course.img)
+    }
+  }, [course, setValue]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setValue("img", base64String, { shouldValidate: true });
+        setPreview(base64String);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+         toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+         setIsUploading(false);
+      }
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit: SubmitHandler<Course> = async (data) => {
+    if (!data.img) {
+        toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        return;
+    }
     const result = await addOrUpdateCourse(data);
     if (result.success) {
       toast({ title: "Success", description: `Course ${course ? 'updated' : 'added'}.` });
       onSave();
       reset();
+      setPreview(null);
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -117,6 +152,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input type="hidden" {...register("id")} />
+      <Input type="hidden" {...register("img")} />
       <div>
         <Label htmlFor="courseTitle">Title</Label>
         <Input id="courseTitle" {...register("title")} />
@@ -142,21 +178,28 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
         <Input id="courseLink" placeholder="https://example.com/course-details" {...register("link")} />
         {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
-       <div>
-        <Label htmlFor="courseImg">Image URL</Label>
-        <Input id="courseImg" placeholder="https://picsum.photos/seed/course/400/300" {...register("img")} />
-        {errors.img && <p className="text-red-500 text-sm">{errors.img.message}</p>}
-      </div>
       <div>
-        <Label htmlFor="courseImgFile">Or Upload Image</Label>
-        <Input id="courseImgFile" type="file" />
-         <p className="text-sm text-muted-foreground pt-1">File upload is not yet functional.</p>
+        <Label htmlFor="courseImgFile">Upload Image</Label>
+        <Input id="courseImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
+        {errors.img && <p className="text-red-500 text-sm">{errors.img.message}</p>}
+        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
+       {preview && (
+        <div className="mt-4">
+          <Label>Image Preview</Label>
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          </div>
+        </div>
+      )}
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="ghost">Cancel</Button>
         </DialogClose>
-        <Button type="submit">Save Course</Button>
+        <Button type="submit" disabled={isUploading}>
+           {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+           Save Course
+        </Button>
       </DialogFooter>
     </form>
   );
@@ -448,7 +491,7 @@ export default function AdminPage() {
                 {courses.map((course) => (
                   <div key={course.id} className="flex items-center justify-between p-2 border rounded-md">
                      <div className="flex items-center gap-4">
-                        <Image src={course.img} alt={course.title} width={60} height={45} className="rounded-md" />
+                        <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md" />
                         <div>
                           <p className="font-semibold">{course.title}</p>
                           <p className="text-sm text-muted-foreground">{course.category} - {course.duration}</p>

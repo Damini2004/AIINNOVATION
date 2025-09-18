@@ -13,7 +13,7 @@ const courseSchema = z.object({
   description: z.string().min(1, "Description is required"),
   duration: z.string().min(1, "Duration is required"),
   category: z.string().min(1, "Category is required"),
-  img: z.string().url("Must be a valid URL"),
+  img: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
 
