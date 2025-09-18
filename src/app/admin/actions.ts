@@ -33,7 +33,7 @@ const eventSchema = z.object({
   subtitle: z.string().min(1, "Subtitle is required"),
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
-  image: z.string().url("Must be a valid URL for the image"),
+  image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL for the event"),
 });
 

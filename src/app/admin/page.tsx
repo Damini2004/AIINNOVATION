@@ -83,7 +83,7 @@ const eventSchema = z.object({
   subtitle: z.string().min(1, "Subtitle is required"),
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
-  image: z.string().url("Must be a valid URL for the image"),
+  image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL for the event"),
 });
 
@@ -321,22 +321,57 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
 
 function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(event?.image || null);
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<Event>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event || { image: `https://picsum.photos/seed/${Math.random()}/600/400` },
+    defaultValues: event || { image: '' },
   });
 
+  useEffect(() => {
+    if (event) {
+        setValue('image', event.image);
+        setPreview(event.image)
+    }
+  }, [event, setValue]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setValue("image", base64String, { shouldValidate: true });
+        setPreview(base64String);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+         toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+         setIsUploading(false);
+      }
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit: SubmitHandler<Event> = async (data) => {
+    if (!data.image) {
+        toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        return;
+    }
     const result = await addOrUpdateEvent(data);
     if (result.success) {
       toast({ title: "Success", description: `Event ${event ? 'updated' : 'added'}.` });
       onSave();
       reset();
+      setPreview(null);
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -345,6 +380,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
        <Input type="hidden" {...register("id")} />
+       <Input type="hidden" {...register("image")} />
        <div>
         <Label htmlFor="eventTitle">Title</Label>
         <Input id="eventTitle" {...register("title")} />
@@ -366,10 +402,19 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
       <div>
-        <Label htmlFor="eventImage">Image URL</Label>
-        <Input id="eventImage" {...register("image")} />
+        <Label htmlFor="eventImgFile">Upload Image</Label>
+        <Input id="eventImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
         {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
+       {preview && (
+        <div className="mt-4">
+          <Label>Image Preview</Label>
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          </div>
+        </div>
+      )}
       <div>
         <Label htmlFor="eventLink">Event Link</Label>
         <Input id="eventLink" {...register("link")} />
@@ -379,7 +424,10 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
         <DialogClose asChild>
           <Button variant="ghost">Cancel</Button>
         </DialogClose>
-        <Button type="submit">Save Event</Button>
+        <Button type="submit" disabled={isUploading}>
+          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save Event
+        </Button>
       </DialogFooter>
     </form>
   );
@@ -625,7 +673,7 @@ export default function AdminPage() {
                 {events.map((event) => (
                   <div key={event.id} className="flex items-center justify-between p-2 border rounded-md">
                     <div className="flex items-center gap-4">
-                        <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md" />
+                        <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md object-cover" />
                         <div>
                           <p className="font-semibold">{event.title}</p>
                            <p className="text-sm text-muted-foreground">{event.category} - {event.subtitle}</p>
