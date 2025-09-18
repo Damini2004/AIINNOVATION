@@ -79,11 +79,11 @@ export default function MissionVisionPage() {
             {/* Right Image */}
             <div className="lg:col-span-5 flex justify-center">
               <Image
-                src="https://picsum.photos/seed/mission-main/500/600"
+                src="/assests/images/b1.png"
                 alt="Mission illustration"
                 width={500}
                 height={600}
-                className="rounded-lg shadow-xl"
+                className="rounded-lg"
                 data-ai-hint="abstract shapes"
               />
             </div>

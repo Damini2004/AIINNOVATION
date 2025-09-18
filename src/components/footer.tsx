@@ -14,9 +14,14 @@ export function Footer() {
           {/* Column 1 - Company Info */}
           <div>
             <div className="mb-10">
-              <Link href="/">
-                <Icons.logo className="h-12 w-auto text-foreground" />
-              </Link>
+               <Image
+                     src="/assests/images/logo.png" // replace with your logo path inside public folder
+                     alt="Datatech Logo"
+                     width={160} // adjust size
+                     height={40}
+                     className="h-10 w-auto"
+                     priority
+                   />
             </div>
             <p className="text-base text-muted-foreground leading-relaxed">
               AI Innovation Society is a global platform fostering ethical,

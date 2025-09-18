@@ -94,7 +94,7 @@ export default function AboutUsPage() {
           {/* Right Image */}
           <div className="flex justify-center">
             <Image
-              src="https://picsum.photos/seed/about-us-main/600/600"
+              src="/assests/images/about-3.png"
               alt="AI Research illustration"
               width={500}
               height={500}

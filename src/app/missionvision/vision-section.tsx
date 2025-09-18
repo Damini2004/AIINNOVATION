@@ -22,11 +22,11 @@ export default function VisionSection() {
           {/* Left Image */}
           <div className="flex justify-center">
             <Image
-              src="https://picsum.photos/seed/vision-main/600/600"
+              src="/assests/images/about1.png"
               alt="Vision illustration"
               width={600}
               height={600}
-              className="rounded-lg shadow-xl"
+              className="rounded-lg"
               data-ai-hint="future technology"
             />
           </div>
