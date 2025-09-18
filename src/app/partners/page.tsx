@@ -67,13 +67,15 @@ export default function PartnersPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-12 items-center">
               {partners.map((partner) => (
                 <div key={partner.id} className="flex justify-center grayscale hover:grayscale-0 transition duration-300">
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    width={150}
-                    height={80}
-                    className="object-contain"
-                  />
+                  {partner.logo && (
+                    <Image
+                      src={partner.logo}
+                      alt={partner.name}
+                      width={150}
+                      height={80}
+                      className="object-contain"
+                    />
+                  )}
                 </div>
               ))}
             </div>
