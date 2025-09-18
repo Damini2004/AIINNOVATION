@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    if (localStorage.getItem("isAdminLoggedIn") === "true") {
+      router.replace("/admin");
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [router]);
+
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +33,7 @@ export default function LoginPage() {
     // Mock authentication
     setTimeout(() => {
       if (email === "admin@aiis.com" && password === "password") {
+        localStorage.setItem("isAdminLoggedIn", "true");
         toast({
           title: "Login Successful",
           description: "Redirecting to admin dashboard...",
@@ -38,6 +49,14 @@ export default function LoginPage() {
       }
     }, 1000);
   };
+
+  if (isCheckingAuth) {
+    return (
+       <div className="flex items-center justify-center min-h-[calc(100vh-200px)] bg-background">
+         <Loader2 className="h-8 w-8 animate-spin" />
+       </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)] bg-background">
@@ -55,7 +74,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@aiis.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -85,3 +104,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

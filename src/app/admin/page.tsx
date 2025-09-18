@@ -49,8 +49,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-import { Loader2, Trash2, Edit } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, Trash2, Edit, LogOut } from "lucide-react";
 import Image from "next/image";
 
 // Zod Schemas
@@ -258,11 +258,26 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
 
 
 export default function AdminPage() {
+  const router = useRouter();
   const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
+      if (adminLoggedIn !== "true") {
+        router.push("/login");
+      } else {
+        setIsAuthenticated(true);
+        fetchData();
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -277,9 +292,12 @@ export default function AdminPage() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("isAdminLoggedIn");
+    toast({ title: "Logged Out", description: "You have been successfully logged out." });
+    router.push("/");
+  };
+
 
   const handleDelete = async (collection: 'courses' | 'partners' | 'events', id: string) => {
     let result;
@@ -295,13 +313,23 @@ export default function AdminPage() {
     }
   }
 
+  if (!isAuthenticated) {
+     return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
+  
   if (loading) {
     return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+       <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <Button variant="outline" onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </Button>
+      </div>
 
       <Tabs defaultValue="courses" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -511,3 +539,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    

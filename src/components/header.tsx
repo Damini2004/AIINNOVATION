@@ -1,18 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import "./header.css";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsAdminLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true");
+     // Close mobile menu on navigation
+    setIsOpen(false);
+  }, [pathname]);
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
+
+  const AdminLink = () => (
+     <li>
+        <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
+          Admin
+        </Link>
+      </li>
+  );
 
   return (
     <header
@@ -135,6 +152,7 @@ export function AppHeader() {
               </li>
 
               <li><Link href="/contact-us">Contact</Link></li>
+              <AdminLink />
             </ul>
           </nav>
         </div>
@@ -258,6 +276,11 @@ export function AppHeader() {
               </li>
 
               <li><Link href="/contact-us">Contact</Link></li>
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
+                    Admin
+                </Link>
+              </li>
             </ul>
           </nav>
         )}
@@ -265,3 +288,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
