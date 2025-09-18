@@ -36,7 +36,7 @@
     top: 8rem;
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 1.5rem;
     background-color: hsl(var(--card));
 }
 
@@ -44,7 +44,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding: 1rem;
+    padding: 1.5rem;
     background-color: hsl(var(--card));
     border-radius: var(--radius);
     transition: transform 0.3s, box-shadow 0.3s;
@@ -59,4 +59,11 @@
     flex-shrink: 0;
 }
 
+.career-icon > svg {
+    transition: transform 0.3s ease;
+}
+
+.career-analysis-card:hover .career-icon > svg {
+    transform: scale(1.15);
+}
 
