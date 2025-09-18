@@ -115,21 +115,19 @@ export default function HostEventPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
-      <section className="slider-area-two py-20 bg-secondary relative">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="text-center md:text-left">
-              <h1 className="text-sm font-bold text-primary uppercase">Collaborate</h1>
-              <h2 className="text-4xl font-bold mt-2">Host an Event with AI Innovation Society</h2>
-              <p className="mt-4 text-muted-foreground">Partner with Us to Shape the Future of Responsible AI</p>
-              <Button asChild className="mt-6">
-                <Link href="/submitproposal">Submit Proposal</Link>
-              </Button>
-            </div>
-            <div className="relative flex justify-center">
-               <Image src="https://picsum.photos/seed/host-event-shape/500/500" alt="Abstract Shape" width={400} height={400} className="bounce-animate" data-ai-hint="abstract shape" />
-               <Image src="https://picsum.photos/seed/host-event-home/400/400" alt="Home" width={350} height={350} className="absolute shape-image" data-ai-hint="tech event" />
-            </div>
+      <section
+        className="py-20 bg-secondary relative bg-cover bg-center"
+        style={{ backgroundImage: "url(/assests/images/brid.png)" }}
+        data-ai-hint="abstract geometric"
+      >
+        <div className="container mx-auto px-6 text-center">
+          <h1 className="text-4xl font-bold">Host an Event</h1>
+          <div className="text-sm mt-2">
+            <Link href="/" className="hover:text-primary">
+              HOME
+            </Link>
+            <span className="mx-2 text-muted-foreground">&gt;</span>
+            <span className="text-primary font-medium">HOST AN EVENT</span>
           </div>
         </div>
       </section>
@@ -163,6 +161,9 @@ export default function HostEventPage() {
                 Special Sessions & Workshops – Theme-based tracks within larger conferences, hosted under AIIS branding.<br/>
                 Institutional Collaborations – Partner events co-branded with universities and research centers.
               </p>
+                 <Button asChild className="mt-6">
+                    <Link href="/submitproposal">Submit Proposal</Link>
+                 </Button>
             </div>
           </div>
         </div>
