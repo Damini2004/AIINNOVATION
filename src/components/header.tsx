@@ -123,11 +123,11 @@ export function AppHeader() {
 
               <li className="dropdown">
                 <a href="#" className="flex items-center gap-1">
-                  Publications <ChevronDown className="h-4 w-4" />
+                  Research <ChevronDown className="h-4 w-4" />
                 </a>
                 <ul className="sub-menu">
-                  <li><Link href="/journals">AI Journals</Link></li>
-                  <li><Link href="/ethics">Ethics and Policies</Link></li>
+                  <li><Link href="/journals">Publications</Link></li>
+                  <li><Link href="/hostjournal">Host a journal with AIIS</Link></li>
                 </ul>
               </li>
 
@@ -227,18 +227,18 @@ export function AppHeader() {
                 )}
               </li>
 
-              {/* Publications */}
+              {/* Research */}
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
                   className="flex justify-between w-full font-medium"
-                  onClick={() => toggleDropdown("publications")}
+                  onClick={() => toggleDropdown("research")}
                 >
-                  Publications {openDropdown === "publications" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  Research {openDropdown === "research" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </button>
-                {openDropdown === "publications" && (
+                {openDropdown === "research" && (
                   <ul className="pl-4 mt-2 space-y-2">
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/journals">AI Journals</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ethics">Ethics and Policies</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/journals">Publications</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostjournal">Host a journal with AIIS</Link></li>
                   </ul>
                 )}
               </li>
