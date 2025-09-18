@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -133,6 +134,11 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
         <Label htmlFor="courseImg">Image URL</Label>
         <Input id="courseImg" placeholder="https://picsum.photos/seed/course/400/300" {...register("img")} />
         {errors.img && <p className="text-red-500 text-sm">{errors.img.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="courseImgFile">Or Upload Image</Label>
+        <Input id="courseImgFile" type="file" disabled />
+         <p className="text-sm text-muted-foreground pt-1">File upload is not yet functional.</p>
       </div>
       <DialogFooter>
         <DialogClose asChild>
