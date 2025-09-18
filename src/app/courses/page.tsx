@@ -120,7 +120,7 @@ export default function CoursesPage() {
               <AnimatePresence>
                 {filteredCourses.map((course, index) => (
                   <motion.div
-                    key={course.title}
+                    key={course.id || index}
                     layout
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -168,4 +168,3 @@ export default function CoursesPage() {
     </div>
   );
 }
-

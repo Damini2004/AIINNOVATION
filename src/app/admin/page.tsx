@@ -62,6 +62,7 @@ const courseSchema = z.object({
   duration: z.string().min(1, "Duration is required"),
   category: z.string().min(1, "Category is required"),
   img: z.string().url("Must be a valid URL"),
+  link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
 
 const partnerSchema = z.object({
@@ -130,6 +131,11 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
         <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...register("category")} />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
+      <div>
+        <Label htmlFor="courseLink">Link</Label>
+        <Input id="courseLink" placeholder="https://example.com/course-details" {...register("link")} />
+        {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
+      </div>
        <div>
         <Label htmlFor="courseImg">Image URL</Label>
         <Input id="courseImg" placeholder="https://picsum.photos/seed/course/400/300" {...register("img")} />
@@ -137,7 +143,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
       </div>
       <div>
         <Label htmlFor="courseImgFile">Or Upload Image</Label>
-        <Input id="courseImgFile" type="file" disabled />
+        <Input id="courseImgFile" type="file" />
          <p className="text-sm text-muted-foreground pt-1">File upload is not yet functional.</p>
       </div>
       <DialogFooter>
