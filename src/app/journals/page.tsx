@@ -108,8 +108,8 @@ export default function JournalsPage() {
       <main className="py-24">
         <div className="container mx-auto px-6">
           
-          <section className="mb-20">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12 bg-card border rounded-lg p-8 shadow-sm">
+          <section className="mb-20 space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
                 <div>
                     <CardHeader className="px-0 pt-0">
                         <CardTitle className="flex items-center gap-2 text-primary">
@@ -147,50 +147,60 @@ export default function JournalsPage() {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div className="space-y-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-blue-600">
-                            <ThumbsUp /> Pros for Journals
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-3">
-                            {pros.map((item, index) => (
-                                <li key={index} className="flex items-start">
-                                <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
-                                <span>{item}</span>
-                                </li>
-                            ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-red-600">
-                            <ThumbsDown /> Potential Considerations
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-3">
-                            {cons.map((item, index) => (
-                                <li key={index} className="flex items-start">
-                                <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
-                                <span>{item}</span>
-                                </li>
-                            ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className="relative h-full min-h-[300px] lg:min-h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
+                <div className="relative h-full min-h-[300px] lg:min-h-[400px] lg:order-last">
                     <Image 
-                        src="https://picsum.photos/seed/journals/600/800"
-                        alt="Journals Collaboration"
+                        src="https://picsum.photos/seed/pros/600/500"
+                        alt="Pros of Collaboration"
                         fill
                         className="rounded-lg object-cover"
-                        data-ai-hint="research books"
+                        data-ai-hint="successful presentation"
+                    />
+                </div>
+                 <div>
+                    <CardHeader className="px-0 pt-0">
+                        <CardTitle className="flex items-center gap-2 text-blue-600">
+                        <ThumbsUp /> Pros for Journals
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-0 pb-0">
+                        <ul className="space-y-3">
+                        {pros.map((item, index) => (
+                            <li key={index} className="flex items-start">
+                            <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
+                            <span>{item}</span>
+                            </li>
+                        ))}
+                        </ul>
+                    </CardContent>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
+               <div>
+                    <CardHeader className="px-0 pt-0">
+                        <CardTitle className="flex items-center gap-2 text-red-600">
+                        <ThumbsDown /> Potential Considerations
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-0 pb-0">
+                        <ul className="space-y-3">
+                        {cons.map((item, index) => (
+                            <li key={index} className="flex items-start">
+                            <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
+                            <span>{item}</span>
+                            </li>
+                        ))}
+                        </ul>
+                    </CardContent>
+                </div>
+                <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
+                    <Image 
+                        src="https://picsum.photos/seed/cons/600/500"
+                        alt="Potential Considerations"
+                        fill
+                        className="rounded-lg object-cover"
+                        data-ai-hint="challenging discussion"
                     />
                 </div>
             </div>
