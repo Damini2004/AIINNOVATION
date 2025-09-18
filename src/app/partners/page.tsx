@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getPartners } from "../admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Facebook, Linkedin, Pinterest, Twitter } from "lucide-react";
+import { Facebook, Linkedin, Twitter, Link as LinkIcon } from "lucide-react";
 import "../members.css";
 
 type Partner = {
@@ -97,7 +97,7 @@ export default function PartnersPage() {
                             <div className="team-social">
                                 {partner.facebookUrl && <a href={partner.facebookUrl} target="_blank" rel="noopener noreferrer"><Facebook className="h-5 w-5" /></a>}
                                 {partner.twitterUrl && <a href={partner.twitterUrl} target="_blank" rel="noopener noreferrer"><Twitter className="h-5 w-5" /></a>}
-                                {partner.pinterestUrl && <a href={partner.pinterestUrl} target="_blank" rel="noopener noreferrer"><Pinterest className="h-5 w-5" /></a>}
+                                {partner.pinterestUrl && <a href={partner.pinterestUrl} target="_blank" rel="noopener noreferrer"><LinkIcon className="h-5 w-5" /></a>}
                             </div>
                         </div>
                     </div>
