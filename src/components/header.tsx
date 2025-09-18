@@ -28,15 +28,15 @@ export function AppHeader() {
   };
 
   const AdminLink = () => {
-    if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
-    return (
-     <li>
-        <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
-          Admin
-        </Link>
-      </li>
-    )
-  };
+     if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
+     return (
+       <li>
+         <Link href={isAdminLoggedIn ? "/admin" : "/login"}>
+           Admin
+         </Link>
+       </li>
+     )
+   };
 
 
   return (
@@ -161,7 +161,7 @@ export function AppHeader() {
               </li>
 
               <li><Link href="/contact-us">Contact</Link></li>
-              <AdminLink />
+               <AdminLink />
             </ul>
           </nav>
         </div>
@@ -286,13 +286,13 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/become-a-member">Become a Member</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/institution-chapter">Institution Chapter</Link></li>
-                    <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
                   </ul>
                 )}
               </li>
 
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
-               {isClient ? (
+              {isClient ? (
                 <li className="hover:bg-gray-100 rounded px-3 py-2">
                   <Link href={isAdminLoggedIn ? "/admin" : "/login"}>Admin</Link>
                 </li>
