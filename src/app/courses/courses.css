@@ -84,25 +84,25 @@
 
 .single_portfolio_content {
     padding: 25px;
-    background: white;
+    background: hsl(var(--card));
 }
 
 .single_portfolio_content_title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #f16722; /* Orange color from image */
+    color: hsl(var(--primary));
     margin-bottom: 0.75rem;
     display: block;
 }
 
 .single_portfolio_content_desc {
-    color: #007bff; /* Blue color from image */
+    color: hsl(var(--muted-foreground));
     margin-bottom: 1rem;
     font-size: 1rem;
     line-height: 1.5;
 }
 
 .single_portfolio_content_duration {
-    color: #333; /* Darker text for duration */
+    color: hsl(var(--foreground));
     font-weight: 500;
 }
