@@ -23,12 +23,15 @@ import {
   addOrUpdateCourse,
   addOrUpdatePartner,
   addOrUpdateEvent,
+  addOrUpdateJournal,
   getCourses,
   getPartners,
   getEvents,
+  getJournals,
   deleteCourse,
   deletePartner,
   deleteEvent,
+  deleteJournal,
 } from "./actions";
 import {
   Dialog,
@@ -87,9 +90,17 @@ const eventSchema = z.object({
   link: z.string().url("Must be a valid URL for the event"),
 });
 
+const journalSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  image: z.string().min(1, "Image is required"),
+});
+
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
+type Journal = z.infer<typeof journalSchema>;
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
@@ -433,6 +444,105 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
   );
 }
 
+function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => void }) {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(journal?.image || null);
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm<Journal>({
+    resolver: zodResolver(journalSchema),
+    defaultValues: journal || { image: '' },
+  });
+
+  useEffect(() => {
+    if (journal) {
+        setValue('image', journal.image);
+        setPreview(journal.image)
+    }
+  }, [journal, setValue]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setValue("image", base64String, { shouldValidate: true });
+        setPreview(base64String);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+         toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+         setIsUploading(false);
+      }
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit: SubmitHandler<Journal> = async (data) => {
+    if (!data.image) {
+        toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        return;
+    }
+    const result = await addOrUpdateJournal(data);
+    if (result.success) {
+      toast({ title: "Success", description: `Journal ${journal ? 'updated' : 'added'}.` });
+      onSave();
+      reset();
+      setPreview(null);
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+       <Input type="hidden" {...register("id")} />
+       <Input type="hidden" {...register("image")} />
+       <div>
+        <Label htmlFor="journalTitle">Title</Label>
+        <Input id="journalTitle" {...register("title")} />
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="journalDescription">Description</Label>
+        <Textarea id="journalDescription" {...register("description")} />
+        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="journalImgFile">Upload Image</Label>
+        <Input id="journalImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
+        {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
+      </div>
+       {preview && (
+        <div className="mt-4">
+          <Label>Image Preview</Label>
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          </div>
+        </div>
+      )}
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost">Cancel</Button>
+        </DialogClose>
+        <Button type="submit" disabled={isUploading}>
+          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save Journal
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
 
 export default function AdminPage() {
   const router = useRouter();
@@ -440,6 +550,7 @@ export default function AdminPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [journals, setJournals] = useState<Journal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -458,14 +569,16 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
+      getJournals(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
     setEvents(eventsData);
+    setJournals(journalsData);
     setLoading(false);
   };
 
@@ -476,11 +589,12 @@ export default function AdminPage() {
   };
 
 
-  const handleDelete = async (collection: 'courses' | 'partners' | 'events', id: string) => {
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals', id: string) => {
     let result;
     if (collection === 'courses') result = await deleteCourse(id);
     if (collection === 'partners') result = await deletePartner(id);
     if (collection === 'events') result = await deleteEvent(id);
+    if (collection === 'journals') result = await deleteJournal(id);
 
     if (result?.success) {
       toast({ title: "Success", description: "Item deleted successfully." });
@@ -509,10 +623,11 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="courses" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="courses">Manage Courses</TabsTrigger>
           <TabsTrigger value="partners">Manage Partners</TabsTrigger>
           <TabsTrigger value="events">Manage Events</TabsTrigger>
+          <TabsTrigger value="journals">Manage Journals</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -715,9 +830,73 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="journals">
+           <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Journals</CardTitle>
+                <CardDescription>Add, edit, or delete journals.</CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Journal</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Journal</DialogTitle>
+                  </DialogHeader>
+                  <JournalForm onSave={() => fetchData()} />
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {journals.map((journal) => (
+                  <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div className="flex items-center gap-4">
+                        <Image src={journal.image} alt={journal.title} width={60} height={45} className="rounded-md object-cover" />
+                        <div>
+                          <p className="font-semibold">{journal.title}</p>
+                        </div>
+                     </div>
+                    <div className="flex items-center gap-2">
+                       <Dialog>
+                        <DialogTrigger asChild>
+                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Journal</DialogTitle>
+                          </DialogHeader>
+                          <JournalForm journal={journal} onSave={() => fetchData()} />
+                        </DialogContent>
+                      </Dialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the journal.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('journals', journal.id!)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
 }
-
-    

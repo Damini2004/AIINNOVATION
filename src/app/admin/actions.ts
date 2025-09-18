@@ -37,9 +37,17 @@ const eventSchema = z.object({
   link: z.string().url("Must be a valid URL for the event"),
 });
 
+const journalSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  image: z.string().min(1, "Image is required"),
+});
+
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
+type Journal = z.infer<typeof journalSchema>;
 
 // Generic function to add or update a document
 async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string, data: T, schema: z.ZodType<T>) {
@@ -103,4 +111,7 @@ export async function addOrUpdateEvent(data: Event) { return addOrUpdateDoc('eve
 export async function getEvents(): Promise<Event[]> { return getDocsFromCollection<Event>('events'); }
 export async function deleteEvent(id: string) { return deleteDocFromCollection('events', id); }
 
-    
+// Journal Actions
+export async function addOrUpdateJournal(data: Journal) { return addOrUpdateDoc('journals', data, journalSchema); }
+export async function getJournals(): Promise<Journal[]> { return getDocsFromCollection<Journal>('journals'); }
+export async function deleteJournal(id: string) { return deleteDocFromCollection('journals', id); }

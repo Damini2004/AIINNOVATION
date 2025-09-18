@@ -1,36 +1,184 @@
 
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import { getJournals } from "@/app/admin/actions";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+type Journal = {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+};
 
 export default function JournalsPage() {
+  const [journals, setJournals] = useState<Journal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJournals = async () => {
+      setLoading(true);
+      const journalsData = await getJournals();
+      setJournals(journalsData);
+      setLoading(false);
+    };
+    fetchJournals();
+  }, []);
+
+  const benefits = [
+    "Wider reach and global visibility through AIIS's network.",
+    "Credibility enhancement via association with a recognized society.",
+    "Access to a broad pool of expert reviewers and editors.",
+    "Streamlined submission and peer-review process management.",
+    "Marketing and promotional support for calls for papers and new issues.",
+  ];
+
+  const pros = [
+    "Increased submission rates due to AIIS's reputation.",
+    "Opportunities for special issues linked to AIIS events.",
+    "Collaborative editorial board formation support.",
+  ];
+  
+  const cons = [
+    "Shared branding may dilute a journal's unique identity.",
+    "Potential administrative overhead in coordinating with AIIS.",
+    "Adherence to AIIS's overarching publication policies required.",
+  ];
+
+
   return (
     <div className="bg-background text-foreground">
-      {/* Hero Section */}
+      {/* Banner Section */}
       <section
-        className="py-20 bg-secondary relative bg-cover bg-center"
+        className="py-24 bg-secondary relative bg-cover bg-center"
         style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
       >
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold">Publications</h1>
-          <div className="text-sm mt-2">
-            <Link href="/" className="hover:text-primary">
-              HOME
-            </Link>
-            <span className="mx-2 text-muted-foreground">&gt;</span>
-            <span className="text-primary font-medium">PUBLICATIONS</span>
-          </div>
+          <h1 className="text-4xl font-bold max-w-4xl mx-auto">
+            AIIS Provides Service for Hosting Institutional Journals in
+            Collaboration with Society
+          </h1>
         </div>
       </section>
 
       {/* Main Content */}
       <main className="py-24">
-        <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold">Content Coming Soon</h2>
-            <p className="mt-4 text-muted-foreground">This page is under construction. Check back later for our publications.</p>
+        <div className="container mx-auto px-6">
+          {/* Benefits/Pros/Cons Section */}
+          <section className="mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-600">
+                    <ThumbsUp /> Benefits
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {benefits.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-600">
+                    <ThumbsUp /> Pros
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {pros.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                    <ThumbsDown /> Cons
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {cons.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Journals Section */}
+          <section>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold">Our Journals</h2>
+              <div className="em_bar_bg mt-4"></div>
+              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+                Explore our portfolio of journals spanning various domains of
+                Artificial Intelligence.
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {journals.map((journal) => (
+                  <div
+                    key={journal.id}
+                    className="bg-card border rounded-lg overflow-hidden group"
+                  >
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={journal.image}
+                        alt={journal.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint="journal cover"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold mb-2 group-hover:text-primary">
+                        {journal.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm line-clamp-3">
+                        {journal.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </main>
     </div>
   );
 }
-
-    
