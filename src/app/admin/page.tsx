@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -69,7 +69,7 @@ const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   designation: z.string().min(1, "Designation is required"),
-  logoUrl: z.string().url("Must be a valid URL"),
+  logoUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
@@ -163,22 +163,54 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
 
 function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => void }) {
   const { toast } = useToast();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+
+  const form = useForm<Partner>({
+    resolver: zodResolver(partnerSchema),
+    defaultValues: partner || { logoUrl: `https://picsum.photos/seed/${Math.random()}/150/80`},
+  });
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<Partner>({
-    resolver: zodResolver(partnerSchema),
-    defaultValues: partner || { logoUrl: `https://picsum.photos/seed/${Math.random()}/150/80`},
-  });
+    watch,
+    setValue
+  } = form;
+
+  const logoUrlValue = watch("logoUrl");
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      setValue("logoUrl", ""); // Clear URL if a file is selected
+    }
+  };
 
   const onSubmit: SubmitHandler<Partner> = async (data) => {
-    const result = await addOrUpdatePartner(data);
+    if (!data.logoUrl && !logoFile) {
+        toast({ variant: "destructive", title: "Validation Error", description: "Please provide a logo URL or upload a logo file." });
+        return;
+    }
+
+    // This is where you would handle the file upload to a storage service
+    // and get a URL back to save in the database.
+    // For now, we'll just simulate it.
+    let submissionData = { ...data };
+    if (logoFile) {
+        // In a real app: await uploadFile(logoFile);
+        submissionData.logoUrl = `https://picsum.photos/seed/${Math.random()}/150/80`; // Placeholder
+        toast({ title: "Info", description: "File upload is a demo. Using a placeholder image." });
+    }
+
+    const result = await addOrUpdatePartner(submissionData);
     if (result.success) {
       toast({ title: "Success", description: `Partner ${partner ? 'updated' : 'added'}.` });
       onSave();
       reset();
+      setLogoFile(null);
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -199,13 +231,13 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
       </div>
       <div>
         <Label htmlFor="partnerLogoUrl">Logo URL</Label>
-        <Input id="partnerLogoUrl" {...register("logoUrl")} />
+        <Input id="partnerLogoUrl" {...register("logoUrl")} disabled={!!logoFile} />
         {errors.logoUrl && <p className="text-red-500 text-sm">{errors.logoUrl.message}</p>}
       </div>
        <div>
         <Label htmlFor="logoFile">Or Upload Logo</Label>
-        <Input id="logoFile" type="file" />
-        <p className="text-sm text-muted-foreground pt-1">File upload is not yet functional.</p>
+        <Input id="logoFile" type="file" onChange={handleFileChange} disabled={!!logoUrlValue} />
+        <p className="text-sm text-muted-foreground pt-1">Provide a URL or upload a file. File upload is a demo.</p>
       </div>
       <div>
         <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
@@ -471,7 +503,7 @@ export default function AdminPage() {
                 {partners.map((partner) => (
                   <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md">
                      <div className="flex items-center gap-4">
-                        <Image src={partner.logoUrl} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
+                        <Image src={partner.logoUrl || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
                         <div>
                           <p className="font-semibold">{partner.name}</p>
                           <p className="text-sm text-muted-foreground">{partner.designation}</p>
