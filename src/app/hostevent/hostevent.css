@@ -67,6 +67,11 @@
   }
 }
 
+@keyframes icon-dance {
+  0%, 100% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
 /* Process Section */
 .process-box {
     position: relative;
@@ -139,6 +144,7 @@
 .service-box-three .service-icon {
     display: inline-block;
     margin-bottom: 1rem;
+    animation: icon-dance 3s infinite ease-in-out;
     transition: transform 0.3s ease-in-out;
 }
 
