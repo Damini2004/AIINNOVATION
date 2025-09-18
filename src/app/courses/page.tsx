@@ -73,7 +73,7 @@ export default function CoursesPage() {
       </section>
 
       {/* Main Content */}
-      <main className="portfolio_area py-24">
+      <main className="portfolio_area style_three py-24">
         <div className="container mx-auto px-6">
           <div className="text-center pb-10">
             <h5 className="text-primary font-semibold text-sm uppercase">Courses</h5>
@@ -135,7 +135,8 @@ export default function CoursesPage() {
                           alt={course.title}
                           width={400}
                           height={300}
-                          className="rounded-t-lg w-full"
+                          className="rounded-t-lg w-full h-auto"
+                          style={{aspectRatio: '4 / 3', objectFit: 'cover'}}
                           data-ai-hint="course illustration"
                         />
                         <div className="portfolio-icon">
@@ -151,10 +152,11 @@ export default function CoursesPage() {
                       </div>
                     </div>
                     <div className="single_portfolio_content">
-                      <span><strong>{course.title}</strong></span>
-                      <p>
+                      <span className="single_portfolio_content_title">{course.title}</span>
+                      <p className="single_portfolio_content_desc">
                         {course.link ? <Link href={course.link}>{course.description}</Link> : course.description}
-                        <br />
+                      </p>
+                      <p className="single_portfolio_content_duration">
                         Duration: {course.duration}
                       </p>
                     </div>
