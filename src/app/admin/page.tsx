@@ -202,6 +202,11 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
         <Input id="partnerLogoUrl" {...register("logoUrl")} />
         {errors.logoUrl && <p className="text-red-500 text-sm">{errors.logoUrl.message}</p>}
       </div>
+       <div>
+        <Label htmlFor="logoFile">Or Upload Logo</Label>
+        <Input id="logoFile" type="file" />
+        <p className="text-sm text-muted-foreground pt-1">File upload is not yet functional.</p>
+      </div>
       <div>
         <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
         <Input id="partnerFacebookUrl" {...register("facebookUrl")} />
@@ -579,3 +584,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
