@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import "./header.css";
-import { Icons } from "./icons";
+import Image from "next/image";
 
 export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,8 +35,15 @@ export function AppHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center" title="datatech">
-            <Icons.logo className="h-10 w-auto text-black" />
-          </Link>
+      <Image
+        src="/assests/images/logo.png" // replace with your logo path inside public folder
+        alt="Datatech Logo"
+        width={160} // adjust size
+        height={40}
+        className="h-10 w-auto"
+        priority
+      />
+    </Link>
 
           {/* Hamburger button */}
           <button

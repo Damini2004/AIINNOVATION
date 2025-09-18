@@ -12,7 +12,7 @@ export default function Slider() {
       style={{
         height: "930px",
         background:
-          "url(https://picsum.photos/seed/slider1/1920/930) right top no-repeat scroll",
+          "url(/assests/images/slider1.jpg) right top no-repeat scroll",
         backgroundSize: "cover",
       }}
     >
@@ -57,7 +57,7 @@ export default function Slider() {
           {/* Right image */}
           <div className="flex justify-center lg:justify-end">
             <Image
-              src="https://picsum.photos/seed/slider3/600/600"
+              src="/assests/images/slider3.png"
               alt="AI Innovation Society"
               width={600}
               height={600}

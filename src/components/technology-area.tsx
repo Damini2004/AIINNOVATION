@@ -14,7 +14,7 @@ export default function TechnologyArea() {
             <div className="rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 bg-primary"
                  style={{
                    backgroundImage:
-                     "url(https://picsum.photos/seed/feature1/400/300), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
+                     "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
@@ -50,7 +50,7 @@ export default function TechnologyArea() {
             <div className="rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 bg-primary"
                  style={{
                    backgroundImage:
-                     "url(https://picsum.photos/seed/feature2/400/300), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
+                     "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",

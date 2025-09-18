@@ -60,7 +60,7 @@ export default function CounterSection() {
       className="pt-[96px] pb-[47px] bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('https://picsum.photos/seed/counterbg/1920/400')",
+          "url('/assests/images/counter.jpg')",
       }}
       data-ai-hint="abstract texture"
     >
@@ -83,7 +83,7 @@ export default function CounterSection() {
                       style={{
                         transform: "rotate(-70deg)",
                         backgroundImage:
-                          "url('https://picsum.photos/seed/coun/100/100')",
+                          "url('/assests/images/coun.png')",
                       }}
                       data-ai-hint="geometric shape"
                     ></div>

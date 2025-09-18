@@ -6,6 +6,7 @@ import { db } from "@/firebase/firebaseConfig";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 type EventType = {
   id: string;

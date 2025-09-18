@@ -12,7 +12,7 @@ export default function WhoWeAre() {
           {/* Left Image */}
           <div className="pr-0 lg:pr-8">
             <Image
-              src="https://picsum.photos/seed/about/600/600"
+              src="/assests/images/ab3.png"
               alt="About AI Innovation Society"
               width={600}
               height={600}
