@@ -6,11 +6,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { getPartners } from "../admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Facebook, Linkedin, Pinterest, Twitter } from "lucide-react";
+import "../members.css";
 
 type Partner = {
   id?: string;
   name: string;
+  designation: string;
   logo: string;
+  facebookUrl?: string;
+  twitterUrl?: string;
+  pinterestUrl?: string;
 };
 
 export default function PartnersPage() {
@@ -32,7 +38,6 @@ export default function PartnersPage() {
       {/* Hero Section */}
       <section
         className="py-20 bg-secondary relative bg-cover bg-center"
-        style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
       >
         <div className="container mx-auto px-6 text-center">
@@ -48,34 +53,58 @@ export default function PartnersPage() {
       </section>
 
       {/* Main Content */}
-      <main className="py-24">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold">Our Valued Partners</h2>
-          <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-            We collaborate with leading organizations and institutions to
-            advance the field of AI. Our partnerships are crucial in helping us
-            achieve our mission.
-          </p>
+      <main className="team-area py-24">
+        <div className="container mx-auto px-6">
+           <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold">Our Valued Partners</h2>
+             <div className="em_bar_bg mt-4"></div>
+            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+              We collaborate with leading organizations and institutions to
+              advance the field of AI. Our partnerships are crucial in helping us
+              achieve our mission.
+            </p>
+          </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-12">
-               {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
+            <div className="team-grid">
+               {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="team-card">
+                    <Skeleton className="team-img" style={{height: '250px'}}/>
+                    <div className="team-info">
+                        <Skeleton className="h-5 w-3/4 mb-2"/>
+                        <Skeleton className="h-4 w-1/2"/>
+                    </div>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-12 items-center">
+            <div className="team-grid">
               {partners.map((partner) => (
-                <div key={partner.id} className="flex justify-center grayscale hover:grayscale-0 transition duration-300">
-                  {partner.logo && (
-                    <Image
-                      src={partner.logo}
-                      alt={partner.name}
-                      width={150}
-                      height={80}
-                      className="object-contain"
-                    />
-                  )}
+                <div key={partner.id} className="team-card">
+                    <div className="team-img-wrapper">
+                        {partner.logo && (
+                            <Image
+                                src={partner.logo}
+                                alt={partner.name}
+                                width={400}
+                                height={400}
+                                className="team-img"
+                                style={{objectFit: 'contain', padding: '1rem'}}
+                                data-ai-hint="partner logo"
+                            />
+                        )}
+                         <div className="team-overlay">
+                            <div className="team-social">
+                                {partner.facebookUrl && <a href={partner.facebookUrl} target="_blank" rel="noopener noreferrer"><Facebook className="h-5 w-5" /></a>}
+                                {partner.twitterUrl && <a href={partner.twitterUrl} target="_blank" rel="noopener noreferrer"><Twitter className="h-5 w-5" /></a>}
+                                {partner.pinterestUrl && <a href={partner.pinterestUrl} target="_blank" rel="noopener noreferrer"><Pinterest className="h-5 w-5" /></a>}
+                            </div>
+                        </div>
+                    </div>
+                     <div className="team-info">
+                        <h4>{partner.name}</h4>
+                        <p>{partner.designation}</p>
+                    </div>
                 </div>
               ))}
             </div>
