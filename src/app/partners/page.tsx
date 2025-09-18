@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 type Partner = {
   id?: string;
   name: string;
-  logoUrl: string;
+  logo: string;
 };
 
 export default function PartnersPage() {
@@ -20,7 +21,7 @@ export default function PartnersPage() {
     const fetchPartners = async () => {
       setLoading(true);
       const partnersData = await getPartners();
-      setPartners(partnersData);
+      setPartners(partnersData as Partner[]);
       setLoading(false);
     };
     fetchPartners();
@@ -67,7 +68,7 @@ export default function PartnersPage() {
               {partners.map((partner) => (
                 <div key={partner.id} className="flex justify-center grayscale hover:grayscale-0 transition duration-300">
                   <Image
-                    src={partner.logoUrl}
+                    src={partner.logo}
                     alt={partner.name}
                     width={150}
                     height={80}

@@ -21,7 +21,7 @@ const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   designation: z.string().min(1, "Designation is required"),
-  logoUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  logo: z.string().url("Logo is required"),
   facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),

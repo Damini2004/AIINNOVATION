@@ -69,7 +69,7 @@ const partnerSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Partner name is required"),
   designation: z.string().min(1, "Designation is required"),
-  logoUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  logo: z.string().url("Logo is required"),
   facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   twitterUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   pinterestUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
@@ -167,7 +167,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
 
   const form = useForm<Partner>({
     resolver: zodResolver(partnerSchema),
-    defaultValues: partner || { logoUrl: `https://picsum.photos/seed/${Math.random()}/150/80`},
+    defaultValues: partner || { logo: `https://picsum.photos/seed/${Math.random()}/150/80`},
   });
 
   const {
@@ -179,33 +179,26 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
     setValue
   } = form;
 
-  const logoUrlValue = watch("logoUrl");
+  const logoValue = watch("logo");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setLogoFile(file);
-      setValue("logoUrl", ""); // Clear URL if a file is selected
+      // In a real app, you'd upload the file and set the URL.
+      // For this demo, we'll use a placeholder.
+      setValue("logo", `https://picsum.photos/seed/${Math.random()}/150/80`);
+      toast({ title: "Info", description: "File upload is a demo. Using a placeholder image." });
     }
   };
 
   const onSubmit: SubmitHandler<Partner> = async (data) => {
-    if (!data.logoUrl && !logoFile) {
-        toast({ variant: "destructive", title: "Validation Error", description: "Please provide a logo URL or upload a logo file." });
+    if (!data.logo && !logoFile) {
+        toast({ variant: "destructive", title: "Validation Error", description: "Please upload a logo file." });
         return;
     }
 
-    // This is where you would handle the file upload to a storage service
-    // and get a URL back to save in the database.
-    // For now, we'll just simulate it.
-    let submissionData = { ...data };
-    if (logoFile) {
-        // In a real app: await uploadFile(logoFile);
-        submissionData.logoUrl = `https://picsum.photos/seed/${Math.random()}/150/80`; // Placeholder
-        toast({ title: "Info", description: "File upload is a demo. Using a placeholder image." });
-    }
-
-    const result = await addOrUpdatePartner(submissionData);
+    const result = await addOrUpdatePartner(data);
     if (result.success) {
       toast({ title: "Success", description: `Partner ${partner ? 'updated' : 'added'}.` });
       onSave();
@@ -219,6 +212,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input type="hidden" {...register("id")} />
+       <Input type="hidden" {...register("logo")} />
       <div>
         <Label htmlFor="partnerName">Partner Name</Label>
         <Input id="partnerName" {...register("name")} />
@@ -229,15 +223,11 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
         <Input id="partnerDesignation" {...register("designation")} />
         {errors.designation && <p className="text-red-500 text-sm">{errors.designation.message}</p>}
       </div>
-      <div>
-        <Label htmlFor="partnerLogoUrl">Logo URL</Label>
-        <Input id="partnerLogoUrl" {...register("logoUrl")} disabled={!!logoFile} />
-        {errors.logoUrl && <p className="text-red-500 text-sm">{errors.logoUrl.message}</p>}
-      </div>
        <div>
-        <Label htmlFor="logoFile">Or Upload Logo</Label>
-        <Input id="logoFile" type="file" onChange={handleFileChange} disabled={!!logoUrlValue} />
-        <p className="text-sm text-muted-foreground pt-1">Provide a URL or upload a file. File upload is a demo.</p>
+        <Label htmlFor="logoFile">Upload Logo</Label>
+        <Input id="logoFile" type="file" onChange={handleFileChange} />
+        {errors.logo && <p className="text-red-500 text-sm">{errors.logo.message}</p>}
+        <p className="text-sm text-muted-foreground pt-1">File upload is a demo.</p>
       </div>
       <div>
         <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
@@ -503,7 +493,7 @@ export default function AdminPage() {
                 {partners.map((partner) => (
                   <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md">
                      <div className="flex items-center gap-4">
-                        <Image src={partner.logoUrl || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
+                        <Image src={partner.logo || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
                         <div>
                           <p className="font-semibold">{partner.name}</p>
                           <p className="text-sm text-muted-foreground">{partner.designation}</p>
@@ -616,5 +606,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
