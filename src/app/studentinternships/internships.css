@@ -1,0 +1,71 @@
+
+.internship-details-area {
+    background-color: var(--background);
+}
+
+.portfolio-thumb img {
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.internship-info-card {
+    background-color: hsl(var(--card));
+    padding: 2rem;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.internship-info-card h3 {
+    color: hsl(var(--primary));
+    border-bottom: 2px solid hsl(var(--border));
+    padding-bottom: 1rem;
+}
+
+.internship-info-card ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+    space-y: 0.75rem;
+}
+
+.internship-info-card ul li {
+    color: hsl(var(--foreground));
+}
+
+.internship-info-card ul li b {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.portfolio-content-details-box {
+    margin-top: 3rem;
+}
+
+.portfolio-content-details-box h2,
+.portfolio-content-details-box h3 {
+    color: hsl(var(--foreground));
+    margin-bottom: 1rem;
+}
+
+.block-quote {
+    border-left: 4px solid hsl(var(--primary));
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    background-color: hsl(var(--secondary));
+    border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.block-quote p {
+    font-style: italic;
+    color: hsl(var(--primary));
+    font-weight: 500;
+    margin: 0;
+}
+
+.portfolio-content-details-box ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
