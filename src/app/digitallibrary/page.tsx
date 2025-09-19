@@ -50,15 +50,17 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
           </span>
         </div>
       </div>
-       <Link href={paper.link} target="_blank" rel="noopener noreferrer" className="paper-image-wrapper">
-         <Image 
-            src={paper.image}
-            alt={`Cover for ${paper.paperTitle}`}
-            fill
-            className="object-cover"
-            data-ai-hint="research paper cover"
-        />
-      </Link>
+      {paper.image && (
+        <Link href={paper.link} target="_blank" rel="noopener noreferrer" className="paper-image-wrapper">
+            <Image 
+                src={paper.image}
+                alt={`Cover for ${paper.paperTitle}`}
+                fill
+                className="object-cover"
+                data-ai-hint="research paper cover"
+            />
+        </Link>
+      )}
     </div>
   );
 }
