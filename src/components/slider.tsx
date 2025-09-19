@@ -22,7 +22,7 @@ export default function Slider() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div className="space-y-6 text-center lg:text-left">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-foreground leading-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-foreground leading-tight font-headline">
               Welcome to AI <br />
               <span className="text-foreground">Innovation Society</span>
             </h1>
