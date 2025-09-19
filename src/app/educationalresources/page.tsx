@@ -14,7 +14,7 @@ import {
   FileText,
   Presentation,
   File,
-  Download,
+  Eye,
   X,
 } from "lucide-react";
 import "./resources.css";
@@ -42,9 +42,9 @@ function ResourceCard({ resource }: { resource: EducationalResource }) {
         <div className="resource-meta">
           <span className="file-type-badge">{resource.fileType.split('/')[1] || 'File'}</span>
           <Button asChild size="sm" variant="outline" className="mt-4">
-            <a href={resource.fileUrl} download target="_blank" rel="noopener noreferrer">
-              <Download className="mr-2 h-4 w-4" />
-              Download
+            <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
+              <Eye className="mr-2 h-4 w-4" />
+              View
             </a>
           </Button>
         </div>
