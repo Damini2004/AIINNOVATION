@@ -1,15 +1,16 @@
+
 "use client";
 
-import { GraduationCap, Users, Sparkles, ClipboardCheck } from "lucide-react";
+import { GraduationCap, Users, Sparkles, ClipboardCheck, User, BookOpen } from "lucide-react";
 
 export default function ProgramsPage() {
   const boxes = [
-    { icon: <GraduationCap className="w-10 h-10 text-white" />, title: "AI Certificate Courses", desc: "Online and hybrid programs on AI, ML, and Data Ethics." },
+    { icon: <User className="w-10 h-10 text-white" />, title: "Women in AI", desc: "Empowerment programs, fellowships, and events for women in AI." },
     { icon: <Users className="w-10 h-10 text-white" />, title: "AI in Schools", desc: "Curriculum design and workshops for K–12 and higher education." },
     { icon: <Sparkles className="w-10 h-10 text-white" />, title: "AI & SDGs", desc: "Aligning AI projects with UN Sustainable Development Goals." },
-    { icon: <GraduationCap className="w-10 h-10 text-white" />, title: "Women in AI", desc: "Empowerment programs, fellowships, and events for women in AI." },
+    { icon: <GraduationCap className="w-10 h-10 text-white" />, title: "AI Certificate Courses", desc: "Online and hybrid programs on AI, ML, and Data Ethics." },
     { icon: <ClipboardCheck className="w-10 h-10 text-white" />, title: "AI Events", desc: "Conferences and Workshops at National and International Universities." },
-    { icon: <Sparkles className="w-10 h-10 text-white" />, title: "Publications", desc: "Free of charge publications to members of AIIS." },
+    { icon: <BookOpen className="w-10 h-10 text-white" />, title: "Publications", desc: "Free of charge publications to members of AIIS." },
   ];
 
   return (
