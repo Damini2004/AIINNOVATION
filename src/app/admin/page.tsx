@@ -871,7 +871,6 @@ export default function AdminPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [journals, setJournals] = useState<Journal[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
-  const [resources, setResources] = useState<EducationalResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -891,20 +890,18 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
       getDigitalLibraryPapers(),
-      getEducationalResources(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
     setEvents(eventsData);
     setJournals(journalsData);
     setPapers(papersData);
-    setResources(resourcesData);
     setLoading(false);
   };
 
@@ -963,13 +960,12 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1240,62 +1236,6 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="library">
           <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
-        </TabsContent>
-
-        <TabsContent value="resources">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Educational Resources</CardTitle>
-                <CardDescription>Add or delete educational resources like PDFs, PPTs, etc.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Resource</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Resource</DialogTitle>
-                  </DialogHeader>
-                  <EducationalResourceForm onSave={() => fetchData()} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {resources.map((resource) => (
-                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md">
-                    <div className="flex items-center gap-4">
-                      {getFileIcon(resource.fileType)}
-                      <div className="truncate">
-                        <p className="font-semibold truncate">{resource.title}</p>
-                        <p className="text-sm text-muted-foreground truncate">{resource.fileName}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will permanently delete the resource: "{resource.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
       </Tabs>
