@@ -29,30 +29,31 @@ import Image from "next/image";
 function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   return (
     <div className="paper-item">
-      <div className="paper-card-content">
-        <Link
+       <div className="paper-card-content">
+         <Link
             href={paper.link}
             target="_blank"
             rel="noopener noreferrer"
             className="no-underline"
-        >
+          >
             <h3 className="paper-title">{paper.paperTitle}</h3>
-        </Link>
-        <p className="paper-authors">
-          <User className="inline-icon" /> {paper.authorName}
-        </p>
-        <div className="paper-meta">
-          <span>
-            <Newspaper className="inline-icon" /> {paper.journalName}
-          </span>
-          <span>
-            <FileText className="inline-icon" /> {paper.volumeIssue}
-          </span>
-        </div>
-      </div>
+          </Link>
+          <p className="paper-authors">
+            <User className="inline-icon" /> {paper.authorName}
+          </p>
+          <div className="paper-meta">
+            <span>
+              <Newspaper className="inline-icon" /> {paper.journalName}
+            </span>
+            <span>
+              <FileText className="inline-icon" /> {paper.volumeIssue}
+            </span>
+          </div>
+       </div>
     </div>
   );
 }
+
 
 const sortOptions = [
     { value: 'relevance', label: 'Relevance' },
@@ -147,7 +148,7 @@ export default function DigitalLibraryPage() {
 
           <div className="grid lg:grid-cols-12 gap-12">
             {/* Left Sidebar: Filters */}
-            <aside className="lg:col-span-4">
+            <aside className="lg:col-span-3">
               <div className="p-6 bg-card border rounded-lg sticky top-24">
                   <h3 className="text-lg font-semibold flex items-center mb-4">
                     <Filter className="h-5 w-5 mr-2 text-primary" />
@@ -168,8 +169,8 @@ export default function DigitalLibraryPage() {
                 </div>
             </aside>
             
-            {/* Right Content: Papers List */}
-            <div className="lg:col-span-8">
+            {/* Center Content: Papers List */}
+            <div className="lg:col-span-6">
               <div className="space-y-2">
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
@@ -199,6 +200,20 @@ export default function DigitalLibraryPage() {
                 )}
               </div>
             </div>
+
+            {/* Right Sidebar: Image */}
+            <aside className="lg:col-span-3 hidden lg:block">
+                <div className="sticky top-24">
+                    <Image 
+                        src="https://picsum.photos/seed/library-promo/400/600"
+                        alt="Digital Library"
+                        width={400}
+                        height={600}
+                        className="rounded-lg object-cover shadow-lg"
+                        data-ai-hint="library books"
+                    />
+                </div>
+            </aside>
           </div>
         </div>
       </main>
