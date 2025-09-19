@@ -45,7 +45,7 @@ function ResourceCard({ resource }: { resource: EducationalResource }) {
                 data-ai-hint="resource cover"
             />
         </div>
-        <div className="resource-card-content">
+        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="resource-card-content no-underline">
             <h3 className="resource-title group-hover:text-primary">{resource.title}</h3>
             <p className="resource-description">{resource.description}</p>
             <div className="resource-meta">
@@ -53,13 +53,13 @@ function ResourceCard({ resource }: { resource: EducationalResource }) {
                 {getIcon(resource.fileType)}{resource.fileType.split('/')[1] || resource.fileType}
             </span>
             <Button asChild size="sm" variant="outline">
-                <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
-                <Eye className="mr-2 h-4 w-4" />
-                View
-                </a>
+                <span className="flex items-center">
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                </span>
             </Button>
             </div>
-        </div>
+        </a>
     </div>
   );
 }
