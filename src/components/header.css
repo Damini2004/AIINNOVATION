@@ -1,7 +1,19 @@
+
 .datatech_nav_manu {
   background: #fff;
-  margin-top: 5px;
-  margin-bottom: 5px; /* subtle bottom border */
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: height 0.3s ease-in-out;
+  height: 90px;
+}
+
+.datatech_nav_manu.scrolled {
+  height: 70px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .datatech_menu ul li a {

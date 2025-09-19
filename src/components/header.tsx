@@ -13,6 +13,7 @@ export function AppHeader() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -21,6 +22,14 @@ export function AppHeader() {
      // Close mobile menu on navigation
     setIsOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
 
   const toggleDropdown = (menu: string) => {
@@ -42,18 +51,7 @@ export function AppHeader() {
   return (
     <header
       id="sticky-header"
-      className="datatech_nav_manu"
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 999,
-        paddingLeft: "20px",
-        paddingRight: "20px",
-        height: "60px",
-        display: "flex",
-        alignItems: "center",
-        background: "#fff",
-      }}
+      className={`datatech_nav_manu ${isScrolled ? 'scrolled' : ''}`}
     >
       <div className="container w-full mx-auto">
         {/* Navbar wrapper */}
