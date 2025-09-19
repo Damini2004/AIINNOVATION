@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
+import MemberServices from "./member-services";
+import "./member-services.css";
 
 export default function BecomeAMemberPage() {
 
@@ -73,6 +75,7 @@ export default function BecomeAMemberPage() {
             </div>
           </section>
       </main>
+      <MemberServices />
     </div>
   );
 }
