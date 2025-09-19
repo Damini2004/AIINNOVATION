@@ -12,87 +12,67 @@ export default function TechnologyArea() {
           {/* Left side - Feature cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Card 1 - AI Education */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                 }}
-                 onMouseOver={e => {
-                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
-                 }}
-                 onMouseOut={e => {
-                    e.currentTarget.style.backgroundImage = "";
+                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
                  }}
                  data-ai-hint="education abstract"
                  >
-              <GraduationCap className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
-              <h2 className="font-bold text-xl transition-colors duration-300 group-hover:text-primary-foreground">AI Education</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
+              <GraduationCap className="w-12 h-12 mb-2 text-primary-foreground" />
+              <h2 className="font-bold text-xl">AI Education</h2>
+              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
                 Courses, internships, and curriculum to upskill students and educators in AI.
               </p>
             </div>
 
             {/* Card 2 - Research */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                 }}
-                 onMouseOver={e => {
-                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
-                 }}
-                 onMouseOut={e => {
-                    e.currentTarget.style.backgroundImage = "";
+                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
                  }}
                  >
-              <ClipboardCheck className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
-              <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">Research</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
+              <ClipboardCheck className="w-12 h-12 mb-2 text-primary-foreground" />
+              <h2 className="font-bold text-xl">Research</h2>
+              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
                 Hosting of AI domain journals for ethical research dissemination.
               </p>
             </div>
 
             {/* Card 3 - AI for Social Good */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                 }}
-                 onMouseOver={e => {
-                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
-                 }}
-                 onMouseOut={e => {
-                    e.currentTarget.style.backgroundImage = "";
+                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
                  }}
                 >
-              <Sparkles className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
-              <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">AI for Social Good</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
+              <Sparkles className="w-12 h-12 mb-2 text-primary-foreground" />
+              <h2 className="font-bold text-xl">AI for Social Good</h2>
+              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
                 Initiatives that use AI to address challenges in healthcare and equity.
               </p>
             </div>
 
             {/* Card 4 - Memberships */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                 }}
-                 onMouseOver={e => {
-                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
-                 }}
-                 onMouseOut={e => {
-                    e.currentTarget.style.backgroundImage = "";
+                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
                  }}
                  data-ai-hint="community abstract"
                  >
-              <Users className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
-              <h2 className="font-bold text-xl transition-colors duration-300 group-hover:text-primary-foreground">Memberships</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
+              <Users className="w-12 h-12 mb-2 text-primary-foreground" />
+              <h2 className="font-bold text-xl">Memberships</h2>
+              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
                 Open to students, professionals, researchers, and institutions.
               </p>
             </div>
