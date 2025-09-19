@@ -124,16 +124,16 @@ const educationalResourceSchema = z.object({
   file: z.any().optional(),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   image: z.any().optional(),
-}).refine(data => (data.file && data.file.length > 0) || !!data.link || !!data.id, { // Allow edit without new file/link
+}).refine(data => (data.file && data.file.length > 0) || !!data.link || !!data.id, {
   message: "Either a file or a link is required.",
   path: ["file"],
 });
 
 const counterSchema = z.object({
-  members: z.number().min(0),
-  projects: z.number().min(0),
-  journals: z.number().min(0),
-  subscribers: z.number().min(0),
+  members: z.coerce.number().min(0, "Must be a positive number"),
+  projects: z.coerce.number().min(0, "Must be a positive number"),
+  journals: z.coerce.number().min(0, "Must be a positive number"),
+  subscribers: z.coerce.number().min(0, "Must be a positive number"),
 });
 
 
@@ -146,7 +146,7 @@ type CounterFormType = z.infer<typeof counterSchema>;
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState<string | null>(course?.img || null);
   
   const {
@@ -170,25 +170,27 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsSubmitting(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setValue("img", base64String, { shouldValidate: true });
         setPreview(base64String);
-        setIsUploading(false);
+        setIsSubmitting(false);
       };
       reader.onerror = () => {
          toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
-         setIsUploading(false);
+         setIsSubmitting(false);
       }
       reader.readAsDataURL(file);
     }
   };
 
   const onSubmit: SubmitHandler<Course> = async (data) => {
+    setIsSubmitting(true);
     if (!data.img) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        setIsSubmitting(false);
         return;
     }
     const result = await addOrUpdateCourse(data);
@@ -200,6 +202,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -208,49 +211,48 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
       <Input type="hidden" {...register("img")} />
       <div>
         <Label htmlFor="courseTitle">Title</Label>
-        <Input id="courseTitle" {...register("title")} />
+        <Input id="courseTitle" {...register("title")} disabled={isSubmitting} />
         {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
       </div>
       <div>
         <Label htmlFor="courseDescription">Description</Label>
-        <Textarea id="courseDescription" {...register("description")} />
+        <Textarea id="courseDescription" {...register("description")} disabled={isSubmitting} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
       </div>
       <div>
         <Label htmlFor="courseDuration">Duration</Label>
-        <Input id="courseDuration" {...register("duration")} />
+        <Input id="courseDuration" {...register("duration")} disabled={isSubmitting} />
         {errors.duration && <p className="text-red-500 text-sm">{errors.duration.message}</p>}
       </div>
       <div>
         <Label htmlFor="courseCategory">Category</Label>
-        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...register("category")} />
+        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...register("category")} disabled={isSubmitting} />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
       <div>
         <Label htmlFor="courseLink">Link</Label>
-        <Input id="courseLink" placeholder="https://example.com/course-details" {...register("link")} />
+        <Input id="courseLink" placeholder="https://example.com/course-details" {...register("link")} disabled={isSubmitting} />
         {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
       <div>
         <Label htmlFor="courseImgFile">Upload Image</Label>
-        <Input id="courseImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
+        <Input id="courseImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isSubmitting}/>
         {errors.img && <p className="text-red-500 text-sm">{errors.img.message}</p>}
-        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
        {preview && (
         <div className="mt-4">
           <Label>Image Preview</Label>
-          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
-             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48 bg-muted/50">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full rounded-md" />
           </div>
         </div>
       )}
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isUploading}>
-           {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting}>
+           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
            Save Course
         </Button>
       </DialogFooter>
@@ -260,7 +262,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
 
 function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState<string | null>(partner?.logo || null);
 
   const {
@@ -284,25 +286,27 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsSubmitting(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setValue("logo", base64String, { shouldValidate: true });
         setPreview(base64String);
-        setIsUploading(false);
+        setIsSubmitting(false);
       };
       reader.onerror = () => {
          toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
-         setIsUploading(false);
+         setIsSubmitting(false);
       }
       reader.readAsDataURL(file);
     }
   };
 
   const onSubmit: SubmitHandler<Partner> = async (data) => {
+    setIsSubmitting(true);
      if (!data.logo) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload a logo file." });
+        setIsSubmitting(false);
         return;
     }
     const result = await addOrUpdatePartner(data);
@@ -314,6 +318,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -322,49 +327,48 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
       <Input type="hidden" {...register("logo")} />
       <div>
         <Label htmlFor="partnerName">Partner Name</Label>
-        <Input id="partnerName" {...register("name")} />
+        <Input id="partnerName" {...register("name")} disabled={isSubmitting} />
         {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
       </div>
       <div>
         <Label htmlFor="partnerDesignation">Designation</Label>
-        <Input id="partnerDesignation" {...register("designation")} />
+        <Input id="partnerDesignation" {...register("designation")} disabled={isSubmitting} />
         {errors.designation && <p className="text-red-500 text-sm">{errors.designation.message}</p>}
       </div>
        <div>
         <Label htmlFor="logoFile">Upload Logo</Label>
-        <Input id="logoFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading} />
+        <Input id="logoFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isSubmitting} />
         {errors.logo && <p className="text-red-500 text-sm">{errors.logo.message}</p>}
-        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
        {preview && (
         <div className="mt-4">
           <Label>Logo Preview</Label>
-          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-24">
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-24 bg-muted/50">
              <Image src={preview} alt="Logo preview" width={150} height={80} className="object-contain max-h-full" />
           </div>
         </div>
       )}
       <div>
         <Label htmlFor="partnerFacebookUrl">Facebook URL</Label>
-        <Input id="partnerFacebookUrl" {...register("facebookUrl")} />
+        <Input id="partnerFacebookUrl" {...register("facebookUrl")} disabled={isSubmitting} />
         {errors.facebookUrl && <p className="text-red-500 text-sm">{errors.facebookUrl.message}</p>}
       </div>
       <div>
         <Label htmlFor="partnerTwitterUrl">Twitter URL</Label>
-        <Input id="partnerTwitterUrl" {...register("twitterUrl")} />
+        <Input id="partnerTwitterUrl" {...register("twitterUrl")} disabled={isSubmitting} />
         {errors.twitterUrl && <p className="text-red-500 text-sm">{errors.twitterUrl.message}</p>}
       </div>
       <div>
         <Label htmlFor="partnerPinterestUrl">Pinterest URL</Label>
-        <Input id="partnerPinterestUrl" {...register("pinterestUrl")} />
+        <Input id="partnerPinterestUrl" {...register("pinterestUrl")} disabled={isSubmitting} />
         {errors.pinterestUrl && <p className="text-red-500 text-sm">{errors.pinterestUrl.message}</p>}
       </div>
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isUploading}>
-          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Partner
         </Button>
       </DialogFooter>
@@ -374,7 +378,7 @@ function PartnerForm({ partner, onSave }: { partner?: Partner; onSave: () => voi
 
 function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState<string | null>(event?.image || null);
   
   const {
@@ -398,25 +402,27 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsSubmitting(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setValue("image", base64String, { shouldValidate: true });
         setPreview(base64String);
-        setIsUploading(false);
+        setIsSubmitting(false);
       };
       reader.onerror = () => {
          toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
-         setIsUploading(false);
+         setIsSubmitting(false);
       }
       reader.readAsDataURL(file);
     }
   };
 
   const onSubmit: SubmitHandler<Event> = async (data) => {
+    setIsSubmitting(true);
     if (!data.image) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        setIsSubmitting(false);
         return;
     }
     const result = await addOrUpdateEvent(data);
@@ -428,6 +434,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -436,49 +443,48 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
        <Input type="hidden" {...register("image")} />
        <div>
         <Label htmlFor="eventTitle">Title</Label>
-        <Input id="eventTitle" {...register("title")} />
+        <Input id="eventTitle" {...register("title")} disabled={isSubmitting} />
         {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
       </div>
         <div>
         <Label htmlFor="eventSubtitle">Subtitle</Label>
-        <Input id="eventSubtitle" {...register("subtitle")} />
+        <Input id="eventSubtitle" {...register("subtitle")} disabled={isSubmitting} />
         {errors.subtitle && <p className="text-red-500 text-sm">{errors.subtitle.message}</p>}
       </div>
       <div>
         <Label htmlFor="eventDescription">Description</Label>
-        <Textarea id="eventDescription" {...register("description")} />
+        <Textarea id="eventDescription" {...register("description")} disabled={isSubmitting} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
       </div>
       <div>
         <Label htmlFor="eventCategory">Category</Label>
-        <Input id="eventCategory" {...register("category")} />
+        <Input id="eventCategory" {...register("category")} disabled={isSubmitting} />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
       <div>
         <Label htmlFor="eventImgFile">Upload Image</Label>
-        <Input id="eventImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
+        <Input id="eventImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isSubmitting}/>
         {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
-        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
        {preview && (
         <div className="mt-4">
           <Label>Image Preview</Label>
-          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
-             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48 bg-muted/50">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full rounded-md" />
           </div>
         </div>
       )}
       <div>
         <Label htmlFor="eventLink">Event Link</Label>
-        <Input id="eventLink" {...register("link")} />
+        <Input id="eventLink" {...register("link")} disabled={isSubmitting} />
         {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isUploading}>
-          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Event
         </Button>
       </DialogFooter>
@@ -488,7 +494,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
 
 function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState<string | null>(journal?.image || null);
   
   const {
@@ -512,25 +518,27 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsSubmitting(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setValue("image", base64String, { shouldValidate: true });
         setPreview(base64String);
-        setIsUploading(false);
+        setIsSubmitting(false);
       };
       reader.onerror = () => {
          toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
-         setIsUploading(false);
+         setIsSubmitting(false);
       }
       reader.readAsDataURL(file);
     }
   };
 
   const onSubmit: SubmitHandler<Journal> = async (data) => {
+    setIsSubmitting(true);
     if (!data.image) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
+        setIsSubmitting(false);
         return;
     }
     const result = await addOrUpdateJournal(data);
@@ -542,6 +550,7 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -550,39 +559,38 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
        <Input type="hidden" {...register("image")} />
        <div>
         <Label htmlFor="journalTitle">Title</Label>
-        <Input id="journalTitle" {...register("title")} />
+        <Input id="journalTitle" {...register("title")} disabled={isSubmitting} />
         {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
       </div>
       <div>
         <Label htmlFor="journalDescription">Description</Label>
-        <Textarea id="journalDescription" {...register("description")} />
+        <Textarea id="journalDescription" {...register("description")} disabled={isSubmitting} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
       </div>
       <div>
         <Label htmlFor="journalLink">Link</Label>
-        <Input id="journalLink" placeholder="https://example.com/journal-details" {...register("link")} />
+        <Input id="journalLink" placeholder="https://example.com/journal-details" {...register("link")} disabled={isSubmitting} />
         {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
       <div>
         <Label htmlFor="journalImgFile">Upload Image</Label>
-        <Input id="journalImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading}/>
+        <Input id="journalImgFile" type="file" onChange={handleFileChange} accept="image/*" disabled={isSubmitting}/>
         {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
-        {isUploading && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading file...</div>}
       </div>
        {preview && (
         <div className="mt-4">
           <Label>Image Preview</Label>
-          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48">
-             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full" />
+          <div className="mt-2 p-4 border rounded-md flex justify-center items-center h-48 bg-muted/50">
+             <Image src={preview} alt="Image preview" width={400} height={300} className="object-contain max-h-full rounded-md" />
           </div>
         </div>
       )}
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isUploading}>
-          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Journal
         </Button>
       </DialogFooter>
@@ -594,7 +602,6 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(resource?.image || null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue, clearErrors } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
@@ -602,7 +609,6 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   });
 
   const fileRef = register("file");
-  const imageRef = register("image");
   const selectedFile = watch("file");
   const linkValue = watch("link");
 
@@ -639,7 +645,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   const handleImageFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploadingImage(true);
+      setIsSubmitting(true);
       try {
         const base64String = await fileToDataURL(file);
         setValue("image", base64String, { shouldValidate: true });
@@ -647,7 +653,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
       } catch (error) {
         toast({ variant: "destructive", title: "Error", description: "Failed to read image file." });
       } finally {
-        setIsUploadingImage(false);
+        setIsSubmitting(false);
       }
     }
   };
@@ -664,11 +670,11 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
 
       if (data.file && data.file.length > 0) {
         const file = data.file[0];
-        if (file.size > 5 * 1024 * 1024) { // Increased to 5MB
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
              toast({
                 variant: "destructive",
                 title: "File Too Large",
-                description: "Please upload files smaller than 5MB. For larger files, use a link.",
+                description: "Please upload files smaller than 5MB. For larger files, use the link option.",
             });
             setIsSubmitting(false);
             return;
@@ -688,7 +694,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
          throw new Error("No file or link provided.");
       }
       
-      const resourceData = {
+      const resourceData: EducationalResource = {
         id: data.id,
         title: data.title,
         description: data.description,
@@ -741,24 +747,22 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
             type="file"
             accept="image/*"
             onChange={handleImageFileChange}
-            disabled={isSubmitting || isUploadingImage}
+            disabled={isSubmitting}
         />
-        {isUploadingImage && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading image...</div>}
         {errors.image && <p className="text-red-500 text-sm">{(errors.image as any).message}</p>}
         {imagePreview && (
-          <div className="mt-2 p-2 border rounded-md flex justify-center items-center h-32">
-              <Image src={imagePreview} alt="Cover preview" width={200} height={120} className="object-contain max-h-full" />
+          <div className="mt-2 p-2 border rounded-md flex justify-center items-center h-32 bg-muted/50">
+              <Image src={imagePreview} alt="Cover preview" width={200} height={120} className="object-contain max-h-full rounded-md" />
           </div>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="resourceFile">Upload Resource File (PDF, DOC, PPT)</Label>
+        <Label htmlFor="resourceFile">Upload Resource File (PDF, DOC, PPT, etc.)</Label>
         <Input
           id="resourceFile"
           type="file"
           {...fileRef}
-          accept=".pdf,.doc,.docx,.ppt,.pptx"
           disabled={isSubmitting || !!linkValue}
         />
         {selectedFile && selectedFile.length > 0 && !linkValue && (
@@ -784,8 +788,8 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         <DialogClose asChild>
           <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isSubmitting || isUploadingImage}>
-          {(isSubmitting || isUploadingImage) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Resource
         </Button>
       </DialogFooter>
@@ -809,7 +813,6 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
       reader.onload = async (event) => {
         try {
           const text = event.target?.result as string;
-          // Basic CSV parsing
           const rows = text.split('\n').filter(row => row.trim() !== '');
           const headers = rows[0].split(',').map(h => h.trim());
           const expectedHeaders = ["paperTitle", "authorName", "journalName", "volumeIssue", "link", "image"];
@@ -830,7 +833,6 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
             };
           });
 
-          // Validate with Zod
           const validatedData = z.array(digitalLibraryPaperSchema.omit({id: true})).safeParse(data);
           if (!validatedData.success) {
             console.error(validatedData.error);
@@ -885,7 +887,7 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="p-4 border-2 border-dashed rounded-lg text-center">
-            <Label htmlFor="csv-upload" className="cursor-pointer flex flex-col items-center justify-center space-y-2">
+            <Label htmlFor="csv-upload" className="cursor-pointer flex flex-col items-center justify-center space-y-2 p-4">
                 <Upload className="h-8 w-8 text-muted-foreground" />
                 <span className="font-medium">
                     {fileName ? `Selected: ${fileName}` : "Click to upload a CSV file"}
@@ -911,7 +913,7 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
              <h4 className="font-semibold">Existing Papers ({initialPapers.length})</h4>
              <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                 {initialPapers.map((paper) => (
-                    <div key={paper.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div key={paper.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                         <div className="truncate">
                           <p className="font-medium text-sm truncate">{paper.paperTitle}</p>
                           <p className="text-xs text-muted-foreground truncate">{paper.authorName}</p>
@@ -978,22 +980,22 @@ function CounterForm({ onSave }: { onSave: () => void }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="members">Members</Label>
-              <Input id="members" type="number" {...register("members", { valueAsNumber: true })} />
+              <Input id="members" type="number" {...register("members")} />
               {errors.members && <p className="text-red-500 text-sm">{errors.members.message}</p>}
             </div>
             <div>
               <Label htmlFor="projects">Projects</Label>
-              <Input id="projects" type="number" {...register("projects", { valueAsNumber: true })} />
+              <Input id="projects" type="number" {...register("projects")} />
               {errors.projects && <p className="text-red-500 text-sm">{errors.projects.message}</p>}
             </div>
             <div>
               <Label htmlFor="journals">International Journals</Label>
-              <Input id="journals" type="number" {...register("journals", { valueAsNumber: true })} />
+              <Input id="journals" type="number" {...register("journals")} />
               {errors.journals && <p className="text-red-500 text-sm">{errors.journals.message}</p>}
             </div>
             <div>
               <Label htmlFor="subscribers">Subscribers</Label>
-              <Input id="subscribers" type="number" {...register("subscribers", { valueAsNumber: true })} />
+              <Input id="subscribers" type="number" {...register("subscribers")} />
               {errors.subscribers && <p className="text-red-500 text-sm">{errors.subscribers.message}</p>}
             </div>
           </div>
@@ -1060,25 +1062,20 @@ export default function AdminPage() {
   };
 
 
-  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string, fileName?: string) => {
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string, filePath?: string) => {
     let result;
-    if (collection === 'courses') result = await deleteCourse(id);
-    if (collection === 'partners') result = await deletePartner(id);
-    if (collection === 'events') result = await deleteEvent(id);
-    if (collection === 'journals') result = await deleteJournal(id);
+    if (collection === 'courses') result = await deleteCourse(id, filePath);
+    if (collection === 'partners') result = await deletePartner(id, filePath);
+    if (collection === 'events') result = await deleteEvent(id, filePath);
+    if (collection === 'journals') result = await deleteJournal(id, filePath);
     if (collection === 'digital_library_papers') result = await deleteDigitalLibraryPaper(id);
-    if (collection === 'educational_resources' && fileName) {
-        result = await deleteEducationalResource(id, fileName);
-    } else if (collection === 'educational_resources') {
-        // This case handles links, where fileName can be 'link'
-         result = await deleteEducationalResource(id, fileName || 'link');
-    }
+    if (collection === 'educational_resources') result = await deleteEducationalResource(id, filePath);
 
     if (result?.success) {
       toast({ title: "Success", description: "Item deleted successfully." });
       fetchData();
     } else {
-      toast({ variant: "destructive", title: "Error", description: result?.error });
+      toast({ variant: "destructive", title: "Error", description: result?.error || "Failed to delete item." });
     }
   }
 
@@ -1130,7 +1127,7 @@ export default function AdminPage() {
                 <DialogTrigger asChild>
                   <Button>Add New Course</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Add New Course</DialogTitle>
                   </DialogHeader>
@@ -1141,9 +1138,9 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-4">
                 {courses.map((course) => (
-                  <div key={course.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div key={course.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                      <div className="flex items-center gap-4">
-                        <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md" />
+                        <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md object-cover" />
                         <div>
                           <p className="font-semibold">{course.title}</p>
                           <p className="text-sm text-muted-foreground">{course.category} - {course.duration}</p>
@@ -1154,7 +1151,7 @@ export default function AdminPage() {
                         <DialogTrigger asChild>
                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Edit Course</DialogTitle>
                           </DialogHeader>
@@ -1169,12 +1166,12 @@ export default function AdminPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the course.
+                              This action will permanently delete the course "{course.title}".
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('courses', course.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDelete('courses', course.id!, course.img)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -1197,7 +1194,7 @@ export default function AdminPage() {
                 <DialogTrigger asChild>
                   <Button>Add New Partner</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Add New Partner</DialogTitle>
                   </DialogHeader>
@@ -1208,7 +1205,7 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-4">
                 {partners.map((partner) => (
-                  <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                      <div className="flex items-center gap-4">
                         <Image src={partner.logo || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
                         <div>
@@ -1221,7 +1218,7 @@ export default function AdminPage() {
                         <DialogTrigger asChild>
                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Edit Partner</DialogTitle>
                           </DialogHeader>
@@ -1236,12 +1233,12 @@ export default function AdminPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the partner.
+                              This action will permanently delete the partner "{partner.name}".
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('partners', partner.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDelete('partners', partner.id!, partner.logo)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -1264,7 +1261,7 @@ export default function AdminPage() {
                 <DialogTrigger asChild>
                   <Button>Add New Event</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Add New Event</DialogTitle>
                   </DialogHeader>
@@ -1275,7 +1272,7 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-4">
                 {events.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div key={event.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                     <div className="flex items-center gap-4">
                         <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md object-cover" />
                         <div>
@@ -1288,7 +1285,7 @@ export default function AdminPage() {
                         <DialogTrigger asChild>
                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Edit Event</DialogTitle>
                           </DialogHeader>
@@ -1303,12 +1300,12 @@ export default function AdminPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the event.
+                               This action will permanently delete the event "{event.title}".
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('events', event.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDelete('events', event.id!, event.image)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -1331,7 +1328,7 @@ export default function AdminPage() {
                 <DialogTrigger asChild>
                   <Button>Add New Journal</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Add New Journal</DialogTitle>
                   </DialogHeader>
@@ -1342,7 +1339,7 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-4">
                 {journals.map((journal) => (
-                  <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                     <div className="flex items-center gap-4">
                         <Image src={journal.image} alt={journal.title} width={60} height={45} className="rounded-md object-cover" />
                         <div>
@@ -1354,7 +1351,7 @@ export default function AdminPage() {
                         <DialogTrigger asChild>
                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Edit Journal</DialogTitle>
                           </DialogHeader>
@@ -1369,12 +1366,12 @@ export default function AdminPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the journal.
+                              This action will permanently delete the journal "{journal.title}".
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('journals', journal.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDelete('journals', journal.id!, journal.image)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -1399,7 +1396,7 @@ export default function AdminPage() {
                 <DialogTrigger asChild>
                   <Button>Add New Resource</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Add New Resource</DialogTitle>
                   </DialogHeader>
@@ -1410,9 +1407,15 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-4">
                 {resources.map((resource) => (
-                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                     <div className="flex items-center gap-4">
-                      <Image src={resource.image || "https://picsum.photos/seed/placeholder/60/45"} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
+                      {resource.image ? (
+                        <Image src={resource.image} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
+                      ) : (
+                        <div className="w-[60px] h-[45px] flex items-center justify-center bg-secondary rounded-md">
+                          {getFileIcon(resource.fileType)}
+                        </div>
+                      )}
                       <div>
                         <p className="font-semibold">{resource.title}</p>
                         <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
@@ -1423,7 +1426,7 @@ export default function AdminPage() {
                         <DialogTrigger asChild>
                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Edit Resource</DialogTitle>
                           </DialogHeader>
@@ -1462,5 +1465,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    

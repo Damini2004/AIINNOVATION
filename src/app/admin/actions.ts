@@ -61,7 +61,7 @@ const educationalResourceSchema = z.object({
     id: z.string().optional(),
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
-    fileUrl: z.string().min(1, "File URL or data is required"),
+    fileUrl: z.string().min(1, "File URL or data URI is required"),
     fileName: z.string().min(1, "File name is required"),
     fileType: z.string().min(1, "File type is required"),
     image: z.string().optional(),
@@ -109,6 +109,10 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
 
     return { success: true };
   } catch (error: any) {
+    console.error("Error in addOrUpdateDoc:", error.message);
+    if (error instanceof z.ZodError) {
+       return { success: false, error: "Validation failed: " + error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ') };
+    }
     return { success: false, error: error.message };
   }
 }
@@ -130,17 +134,17 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
     const docRef = doc(db, collectionName, id);
     await deleteDoc(docRef);
 
-    // No need to delete from storage if we are not using it for educational resources
-    if (collectionName !== 'educational_resources' && filePath && filePath !== 'link') {
+    // If a filePath is provided and it's not just a 'link' placeholder, attempt to delete from storage
+    if (filePath && filePath !== 'link' && !filePath.startsWith('data:')) {
         try {
             const storage = getStorage();
             const fileRef = ref(storage, filePath);
             await deleteObject(fileRef);
         } catch (storageError) {
-            if ((storageError as any).code === 'storage/object-not-found') {
-                console.warn("File not found in storage, but document was deleted from Firestore.");
-            } else {
+            // It's okay if the object doesn't exist.
+            if ((storageError as any).code !== 'storage/object-not-found') {
                 console.error("Error deleting file from storage:", storageError);
+                // Decide if you want to fail the whole operation or just warn
             }
         }
     }
@@ -164,22 +168,22 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
 // Course Actions
 export async function addOrUpdateCourse(data: Course) { return addOrUpdateDoc('courses', data, courseSchema); }
 export async function getCourses(): Promise<Course[]> { return getDocsFromCollection<Course>('courses'); }
-export async function deleteCourse(id: string) { return deleteDocFromCollection('courses', id); }
+export async function deleteCourse(id: string, imgPath?: string) { return deleteDocFromCollection('courses', id, imgPath); }
 
 // Partner Actions
 export async function addOrUpdatePartner(data: Partner) { return addOrUpdateDoc('partners', data, partnerSchema); }
 export async function getPartners(): Promise<Partner[]> { return getDocsFromCollection<Partner>('partners'); }
-export async function deletePartner(id: string) { return deleteDocFromCollection('partners', id); }
+export async function deletePartner(id: string, logoPath?: string) { return deleteDocFromCollection('partners', id, logoPath); }
 
 // Event Actions
 export async function addOrUpdateEvent(data: Event) { return addOrUpdateDoc('events', data, eventSchema); }
 export async function getEvents(): Promise<Event[]> { return getDocsFromCollection<Event>('events'); }
-export async function deleteEvent(id: string) { return deleteDocFromCollection('events', id); }
+export async function deleteEvent(id: string, imagePath?: string) { return deleteDocFromCollection('events', id, imagePath); }
 
 // Journal Actions
 export async function addOrUpdateJournal(data: Journal) { return addOrUpdateDoc('journals', data, journalSchema); }
 export async function getJournals(): Promise<Journal[]> { return getDocsFromCollection<Journal>('journals'); }
-export async function deleteJournal(id: string) { return deleteDocFromCollection('journals',id); }
+export async function deleteJournal(id: string, imagePath?: string) { return deleteDocFromCollection('journals',id, imagePath); }
 
 // Digital Library Actions
 export async function getDigitalLibraryPapers(): Promise<DigitalLibraryPaper[]> { return getDocsFromCollection<DigitalLibraryPaper>('digital_library_papers'); }
@@ -202,17 +206,11 @@ export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPap
 
 // Educational Resources Actions
 export async function getEducationalResources(): Promise<EducationalResource[]> { return getDocsFromCollection<EducationalResource>('educational_resources'); }
-
-export async function deleteEducationalResource(id: string, fileName: string) {
-    // Since we are not using Firebase Storage for educational resources anymore, we just delete from Firestore.
-    // The fileName parameter is kept for compatibility but not used.
-    return deleteDocFromCollection('educational_resources', id);
+export async function addOrUpdateEducationalResource(data: EducationalResource) { return addOrUpdateDoc('educational_resources', data, educationalResourceSchema); }
+export async function deleteEducationalResource(id: string, filePath?: string) {
+    return deleteDocFromCollection('educational_resources', id, filePath);
 }
 
-
-export async function addOrUpdateEducationalResource(data: EducationalResource) {
-    return addOrUpdateDoc('educational_resources', data, educationalResourceSchema);
-}
 
 // Counter Actions
 const COUNTER_COLLECTION = 'site_settings';
