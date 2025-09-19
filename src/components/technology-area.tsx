@@ -12,19 +12,23 @@ export default function TechnologyArea() {
           {/* Left side - Feature cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Card 1 - AI Education */}
-            <div className="rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 bg-primary"
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
                  style={{
-                   backgroundImage:
-                     "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
                  }}
+                 onMouseOver={e => {
+                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
+                 }}
+                 onMouseOut={e => {
+                    e.currentTarget.style.backgroundImage = "";
+                 }}
                  data-ai-hint="education abstract"
                  >
-              <GraduationCap className="w-12 h-12 mb-2 text-primary-foreground" />
-              <h2 className="font-bold text-xl">AI Education</h2>
-              <p className="text-base leading-relaxed max-w-xs">
+              <GraduationCap className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+              <h2 className="font-bold text-xl transition-colors duration-300 group-hover:text-primary-foreground">AI Education</h2>
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
                 Courses, internships, and curriculum to upskill students and educators in AI.
               </p>
             </div>
@@ -48,19 +52,23 @@ export default function TechnologyArea() {
             </div>
 
             {/* Card 4 - Memberships */}
-            <div className="rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 bg-primary"
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
                  style={{
-                   backgroundImage:
-                     "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))",
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
                  }}
+                 onMouseOver={e => {
+                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
+                 }}
+                 onMouseOut={e => {
+                    e.currentTarget.style.backgroundImage = "";
+                 }}
                  data-ai-hint="community abstract"
                  >
-              <Users className="w-12 h-12 mb-2 text-primary-foreground" />
-              <h2 className="font-bold text-xl">Memberships</h2>
-              <p className="text-base leading-relaxed max-w-xs">
+              <Users className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+              <h2 className="font-bold text-xl transition-colors duration-300 group-hover:text-primary-foreground">Memberships</h2>
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
                 Open to students, professionals, researchers, and institutions.
               </p>
             </div>
