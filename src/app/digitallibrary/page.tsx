@@ -21,31 +21,21 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   };
 
   return (
-    <div className="paper-card">
-      <div className="paper-card-content">
-        <div className="flex items-start">
-          <BookText className="h-5 w-5 text-primary mr-4 mt-1 flex-shrink-0" />
-          <div>
-            <Link href={paper.link} target="_blank" rel="noopener noreferrer">
-              <h3 className="paper-title">{paper.paperTitle}</h3>
-            </Link>
-            <p className="paper-authors">{paper.authorName}</p>
-            <div className="paper-meta">
-              <span><Newspaper className="inline-icon" /> {paper.journalName}</span>
-              <span><File className="inline-icon" /> {paper.volumeIssue}</span>
+    <Link href={paper.link} target="_blank" rel="noopener noreferrer" className="paper-card no-underline">
+        <div className="paper-card-content">
+            <div className="flex items-start">
+            <BookText className="h-5 w-5 text-primary mr-4 mt-1 flex-shrink-0" />
+            <div>
+                <h3 className="paper-title">{paper.paperTitle}</h3>
+                <p className="paper-authors">{paper.authorName}</p>
+                <div className="paper-meta">
+                <span><Newspaper className="inline-icon" /> {paper.journalName}</span>
+                <span><File className="inline-icon" /> {paper.volumeIssue}</span>
+                </div>
             </div>
-          </div>
+            </div>
         </div>
-      </div>
-      <div className="paper-card-actions">
-        <Button asChild variant="outline" size="sm">
-            <Link href={paper.link} target="_blank" rel="noopener noreferrer">
-              <LinkIcon className="mr-2 h-4 w-4"/>
-              Visit Link
-            </Link>
-        </Button>
-      </div>
-    </div>
+    </Link>
   );
 }
 
