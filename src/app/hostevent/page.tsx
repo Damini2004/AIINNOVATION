@@ -162,6 +162,17 @@ export default function HostEventPage() {
       <section className="py-24">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative group">
+               <iframe width="100%" height="500px" src="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv&autoplay=1&mute=0" allow="autoplay" allowFullScreen></iframe>
+                <a
+                  href="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv&autoplay=1&mute=0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pulse-btn absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-20 h-20 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                >
+                  <Play className="h-10 w-10" />
+                </a>
+            </div>
             <div>
                 <h5 className="text-primary font-semibold text-lg">Host an Event with AI Innovation Society</h5>
                 <div className="em_bar_bg text-left"></div>
@@ -173,17 +184,6 @@ export default function HostEventPage() {
                   Special Sessions & Workshops – Theme-based tracks within larger conferences, hosted under AIIS branding.<br/>
                   Institutional Collaborations – Partner events co-branded with universities and research centers.
                 </p>
-            </div>
-            <div className="relative group">
-               <iframe width="100%" height="500px" src="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv&autoplay=1&mute=0" allow="autoplay" allowFullScreen></iframe>
-                <a
-                  href="https://www.youtube.com/embed/UYGbTqu4JDY?si=_LJ08zTbOr80lXzv&autoplay=1&mute=0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="pulse-btn absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-20 h-20 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition"
-                >
-                  <Play className="h-10 w-10" />
-                </a>
             </div>
           </div>
         </div>
