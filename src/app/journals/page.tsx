@@ -89,7 +89,7 @@ export default function JournalsPage() {
     <div className="bg-background text-foreground">
       {/* Banner Section */}
       <section
-        className="py-24 bg-secondary relative bg-cover bg-center"
+        className="py-32 bg-secondary relative bg-cover bg-center"
         style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
       >
