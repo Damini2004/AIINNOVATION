@@ -1,10 +1,6 @@
 
 
 .paper-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 1.5rem;
     padding: 1.5rem 0;
     border-bottom: 1px solid hsl(var(--border));
 }
@@ -73,20 +69,4 @@
     height: 1rem;
     margin-right: 0.5rem;
     color: hsl(var(--primary) / 0.8);
-}
-
-.paper-image-wrapper {
-    width: 150px;
-    height: 150px;
-    position: relative;
-    border-radius: var(--radius);
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 1px solid hsl(var(--border));
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.paper-image-wrapper:hover {
-     transform: scale(1.05);
-     box-shadow: 0 8px 25px hsl(var(--primary) / 0.1);
 }
