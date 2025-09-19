@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import { CheckCircle, XCircle, ThumbsUp, ThumbsDown, BookOpen } from "lucide-react";
 import { getJournals } from "@/app/admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,19 +47,23 @@ export default function JournalsPage() {
   const JournalCard = ({ journal }: { journal: Journal }) => {
     const cardContent = (
       <div
-        className="bg-card border rounded-lg overflow-hidden group h-full flex flex-col"
+        className="journal-card bg-card border rounded-lg overflow-hidden group h-full flex flex-col"
       >
-        <div className="relative w-full h-48">
+        <div className="relative w-full h-48 overflow-hidden">
           <Image
             src={journal.image}
             alt={journal.title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
             data-ai-hint="journal cover"
           />
+           <div className="journal-card-overlay">
+              <BookOpen className="w-8 h-8 text-white" />
+              <span className="mt-2 text-sm font-semibold">Read More</span>
+          </div>
         </div>
         <div className="p-6 flex flex-col flex-grow">
-          <h3 className="text-xl font-bold mb-2 group-hover:text-primary">
+          <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
             {journal.title}
           </h3>
           <p className="text-muted-foreground text-sm line-clamp-3 flex-grow">
