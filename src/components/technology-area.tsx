@@ -1,3 +1,4 @@
+
 "use client";
 
 import { GraduationCap, Users, Sparkles, ClipboardCheck, CheckCircle2 } from "lucide-react";
@@ -29,19 +30,19 @@ export default function TechnologyArea() {
             </div>
 
             {/* Card 2 - Research */}
-            <div className="rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4">
-              <ClipboardCheck className="w-12 h-12 mb-2 text-primary" />
-              <h2 className="font-bold text-xl text-foreground">Research</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground">
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-colors duration-300 hover:bg-gradient-to-r from-primary to-accent hover:text-primary-foreground">
+              <ClipboardCheck className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+              <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">Research</h2>
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
                 Hosting of AI domain journals for ethical research dissemination.
               </p>
             </div>
 
             {/* Card 3 - AI for Social Good */}
-            <div className="rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4">
-              <Sparkles className="w-12 h-12 mb-2 text-primary" />
-              <h2 className="font-bold text-xl text-foreground">AI for Social Good</h2>
-              <p className="text-base leading-relaxed max-w-xs text-muted-foreground">
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-colors duration-300 hover:bg-gradient-to-r from-primary to-accent hover:text-primary-foreground">
+              <Sparkles className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+              <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">AI for Social Good</h2>
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
                 Initiatives that use AI to address challenges in healthcare and equity.
               </p>
             </div>
