@@ -122,7 +122,7 @@ const educationalResourceSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  file: z.instanceof(FileList).optional(),
+  file: z.any().optional(),
   link: z.string().url().optional().or(z.literal('')),
 }).refine(data => (data.file && data.file.length > 0) || !!data.link, {
   message: "Either a file or a link is required.",
