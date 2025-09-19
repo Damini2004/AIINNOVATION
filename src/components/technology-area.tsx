@@ -29,50 +29,50 @@ export default function TechnologyArea() {
             </div>
 
             {/* Card 2 - Research */}
-            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
-                 style={{
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground hover:[--card-bg-image:url(/assests/images/feature.png)] hover:[--card-bg-gradient:linear-gradient(to_right,hsl(var(--primary)),hsl(var(--accent)))]"
+                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
+                   backgroundImage: "var(--card-bg-image, none), var(--card-bg-gradient, none)"
                  }}
                  >
-              <ClipboardCheck className="w-12 h-12 mb-2 text-primary-foreground" />
+              <ClipboardCheck className="w-12 h-12 mb-2 text-primary group-hover:text-primary-foreground" />
               <h2 className="font-bold text-xl">Research</h2>
-              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground group-hover:text-primary-foreground/80">
                 Hosting of AI domain journals for ethical research dissemination.
               </p>
             </div>
 
             {/* Card 3 - AI for Social Good */}
-            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
-                 style={{
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground hover:[--card-bg-image:url(/assests/images/feature.png)] hover:[--card-bg-gradient:linear-gradient(to_right,hsl(var(--primary)),hsl(var(--accent)))]"
+                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
+                   backgroundImage: "var(--card-bg-image, none), var(--card-bg-gradient, none)"
                  }}
                 >
-              <Sparkles className="w-12 h-12 mb-2 text-primary-foreground" />
+              <Sparkles className="w-12 h-12 mb-2 text-primary group-hover:text-primary-foreground" />
               <h2 className="font-bold text-xl">AI for Social Good</h2>
-              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground group-hover:text-primary-foreground/80">
                 Initiatives that use AI to address challenges in healthcare and equity.
               </p>
             </div>
 
             {/* Card 4 - Memberships */}
-            <div className="group rounded-xl shadow-lg p-8 text-primary-foreground flex flex-col items-center text-center space-y-4 transition-all duration-300"
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground hover:[--card-bg-image:url(/assests/images/feature.png)] hover:[--card-bg-gradient:linear-gradient(to_right,hsl(var(--primary)),hsl(var(--accent)))]"
                  style={{
                    backgroundSize: "cover",
                    backgroundPosition: "center",
                    backgroundRepeat: "no-repeat",
-                   backgroundImage: "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))"
+                   backgroundImage: "var(--card-bg-image, none), var(--card-bg-gradient, none)"
                  }}
                  data-ai-hint="community abstract"
                  >
-              <Users className="w-12 h-12 mb-2 text-primary-foreground" />
+              <Users className="w-12 h-12 mb-2 text-primary group-hover:text-primary-foreground" />
               <h2 className="font-bold text-xl">Memberships</h2>
-              <p className="text-base leading-relaxed max-w-xs text-primary-foreground/80">
+              <p className="text-base leading-relaxed max-w-xs text-muted-foreground group-hover:text-primary-foreground/80">
                 Open to students, professionals, researchers, and institutions.
               </p>
             </div>
