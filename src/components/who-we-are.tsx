@@ -33,7 +33,7 @@ export default function WhoWeAre() {
               Artificial <span className="text-primary">Intelligence</span>
             </h2>
 
-            <div className="em_bar_bg text-left"></div>
+            <div className="em_bar_bg text-left" style={{ margin: '20px 0' }}></div>
 
             <p className="pt-3 text-base text-muted-foreground">
               AI Innovation Society (AIIS) is a non-profit initiative dedicated to promoting responsible artificial intelligence through education, ethical research, global events, and collaborative innovation. We connect researchers, educators, developers, and change-makers to harness AI for the greater good.
