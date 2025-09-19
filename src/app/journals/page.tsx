@@ -140,7 +140,7 @@ export default function JournalsPage() {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
-                <div className="relative h-full min-h-[300px] lg:min-h-[400px] lg:order-last">
+                 <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
                     <Image 
                         src="https://picsum.photos/seed/pros/600/500"
                         alt="Pros of Collaboration"
@@ -238,5 +238,7 @@ export default function JournalsPage() {
     </div>
   );
 }
+
+    
 
     
