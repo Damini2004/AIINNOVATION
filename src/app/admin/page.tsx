@@ -601,19 +601,21 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
     }
   }, [selectedFile]);
 
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsUploading(true);
     const file = data.file[0];
-    const reader = new FileReader();
     
-    reader.onload = async (e) => {
-      const fileData = e.target?.result as string;
-      if (!fileData) {
-          toast({ variant: "destructive", title: "Error", description: "Could not read file data." });
-          setIsUploading(false);
-          return;
-      }
-      
+    try {
+      const fileData = await readFileAsDataURL(file);
       const result = await addEducationalResource({
         title: data.title,
         description: data.description,
@@ -629,15 +631,11 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
       } else {
         toast({ variant: "destructive", title: "Error", description: result.error });
       }
-      setIsUploading(false);
-    };
-
-    reader.onerror = () => {
-      toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to read or upload file." });
+    } finally {
       setIsUploading(false);
     }
-
-    reader.readAsDataURL(file);
   };
 
   return (
