@@ -112,16 +112,18 @@ export default function DigitalLibraryPage() {
           
           {/* Search Bar */}
           <div className="mb-12">
-              <div className="relative max-w-2xl mx-auto">
+            <div className="relative max-w-2xl mx-auto">
                 <Input
                     type="text"
                     placeholder="Search by paper title, author, or journal..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-12 text-base"
+                    className="h-12 text-base rounded-full pr-14"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              </div>
+                <Button variant="default" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full h-10 w-10" style={{backgroundColor: 'hsl(var(--primary))'}}>
+                    <Search className="h-5 w-5 text-primary-foreground" />
+                </Button>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-12 gap-12">
