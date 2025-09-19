@@ -64,6 +64,7 @@ const educationalResourceSchema = z.object({
     fileUrl: z.string().min(1, "File URL or data is required"),
     fileName: z.string().min(1, "File name is required"),
     fileType: z.string().min(1, "File type is required"),
+    image: z.string().optional(),
 });
 
 
@@ -203,5 +204,3 @@ export async function deleteEducationalResource(id: string, fileName: string) {
 export async function addOrUpdateEducationalResource(data: EducationalResource) {
     return addOrUpdateDoc('educational_resources', data, educationalResourceSchema);
 }
-
-  

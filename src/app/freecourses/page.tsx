@@ -15,40 +15,51 @@ import {
   Presentation,
   File,
   Eye,
-  X
+  X,
+  Link as LinkIcon
 } from "lucide-react";
 import "../educationalresources/resources.css";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 function ResourceCard({ resource }: { resource: EducationalResource }) {
   const getIcon = (fileType: string) => {
-    if (fileType.includes("pdf")) return <FileText className="h-10 w-10 text-primary" />;
-    if (fileType.includes("presentation") || fileType.includes("powerpoint")) return <Presentation className="h-10 w-10 text-primary" />;
-    if (fileType.includes("document") || fileType.includes("word")) return <File className="h-10 w-10 text-primary" />;
-    return <File className="h-10 w-10 text-primary" />;
+    if (fileType.includes("pdf")) return <FileText className="h-5 w-5 mr-2" />;
+    if (fileType.includes("presentation") || fileType.includes("powerpoint")) return <Presentation className="h-5 w-5 mr-2" />;
+    if (fileType.includes("document") || fileType.includes("word")) return <File className="h-5 w-5 mr-2" />;
+    if (fileType === 'link') return <LinkIcon className="h-5 w-5 mr-2" />;
+    return <File className="h-5 w-5 mr-2" />;
   };
 
   return (
-    <div className="resource-card">
-      <div className="resource-card-icon">
-        {getIcon(resource.fileType)}
-      </div>
-      <div className="resource-card-content">
-        <h3 className="resource-title">{resource.title}</h3>
-        <p className="resource-description">{resource.description}</p>
-        <div className="resource-meta">
-          <span className="file-type-badge">{resource.fileType.split('/')[1] || 'File'}</span>
-          <Button asChild size="sm" variant="outline" className="mt-4">
-            <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
-              <Eye className="mr-2 h-4 w-4" />
-              View
-            </a>
-          </Button>
+    <div className="resource-card group">
+        <div className="resource-card-image">
+            <Image 
+                src={resource.image || 'https://picsum.photos/seed/resource/400/225'}
+                alt={resource.title}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                data-ai-hint="resource cover"
+            />
         </div>
-      </div>
+        <div className="resource-card-content">
+            <h3 className="resource-title group-hover:text-primary">{resource.title}</h3>
+            <p className="resource-description">{resource.description}</p>
+            <div className="resource-meta">
+            <span className="file-type-badge flex items-center">
+                {getIcon(resource.fileType)}{resource.fileType.split('/')[1] || resource.fileType}
+            </span>
+            <Button asChild size="sm" variant="outline">
+                <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
+                <Eye className="mr-2 h-4 w-4" />
+                View
+                </a>
+            </Button>
+            </div>
+        </div>
     </div>
   );
 }
@@ -194,11 +205,16 @@ export default function FreeCoursesPage() {
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="p-6 border rounded-lg space-y-4">
-                      <Skeleton className="h-10 w-10 rounded-full" />
-                      <Skeleton className="h-5 w-3/4" />
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-8 w-24" />
+                    <div key={i} className="space-y-4 rounded-lg border bg-card">
+                      <Skeleton className="h-40 w-full" />
+                      <div className="p-4 space-y-2">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-12 w-full" />
+                        <div className="flex justify-between items-center pt-2">
+                          <Skeleton className="h-6 w-16" />
+                          <Skeleton className="h-8 w-24" />
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

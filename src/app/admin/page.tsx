@@ -124,6 +124,7 @@ const educationalResourceSchema = z.object({
   description: z.string().min(1, "Description is required"),
   file: z.any().optional(),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  image: z.any().optional(),
 }).refine(data => (data.file && data.file.length > 0) || !!data.link || !!data.id, { // Allow edit without new file/link
   message: "Either a file or a link is required.",
   path: ["file"],
@@ -585,19 +586,23 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
 function EducationalResourceForm({ onSave, resource }: { onSave: () => void; resource?: EducationalResource }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(resource?.image || null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue, clearErrors } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
-    defaultValues: resource ? { ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '' } : { title: "", description: "", link: "" },
+    defaultValues: resource ? { ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '', image: resource.image } : { title: "", description: "", link: "", image: '' },
   });
 
   const fileRef = register("file");
+  const imageRef = register("image");
   const selectedFile = watch("file");
   const linkValue = watch("link");
 
   useEffect(() => {
     if (resource) {
-      reset({ ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '' });
+      reset({ ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '', image: resource.image });
+      if(resource.image) setImagePreview(resource.image);
     }
   }, [resource, reset]);
 
@@ -624,6 +629,22 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
     });
   }
 
+  const handleImageFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploadingImage(true);
+      try {
+        const base64String = await fileToDataURL(file);
+        setValue("image", base64String, { shouldValidate: true });
+        setImagePreview(base64String);
+      } catch (error) {
+        toast({ variant: "destructive", title: "Error", description: "Failed to read image file." });
+      } finally {
+        setIsUploadingImage(false);
+      }
+    }
+  };
+
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsSubmitting(true);
     
@@ -636,11 +657,11 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
 
       if (data.file && data.file.length > 0) {
         const file = data.file[0];
-        if (file.size > 1024 * 1024) {
+        if (file.size > 5 * 1024 * 1024) { // Increased to 5MB
              toast({
                 variant: "destructive",
                 title: "File Too Large",
-                description: "Please upload files smaller than 1MB. For larger files, use a link.",
+                description: "Please upload files smaller than 5MB. For larger files, use a link.",
             });
             setIsSubmitting(false);
             return;
@@ -649,7 +670,6 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileName = file.name;
         fileType = file.type;
       } else if (isEditing && !data.link) {
-          // If editing and no new file or link, keep the old values
           const originalResource = resource!;
           fileUrl = originalResource.fileUrl;
           fileName = originalResource.fileName;
@@ -668,6 +688,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileUrl,
         fileName,
         fileType,
+        image: data.image || '',
       };
 
       const result = await addOrUpdateEducationalResource(resourceData);
@@ -676,6 +697,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         toast({ title: "Success", description: `Educational resource ${isEditing ? 'updated' : 'saved'}.` });
         onSave();
         reset();
+        setImagePreview(null);
       } else {
         throw new Error(result.error || "Failed to save resource to the database.");
       }
@@ -693,6 +715,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input type="hidden" {...register("id")} />
+      <Input type="hidden" {...register("image")} />
       <div>
         <Label htmlFor="resourceTitle">Title</Label>
         <Input id="resourceTitle" {...register("title")} disabled={isSubmitting} />
@@ -705,7 +728,25 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="resourceFile">Upload File</Label>
+        <Label htmlFor="resourceCoverImage">Upload Cover Image</Label>
+        <Input
+            id="resourceCoverImage"
+            type="file"
+            accept="image/*"
+            onChange={handleImageFileChange}
+            disabled={isSubmitting || isUploadingImage}
+        />
+        {isUploadingImage && <div className="flex items-center text-sm text-muted-foreground pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Reading image...</div>}
+        {errors.image && <p className="text-red-500 text-sm">{(errors.image as any).message}</p>}
+        {imagePreview && (
+          <div className="mt-2 p-2 border rounded-md flex justify-center items-center h-32">
+              <Image src={imagePreview} alt="Cover preview" width={200} height={120} className="object-contain max-h-full" />
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="resourceFile">Upload Resource File (PDF, DOC, PPT)</Label>
         <Input
           id="resourceFile"
           type="file"
@@ -736,8 +777,8 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         <DialogClose asChild>
           <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting || isUploadingImage}>
+          {(isSubmitting || isUploadingImage) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Resource
         </Button>
       </DialogFooter>
@@ -1299,7 +1340,7 @@ export default function AdminPage() {
                 {resources.map((resource) => (
                   <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md">
                     <div className="flex items-center gap-4">
-                      {getFileIcon(resource.fileType)}
+                      <Image src={resource.image || "https://picsum.photos/seed/placeholder/60/45"} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
                       <div>
                         <p className="font-semibold">{resource.title}</p>
                         <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
@@ -1352,3 +1393,4 @@ export default function AdminPage() {
     
 
   
+
