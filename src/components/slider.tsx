@@ -18,9 +18,9 @@ export default function Slider() {
       }}
     >
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left content */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-12">
             <h1 className="text-5xl font-extrabold text-foreground leading-tight">
               Welcome to AI <br />
               <span className="text-foreground">Innovation Society</span>
@@ -56,7 +56,7 @@ export default function Slider() {
           </div>
 
           {/* Right image */}
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex justify-center lg:justify-end lg:-mt-12">
             <Image
               src="/assests/images/slider3.png"
               alt="AI Innovation Society"
