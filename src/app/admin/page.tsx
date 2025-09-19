@@ -123,7 +123,7 @@ const educationalResourceSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   file: z.any().optional(),
-  link: z.string().url().optional().or(z.literal('')),
+  link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 }).refine(data => (data.file && data.file.length > 0) || !!data.link, {
   message: "Either a file or a link is required.",
   path: ["file"],
@@ -588,7 +588,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue, clearErrors } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
-    defaultValues: resource || { title: "", description: "", link: "" },
+    defaultValues: resource ? { ...resource, file: undefined, link: resource.fileUrl.startsWith('http') ? resource.fileUrl : '' } : { title: "", description: "", link: "" },
   });
 
   const fileRef = register("file");
@@ -597,7 +597,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
 
   useEffect(() => {
     if (resource) {
-      reset(resource);
+      reset({ ...resource, file: undefined, link: resource.fileUrl.startsWith('http') ? resource.fileUrl : '' });
     }
   }, [resource, reset]);
 
@@ -615,26 +615,37 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
     }
   }, [selectedFile, setValue, errors.link, clearErrors]);
 
+  const fileToDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+  }
 
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsSubmitting(true);
-    let orphanFileUrl: string | null = null;
-
+    
     try {
       let fileUrl = data.link || "";
-      let fileName = "";
+      let fileName = "link";
       let fileType = "link";
 
       if (data.file && data.file.length > 0) {
         const file = data.file[0];
-        const filePath = `educational_resources/${Date.now()}_${file.name}`;
-        const storageRef = ref(clientStorage, filePath);
-        
-        await uploadBytes(storageRef, file);
-        fileUrl = await getDownloadURL(storageRef);
+        if (file.size > 1024 * 1024) { // 1MB size limit for Firestore document
+             toast({
+                variant: "destructive",
+                title: "File Too Large",
+                description: "Please upload files smaller than 1MB. For larger files, please provide a link.",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+        fileUrl = await fileToDataURL(file);
         fileName = file.name;
         fileType = file.type;
-        orphanFileUrl = fileUrl;
       }
 
       if (!fileUrl) {
@@ -645,7 +656,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: data.title,
         description: data.description,
         fileUrl,
-        fileName: fileName || "link",
+        fileName,
         fileType,
       };
 
@@ -664,16 +675,6 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: "Operation Failed",
         description: error.message,
       });
-      if (orphanFileUrl) {
-          console.error("Attempting to delete orphaned file:", orphanFileUrl);
-          const orphanRef = ref(clientStorage, orphanFileUrl);
-          try {
-            await deleteObject(orphanRef);
-            console.log("Orphaned file deleted successfully.");
-          } catch (deleteError) {
-              console.error("Failed to delete orphaned file:", deleteError);
-          }
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -992,7 +993,7 @@ export default function AdminPage() {
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
+          <TabsTrigger value="resources">Educational Resources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1291,7 +1292,7 @@ export default function AdminPage() {
                       {getFileIcon(resource.fileType)}
                       <div>
                         <p className="font-semibold">{resource.title}</p>
-                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileUrl}</a>
+                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

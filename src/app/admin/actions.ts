@@ -61,7 +61,7 @@ const educationalResourceSchema = z.object({
     id: z.string().optional(),
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
-    fileUrl: z.string().url("Must be a valid URL"),
+    fileUrl: z.string().min(1, "File URL or data is required"),
     fileName: z.string().min(1, "File name is required"),
     fileType: z.string().min(1, "File type is required"),
 });
@@ -120,18 +120,17 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
     const docRef = doc(db, collectionName, id);
     await deleteDoc(docRef);
 
-    if (filePath && filePath !== 'link') {
+    // No need to delete from storage if we are not using it for educational resources
+    if (collectionName !== 'educational_resources' && filePath && filePath !== 'link') {
         try {
             const storage = getStorage();
             const fileRef = ref(storage, filePath);
             await deleteObject(fileRef);
         } catch (storageError) {
-            // Check for specific error code if file does not exist
             if ((storageError as any).code === 'storage/object-not-found') {
-                console.warn("File not found in storage, but document was deleted from Firestore. This might be okay if it was a link or already deleted.");
+                console.warn("File not found in storage, but document was deleted from Firestore.");
             } else {
-                console.error("Error deleting file from storage, but document was deleted from Firestore:", storageError);
-                 // Don't re-throw, just log. The main goal was to delete the record.
+                console.error("Error deleting file from storage:", storageError);
             }
         }
     }
@@ -195,10 +194,9 @@ export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPap
 export async function getEducationalResources(): Promise<EducationalResource[]> { return getDocsFromCollection<EducationalResource>('educational_resources'); }
 
 export async function deleteEducationalResource(id: string, fileName: string) {
-    const filePath = `educational_resources/${fileName}`;
-    // For links, fileName is 'link', so filePath will be 'educational_resources/link', which won't exist.
-    // The check in deleteDocFromCollection handles this.
-    return deleteDocFromCollection('educational_resources', id, filePath);
+    // Since we are not using Firebase Storage for educational resources anymore, we just delete from Firestore.
+    // The fileName parameter is kept for compatibility but not used.
+    return deleteDocFromCollection('educational_resources', id);
 }
 
 
@@ -212,11 +210,7 @@ export async function addEducationalResource(data: Omit<EducationalResource, 'id
         revalidatePath('/freecourses');
         return { success: true };
     } catch (error: any) {
-        // The frontend will handle deleting the orphaned file.
-        // We log the error here for server-side debugging.
         console.error("Add resource to DB error:", error);
         return { success: false, error: error.message };
     }
 }
-
-    
