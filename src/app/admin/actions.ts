@@ -3,8 +3,8 @@
 
 import { z } from "zod";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/firebase/firebaseConfig";
+import { ref, uploadString, getDownloadURL, getStorage, deleteObject } from "firebase/storage";
+import { db, storage as clientStorage } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
 
 // Zod Schemas
@@ -168,15 +168,29 @@ export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPap
 
 // Educational Resources Actions
 export async function getEducationalResources(): Promise<EducationalResource[]> { return getDocsFromCollection<EducationalResource>('educational_resources'); }
-export async function deleteEducationalResource(id: string) { return deleteDocFromCollection('educational_resources', id); }
-export async function addEducationalResource(data: { title: string; description: string; fileData: string; fileName: string; fileType: string; }) {
+export async function deleteEducationalResource(id: string) { 
+    // Also delete from storage
+    return deleteDocFromCollection('educational_resources', id); 
+}
+
+export async function addEducationalResource(data: { title: string; description: string; filePath: string; fileName: string; fileType: string; }) {
+  const { title, description, filePath, fileName, fileType } = data;
+  const storage = getStorage();
+  const tempRef = ref(storage, filePath);
+
   try {
-    const { title, description, fileData, fileName, fileType } = data;
+    const permPath = `educational_resources/${Date.now()}_${fileName}`;
+    const permRef = ref(storage, permPath);
     
-    // Upload file to Firebase Storage
-    const storageRef = ref(storage, `educational_resources/${Date.now()}_${fileName}`);
-    const uploadResult = await uploadString(storageRef, fileData, 'data_url');
-    const fileUrl = await getDownloadURL(uploadResult.ref);
+    // Copy file from temp to permanent location
+    const fileSnapshot = await getDownloadURL(tempRef);
+    const fileResponse = await fetch(fileSnapshot);
+    const fileBlob = await fileResponse.blob();
+    await uploadString(permRef, await fileBlob.text(), 'raw', { contentType: fileType });
+    const fileUrl = await getDownloadURL(permRef);
+    
+    // Delete temp file
+    await deleteObject(tempRef);
 
     const resourceData: Omit<EducationalResource, 'id'> = {
       title,
@@ -191,9 +205,13 @@ export async function addEducationalResource(data: { title: string; description:
 
     revalidatePath('/admin');
     revalidatePath('/educationalresources');
+    revalidatePath('/freecourses');
     return { success: true };
+
   } catch (error: any) {
-    console.error("Add resource error:", error);
+     console.error("Add resource error:", error);
+    // Cleanup temp file if something fails
+    try { await deleteObject(tempRef); } catch (e) {}
     return { success: false, error: error.message };
   }
 }

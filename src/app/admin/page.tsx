@@ -64,6 +64,9 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode } from "lucide-react";
 import Image from "next/image";
+import { ref, uploadBytes } from "firebase/storage";
+import { storage as clientStorage } from "@/firebase/firebaseConfig";
+
 
 // Zod Schemas
 const courseSchema = z.object({
@@ -577,7 +580,7 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
 
 function EducationalResourceForm({ onSave }: { onSave: () => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
 
   const {
@@ -585,10 +588,10 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
     handleSubmit,
     formState: { errors },
     reset,
-    watch
+    watch,
   } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
-    defaultValues: { title: "", description: "" }
+    defaultValues: { title: "", description: "" },
   });
 
   const selectedFile = watch("file");
@@ -601,25 +604,21 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
     }
   }, [selectedFile]);
 
-  const readFileAsDataURL = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file);
-    });
-  };
-
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
-    setIsUploading(true);
+    setIsSubmitting(true);
     const file = data.file[0];
-    
+
     try {
-      const fileData = await readFileAsDataURL(file);
+      // 1. Upload file to a temporary path on client-side
+      const tempPath = `temp/${Date.now()}_${file.name}`;
+      const storageRef = ref(clientStorage, tempPath);
+      await uploadBytes(storageRef, file);
+
+      // 2. Call server action with metadata and temp path
       const result = await addEducationalResource({
         title: data.title,
         description: data.description,
-        fileData,
+        filePath: tempPath,
         fileName: file.name,
         fileType: file.type,
       });
@@ -629,12 +628,20 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
         onSave();
         reset();
       } else {
-        toast({ variant: "destructive", title: "Error", description: result.error });
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.error || "Failed to save the resource.",
+        });
       }
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to read or upload file." });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Upload Error",
+        description: `Failed to upload file: ${error.message}`,
+      });
     } finally {
-      setIsUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -642,27 +649,47 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="resourceTitle">Title</Label>
-        <Input id="resourceTitle" {...register("title")} disabled={isUploading}/>
-        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+        <Input id="resourceTitle" {...register("title")} disabled={isSubmitting} />
+        {errors.title && (
+          <p className="text-red-500 text-sm">{errors.title.message}</p>
+        )}
       </div>
       <div>
         <Label htmlFor="resourceDescription">Description</Label>
-        <Textarea id="resourceDescription" {...register("description")} disabled={isUploading}/>
-        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+        <Textarea
+          id="resourceDescription"
+          {...register("description")}
+          disabled={isSubmitting}
+        />
+        {errors.description && (
+          <p className="text-red-500 text-sm">{errors.description.message}</p>
+        )}
       </div>
       <div>
         <Label htmlFor="resourceFile">Upload File</Label>
-        <Input id="resourceFile" type="file" {...register("file")} accept=".pdf,.doc,.docx,.ppt,.pptx" disabled={isUploading}/>
-        {errors.file && <p className="text-red-500 text-sm">{errors.file.message as string}</p>}
-        {fileName && <p className="text-sm text-muted-foreground mt-2">Selected: {fileName}</p>}
+        <Input
+          id="resourceFile"
+          type="file"
+          {...register("file")}
+          accept=".pdf,.doc,.docx,.ppt,.pptx"
+          disabled={isSubmitting}
+        />
+        {errors.file && (
+          <p className="text-red-500 text-sm">{errors.file.message as string}</p>
+        )}
+        {fileName && (
+          <p className="text-sm text-muted-foreground mt-2">Selected: {fileName}</p>
+        )}
       </div>
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost" disabled={isUploading}>Cancel</Button>
+          <Button variant="ghost" disabled={isSubmitting}>
+            Cancel
+          </Button>
         </DialogClose>
-        <Button type="submit" disabled={isUploading}>
-           {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-           Save Resource
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save Resource
         </Button>
       </DialogFooter>
     </form>
