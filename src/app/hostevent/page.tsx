@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import { FileText, Lightbulb, Calendar, Handshake, Star, BarChart, ShieldCheck, Users, Play } from "lucide-react";
 import "./hostevent.css";
 import "@/components/slider.css";
@@ -112,6 +113,27 @@ export default function HostEventPage() {
 
     return () => elements.forEach(el => observer.unobserve(el));
   }, [stats]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
 
 
   return (
@@ -223,17 +245,23 @@ export default function HostEventPage() {
                   <h2 className="text-3xl font-bold">Benefits of Collaboration with AI Innovation Society</h2>
                   <div className="em_bar_bg mt-4"></div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+              >
                   {benefits.map((benefit, index) => (
-                      <div key={index} className="service-box-three">
+                      <motion.div key={index} className="service-box-three" variants={itemVariants}>
                           <div className="service-box-inner">
                               <div className="service-icon">{benefit.icon}</div>
                               <h3 className="text-xl font-bold my-4">{benefit.title}</h3>
                               <p className="text-muted-foreground">{benefit.description}</p>
                           </div>
-                      </div>
+                      </motion.div>
                   ))}
-              </div>
+              </motion.div>
           </div>
       </section>
 
@@ -258,3 +286,5 @@ export default function HostEventPage() {
     </div>
   );
 }
+
+    
