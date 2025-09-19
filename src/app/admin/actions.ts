@@ -200,17 +200,8 @@ export async function deleteEducationalResource(id: string, fileName: string) {
 }
 
 
-export async function addEducationalResource(data: Omit<EducationalResource, 'id'>) {
-    try {
-        const validatedData = educationalResourceSchema.omit({id: true}).parse(data);
-        await addDoc(collection(db, "educational_resources"), validatedData);
-
-        revalidatePath('/admin');
-        revalidatePath('/educationalresources');
-        revalidatePath('/freecourses');
-        return { success: true };
-    } catch (error: any) {
-        console.error("Add resource to DB error:", error);
-        return { success: false, error: error.message };
-    }
+export async function addOrUpdateEducationalResource(data: EducationalResource) {
+    return addOrUpdateDoc('educational_resources', data, educationalResourceSchema);
 }
+
+  

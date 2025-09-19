@@ -24,7 +24,7 @@ import {
   addOrUpdatePartner,
   addOrUpdateEvent,
   addOrUpdateJournal,
-  addEducationalResource,
+  addOrUpdateEducationalResource,
   getCourses,
   getPartners,
   getEvents,
@@ -62,7 +62,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode, Link as LinkIcon } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage as clientStorage } from "@/firebase/firebaseConfig";
@@ -124,7 +124,7 @@ const educationalResourceSchema = z.object({
   description: z.string().min(1, "Description is required"),
   file: z.any().optional(),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
-}).refine(data => (data.file && data.file.length > 0) || !!data.link, {
+}).refine(data => (data.file && data.file.length > 0) || !!data.link || !!data.id, { // Allow edit without new file/link
   message: "Either a file or a link is required.",
   path: ["file"],
 });
@@ -588,7 +588,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue, clearErrors } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
-    defaultValues: resource ? { ...resource, file: undefined, link: resource.fileUrl.startsWith('http') ? resource.fileUrl : '' } : { title: "", description: "", link: "" },
+    defaultValues: resource ? { ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '' } : { title: "", description: "", link: "" },
   });
 
   const fileRef = register("file");
@@ -597,7 +597,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
 
   useEffect(() => {
     if (resource) {
-      reset({ ...resource, file: undefined, link: resource.fileUrl.startsWith('http') ? resource.fileUrl : '' });
+      reset({ ...resource, file: undefined, link: resource.fileType === 'link' ? resource.fileUrl : '' });
     }
   }, [resource, reset]);
 
@@ -631,14 +631,16 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
       let fileUrl = data.link || "";
       let fileName = "link";
       let fileType = "link";
+      
+      const isEditing = !!data.id;
 
       if (data.file && data.file.length > 0) {
         const file = data.file[0];
-        if (file.size > 1024 * 1024) { // 1MB size limit for Firestore document
+        if (file.size > 1024 * 1024) {
              toast({
                 variant: "destructive",
                 title: "File Too Large",
-                description: "Please upload files smaller than 1MB. For larger files, please provide a link.",
+                description: "Please upload files smaller than 1MB. For larger files, use a link.",
             });
             setIsSubmitting(false);
             return;
@@ -646,13 +648,21 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileUrl = await fileToDataURL(file);
         fileName = file.name;
         fileType = file.type;
+      } else if (isEditing && !data.link) {
+          // If editing and no new file or link, keep the old values
+          const originalResource = resource!;
+          fileUrl = originalResource.fileUrl;
+          fileName = originalResource.fileName;
+          fileType = originalResource.fileType;
       }
+
 
       if (!fileUrl) {
          throw new Error("No file or link provided.");
       }
       
       const resourceData = {
+        id: data.id,
         title: data.title,
         description: data.description,
         fileUrl,
@@ -660,10 +670,10 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileType,
       };
 
-      const result = await addEducationalResource(resourceData);
+      const result = await addOrUpdateEducationalResource(resourceData);
 
       if (result.success) {
-        toast({ title: "Success", description: "Educational resource saved." });
+        toast({ title: "Success", description: `Educational resource ${isEditing ? 'updated' : 'saved'}.` });
         onSave();
         reset();
       } else {
@@ -1296,7 +1306,17 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                       {/* Edit functionality can be added here if needed */}
+                       <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Resource</DialogTitle>
+                          </DialogHeader>
+                          <EducationalResourceForm onSave={fetchData} resource={resource}/>
+                        </DialogContent>
+                       </Dialog>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
@@ -1330,3 +1350,5 @@ export default function AdminPage() {
     
 
     
+
+  
