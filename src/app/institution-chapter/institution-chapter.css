@@ -1,0 +1,42 @@
+
+.chapter-service-card {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 50px 35px 30px;
+    background: hsl(var(--card));
+    box-shadow: 0px 0px 25px 0px hsla(0, 0%, 0%, 0.1);
+    border-radius: var(--radius);
+    transition: all 0.5s ease-in-out;
+    border-bottom: 3px solid transparent;
+}
+
+.chapter-service-card:hover {
+    transform: translateY(-10px);
+    border-bottom-color: hsl(var(--primary));
+}
+
+.chapter-service-card .service-icon {
+    font-size: 50px;
+    color: hsl(var(--primary));
+    display: inline-block;
+    transition: all 0.5s;
+    margin-bottom: 20px;
+}
+
+.chapter-service-card .service-icon svg {
+    width: 50px;
+    height: 50px;
+}
+
+.chapter-service-card .service-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.chapter-service-card .service-description {
+    color: hsl(var(--muted-foreground));
+    transition: color 0.3s;
+}
