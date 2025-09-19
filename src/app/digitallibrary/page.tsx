@@ -9,9 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Search,
   BookText,
-  File,
+  FileText,
   User,
   Newspaper,
   Calendar,
@@ -38,7 +45,7 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
             <Newspaper className="inline-icon" /> {paper.journalName}
           </span>
           <span>
-            <File className="inline-icon" /> {paper.volumeIssue}
+            <FileText className="inline-icon" /> {paper.volumeIssue}
           </span>
         </div>
       </div>
@@ -50,6 +57,7 @@ export default function DigitalLibraryPage() {
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState<"latest" | "alpha">("latest");
 
   useEffect(() => {
     const fetchPapers = async () => {
@@ -61,14 +69,22 @@ export default function DigitalLibraryPage() {
     fetchPapers();
   }, []);
 
-  const filteredPapers = papers.filter((paper) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      paper.paperTitle.toLowerCase().includes(term) ||
-      paper.authorName.toLowerCase().includes(term) ||
-      paper.journalName.toLowerCase().includes(term)
-    );
-  });
+  const sortedAndFilteredPapers = papers
+    .filter((paper) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        paper.paperTitle.toLowerCase().includes(term) ||
+        paper.authorName.toLowerCase().includes(term) ||
+        paper.journalName.toLowerCase().includes(term)
+      );
+    })
+    .sort((a, b) => {
+      if (sortOrder === "alpha") {
+        return a.paperTitle.localeCompare(b.paperTitle);
+      }
+      // "latest" is default - Firestore auto-IDs are roughly time-ordered
+      return (b.id ?? "").localeCompare(a.id ?? "");
+    });
 
   return (
     <div className="bg-background text-foreground">
@@ -101,15 +117,26 @@ export default function DigitalLibraryPage() {
                   <Filter className="h-5 w-5 mr-2 text-primary" />
                   Filter & Search
                 </h3>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Search papers..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 h-11 text-sm"
-                  />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="space-y-4">
+                    <div className="relative">
+                    <Input
+                        type="text"
+                        placeholder="Search papers..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9 h-11 text-sm"
+                    />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    </div>
+                     <Select onValueChange={(value: "latest" | "alpha") => setSortOrder(value)} defaultValue={sortOrder}>
+                        <SelectTrigger className="w-full h-11 text-sm">
+                            <SelectValue placeholder="Sort by..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="latest">Sort by Latest</SelectItem>
+                            <SelectItem value="alpha">Sort by A-Z</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
               </div>
               <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
@@ -142,8 +169,8 @@ export default function DigitalLibraryPage() {
                       </div>
                     </div>
                   ))
-                ) : filteredPapers.length > 0 ? (
-                  filteredPapers.map((paper) => (
+                ) : sortedAndFilteredPapers.length > 0 ? (
+                  sortedAndFilteredPapers.map((paper) => (
                     <PaperCard key={paper.id} paper={paper} />
                   ))
                 ) : (
