@@ -18,8 +18,8 @@ export function Footer() {
                <Image
                      src="/assests/images/logo.png" // replace with your logo path inside public folder
                      alt="Datatech Logo"
-                     width={200} // adjust size
-                     height={50}
+                     width={250} // adjust size
+                     height={63}
                    />
             </div>
             <p className="text-base text-muted-foreground leading-relaxed">
