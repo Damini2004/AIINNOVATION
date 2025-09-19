@@ -32,7 +32,11 @@ import {
   deletePartner,
   deleteEvent,
   deleteJournal,
+  getDigitalLibraryPapers,
+  bulkAddDigitalLibraryPapers,
+  deleteDigitalLibraryPaper,
 } from "./actions";
+import type { DigitalLibraryPaper } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -55,7 +59,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 
 // Zod Schemas
@@ -97,6 +101,16 @@ const journalSchema = z.object({
   image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
+
+const digitalLibraryPaperSchema = z.object({
+  id: z.string().optional(),
+  paperTitle: z.string().min(1, "Paper Title is required"),
+  authorName: z.string().min(1, "Author Name is required"),
+  journalName: z.string().min(1, "Journal Name is required"),
+  volumeIssue: z.string().min(1, "Volume/Issue is required"),
+  link: z.string().url("Must be a valid URL"),
+});
+
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
@@ -550,15 +564,166 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
 }
 
 
+function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: DigitalLibraryPaper[], onUpdate: () => void }) {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [parsedData, setParsedData] = useState<DigitalLibraryPaper[] | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const text = event.target?.result as string;
+          // Basic CSV parsing
+          const rows = text.split('\n').filter(row => row.trim() !== '');
+          const headers = rows[0].split(',').map(h => h.trim());
+          const expectedHeaders = ["paperTitle", "authorName", "journalName", "volumeIssue", "link"];
+          
+          if (headers.length !== expectedHeaders.length || !expectedHeaders.every((h, i) => h === headers[i])) {
+            throw new Error("CSV headers do not match expected format: " + expectedHeaders.join(', '));
+          }
+
+          const data: DigitalLibraryPaper[] = rows.slice(1).map(row => {
+            const values = row.split(',').map(v => v.trim());
+            return {
+              paperTitle: values[0] || '',
+              authorName: values[1] || '',
+              journalName: values[2] || '',
+              volumeIssue: values[3] || '',
+              link: values[4] || '',
+            };
+          });
+
+          // Validate with Zod
+          const validatedData = z.array(digitalLibraryPaperSchema).safeParse(data);
+          if (!validatedData.success) {
+            console.error(validatedData.error);
+            throw new Error("CSV data is invalid. Check console for details.");
+          }
+
+          setParsedData(validatedData.data);
+          toast({ title: "File Parsed", description: `${data.length} records found in ${file.name}.` });
+        } catch (error: any) {
+          toast({ variant: "destructive", title: "Error parsing file", description: error.message });
+          setParsedData(null);
+          setFileName(null);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleBulkUpload = async () => {
+    if (!parsedData) return;
+    setIsUploading(true);
+    const result = await bulkAddDigitalLibraryPapers(parsedData);
+    if (result.success) {
+      toast({ title: "Success", description: `${result.count} papers have been uploaded.` });
+      onUpdate();
+      setParsedData(null);
+      setFileName(null);
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+    setIsUploading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteDigitalLibraryPaper(id);
+    if (result.success) {
+      toast({ title: "Success", description: "Paper deleted successfully." });
+      onUpdate();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  }
+
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Digital Library</CardTitle>
+        <CardDescription>Upload a CSV file to bulk-add papers or manage existing ones.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="p-4 border-2 border-dashed rounded-lg text-center">
+            <Label htmlFor="csv-upload" className="cursor-pointer flex flex-col items-center justify-center space-y-2">
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <span className="font-medium">
+                    {fileName ? `Selected: ${fileName}` : "Click to upload a CSV file"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                    Headers: paperTitle, authorName, journalName, volumeIssue, link
+                </span>
+            </Label>
+            <Input id="csv-upload" type="file" className="hidden" accept=".csv" onChange={handleFileChange} disabled={isUploading}/>
+        </div>
+        
+        {parsedData && (
+          <div className="flex justify-end gap-2">
+             <Button variant="outline" onClick={() => { setParsedData(null); setFileName(null); }}>Clear</Button>
+            <Button onClick={handleBulkUpload} disabled={isUploading}>
+              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4" />}
+              Confirm & Upload {parsedData.length} Records
+            </Button>
+          </div>
+        )}
+        
+        <div className="space-y-2 pt-4">
+             <h4 className="font-semibold">Existing Papers ({initialPapers.length})</h4>
+             <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                {initialPapers.map((paper) => (
+                    <div key={paper.id} className="flex items-center justify-between p-2 border rounded-md">
+                        <div className="truncate">
+                          <p className="font-medium text-sm truncate">{paper.paperTitle}</p>
+                          <p className="text-xs text-muted-foreground truncate">{paper.authorName}</p>
+                        </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                This action will permanently delete the paper: "{paper.paperTitle}".
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(paper.id!)}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+      </CardContent>
+    </Card>
+  )
+}
+
+
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partners, setPartners] =useState<Partner[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [journals, setJournals] = useState<Journal[]>([]);
+  const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState("courses");
 
   useEffect(() => {
     const checkAuth = () => {
@@ -575,16 +740,18 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
+      getDigitalLibraryPapers(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
     setEvents(eventsData);
     setJournals(journalsData);
+    setPapers(papersData);
     setLoading(false);
   };
 
@@ -595,12 +762,13 @@ export default function AdminPage() {
   };
 
 
-  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals', id: string) => {
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers', id: string) => {
     let result;
     if (collection === 'courses') result = await deleteCourse(id);
     if (collection === 'partners') result = await deletePartner(id);
     if (collection === 'events') result = await deleteEvent(id);
     if (collection === 'journals') result = await deleteJournal(id);
+    if (collection === 'digital_library_papers') result = await deleteDigitalLibraryPaper(id);
 
     if (result?.success) {
       toast({ title: "Success", description: "Item deleted successfully." });
@@ -628,12 +796,13 @@ export default function AdminPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="courses" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="courses">Manage Courses</TabsTrigger>
           <TabsTrigger value="partners">Manage Partners</TabsTrigger>
           <TabsTrigger value="events">Manage Events</TabsTrigger>
           <TabsTrigger value="journals">Manage Journals</TabsTrigger>
+          <TabsTrigger value="library">Digital Library</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -651,7 +820,7 @@ export default function AdminPage() {
                   <DialogHeader>
                     <DialogTitle>Add New Course</DialogTitle>
                   </DialogHeader>
-                  <CourseForm onSave={() => fetchData()} />
+                  <CourseForm onSave={() => {fetchData();}} />
                 </DialogContent>
               </Dialog>
             </CardHeader>
@@ -901,6 +1070,9 @@ export default function AdminPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+         <TabsContent value="library">
+          <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
         </TabsContent>
       </Tabs>
     </div>

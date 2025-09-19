@@ -45,10 +45,21 @@ const journalSchema = z.object({
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
 
+const digitalLibraryPaperSchema = z.object({
+  id: z.string().optional(),
+  paperTitle: z.string().min(1, "Paper Title is required"),
+  authorName: z.string().min(1, "Author Name is required"),
+  journalName: z.string().min(1, "Journal Name is required"),
+  volumeIssue: z.string().min(1, "Volume/Issue is required"),
+  link: z.string().url("Must be a valid URL"),
+});
+
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
+export type DigitalLibraryPaper = z.infer<typeof digitalLibraryPaperSchema>;
+
 
 // Generic function to add or update a document
 async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string, data: T, schema: z.ZodType<T>) {
@@ -65,6 +76,8 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
     revalidatePath('/admin');
     revalidatePath(`/${collectionName}`);
     if (collectionName === 'events') revalidatePath('/');
+    if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
+
 
     return { success: true };
   } catch (error: any) {
@@ -91,6 +104,8 @@ async function deleteDocFromCollection(collectionName: string, id: string) {
     revalidatePath('/admin');
     revalidatePath(`/${collectionName}`);
      if (collectionName === 'events') revalidatePath('/');
+    if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
+
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -116,3 +131,22 @@ export async function deleteEvent(id: string) { return deleteDocFromCollection('
 export async function addOrUpdateJournal(data: Journal) { return addOrUpdateDoc('journals', data, journalSchema); }
 export async function getJournals(): Promise<Journal[]> { return getDocsFromCollection<Journal>('journals'); }
 export async function deleteJournal(id: string) { return deleteDocFromCollection('journals', id); }
+
+// Digital Library Actions
+export async function getDigitalLibraryPapers(): Promise<DigitalLibraryPaper[]> { return getDocsFromCollection<DigitalLibraryPaper>('digital_library_papers'); }
+export async function deleteDigitalLibraryPaper(id: string) { return deleteDocFromCollection('digital_library_papers', id); }
+export async function bulkAddDigitalLibraryPapers(papers: DigitalLibraryPaper[]) {
+  try {
+    const batch = papers.map(paper => {
+      const validatedData = digitalLibraryPaperSchema.parse(paper);
+      return addDoc(collection(db, "digital_library_papers"), validatedData);
+    });
+    await Promise.all(batch);
+    revalidatePath('/admin');
+    revalidatePath('/digitallibrary');
+    return { success: true, count: papers.length };
+  } catch (error: any) {
+    console.error("Bulk add error:", error);
+    return { success: false, error: error.message };
+  }
+}
