@@ -109,25 +109,30 @@ export default function DigitalLibraryPage() {
       {/* Main Content */}
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-6">
+          
+          {/* Search Bar */}
+          <div className="mb-8">
+              <div className="relative max-w-lg mx-auto">
+                <Input
+                    type="text"
+                    placeholder="Search by paper title, author, or journal..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 text-base"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              </div>
+          </div>
+
           <div className="grid lg:grid-cols-12 gap-12">
             {/* Left Sidebar: Filters & Image */}
             <aside className="lg:col-span-3 space-y-8">
               <div className="p-6 bg-card border rounded-lg">
                 <h3 className="text-lg font-semibold flex items-center mb-4">
                   <Filter className="h-5 w-5 mr-2 text-primary" />
-                  Filter & Search
+                  Filter & Sort
                 </h3>
                 <div className="space-y-4">
-                    <div className="relative">
-                    <Input
-                        type="text"
-                        placeholder="Search papers..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 h-11 text-sm"
-                    />
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
                      <Select onValueChange={(value: "latest" | "alpha") => setSortOrder(value)} defaultValue={sortOrder}>
                         <SelectTrigger className="w-full h-11 text-sm">
                             <SelectValue placeholder="Sort by..." />
