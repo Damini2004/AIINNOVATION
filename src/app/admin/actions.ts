@@ -60,9 +60,9 @@ const educationalResourceSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  fileUrl: z.string().url(),
-  fileName: z.string(),
-  fileType: z.string(),
+  fileUrl: z.string().url("File URL is required"),
+  fileName: z.string().min(1, "File name is required"),
+  fileType: z.string().min(1, "File type is required"),
 });
 
 
@@ -202,18 +202,9 @@ export async function addEducationalResource(data: Omit<EducationalResource, 'id
         revalidatePath('/freecourses');
         return { success: true };
     } catch (error: any) {
-        console.error("Add resource error:", error);
-        
-        // If DB write fails, attempt to delete the orphaned file from storage
-        try {
-            const storage = getStorage();
-            const fileRef = ref(storage, data.fileUrl);
-            await deleteObject(fileRef);
-            console.log("Orphaned file deleted from storage.");
-        } catch (storageError) {
-            console.error("Failed to delete orphaned file from storage:", storageError);
-        }
-
+        // The frontend will handle deleting the orphaned file.
+        // We log the error here for server-side debugging.
+        console.error("Add resource to DB error:", error);
         return { success: false, error: error.message };
     }
 }

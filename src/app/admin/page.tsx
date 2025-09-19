@@ -64,7 +64,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode } from "lucide-react";
 import Image from "next/image";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage as clientStorage } from "@/firebase/firebaseConfig";
 
 
@@ -607,13 +607,14 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsSubmitting(true);
     const file = data.file[0];
+    let downloadUrl = '';
 
     try {
       // 1. Upload file to a permanent path on client-side
       const permPath = `educational_resources/${Date.now()}_${file.name}`;
       const storageRef = ref(clientStorage, permPath);
       await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(storageRef);
+      downloadUrl = await getDownloadURL(storageRef);
 
       // 2. Call server action with metadata and final URL
       const result = await addEducationalResource({
@@ -629,18 +630,32 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
         onSave();
         reset();
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.error || "Failed to save the resource.",
-        });
+        throw new Error(result.error || "Failed to save the resource.");
       }
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Upload Error",
-        description: `Failed to upload file: ${error.message}`,
+        title: "Error",
+        description: `Operation failed: ${error.message}`,
       });
+      // If DB write fails, but upload succeeded, try to delete the orphaned file.
+      if (downloadUrl) {
+          try {
+              const fileRefToDelete = ref(clientStorage, downloadUrl);
+              await deleteObject(fileRefToDelete);
+              toast({
+                  variant: "destructive",
+                  title: "Cleanup",
+                  description: "Orphaned file was deleted from storage.",
+              });
+          } catch (cleanupError: any) {
+               toast({
+                  variant: "destructive",
+                  title: "Cleanup Failed",
+                  description: `Could not delete orphaned file: ${cleanupError.message}`,
+              });
+          }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -1287,3 +1302,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
