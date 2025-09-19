@@ -65,7 +65,6 @@ export function AppHeader() {
         alt="Datatech Logo"
         width={200} // adjust size
         height={50}
-        className="h-12 w-auto"
         priority
       />
     </Link>
