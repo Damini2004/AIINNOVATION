@@ -60,11 +60,11 @@ export default function InstitutionChapterServices() {
     };
 
   return (
-    <div className="chapter-service-area py-20 bg-secondary">
+    <div className="chapter-service-area py-20 bg-blue-950 text-white">
       <div className="container mx-auto px-6">
         <div className="text-center pb-12">
           <h5 className="text-primary font-semibold uppercase">Chapter Services</h5>
-          <h2 className="text-3xl font-bold">
+          <h2 className="text-3xl font-bold text-white">
             What Your Institution Gains
           </h2>
           <div className="em_bar_bg"></div>
