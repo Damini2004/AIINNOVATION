@@ -122,9 +122,9 @@ const educationalResourceSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  file: z.instanceof(File).optional(),
+  file: z.instanceof(FileList).optional(),
   link: z.string().url().optional().or(z.literal('')),
-}).refine(data => !!data.file || !!data.link, {
+}).refine(data => (data.file && data.file.length > 0) || !!data.link, {
   message: "Either a file or a link is required.",
   path: ["file"],
 });
@@ -586,13 +586,13 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<EducationalResourceFormType>({
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue, clearErrors } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
     defaultValues: resource || { title: "", description: "", link: "" },
   });
 
   const fileRef = register("file");
-  const selectedFile = watch("file")?.[0];
+  const selectedFile = watch("file");
   const linkValue = watch("link");
 
   useEffect(() => {
@@ -602,17 +602,18 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   }, [resource, reset]);
 
   useEffect(() => {
-    // If user inputs a link, disable file input, and vice-versa
     if (linkValue) {
       setValue("file", undefined);
+      if (errors.file) clearErrors("file");
     }
-  }, [linkValue, setValue]);
+  }, [linkValue, setValue, errors.file, clearErrors]);
 
   useEffect(() => {
-    if (selectedFile) {
+    if (selectedFile && selectedFile.length > 0) {
        setValue("link", "");
+       if (errors.link) clearErrors("link");
     }
-  }, [selectedFile, setValue]);
+  }, [selectedFile, setValue, errors.link, clearErrors]);
 
 
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
@@ -624,8 +625,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
       let fileName = "";
       let fileType = "link";
 
-      // If a file is provided, upload it to Firebase Storage
-      if (data.file?.[0]) {
+      if (data.file && data.file.length > 0) {
         const file = data.file[0];
         const filePath = `educational_resources/${Date.now()}_${file.name}`;
         const storageRef = ref(clientStorage, filePath);
@@ -634,7 +634,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileUrl = await getDownloadURL(storageRef);
         fileName = file.name;
         fileType = file.type;
-        orphanFileUrl = fileUrl; // Keep track for cleanup on DB error
+        orphanFileUrl = fileUrl;
       }
 
       if (!fileUrl) {
@@ -645,7 +645,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: data.title,
         description: data.description,
         fileUrl,
-        fileName: fileName || "link", // Store file name or 'link'
+        fileName: fileName || "link",
         fileType,
       };
 
@@ -664,7 +664,6 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: "Operation Failed",
         description: error.message,
       });
-      // If DB save failed but a file was uploaded, try to delete the orphaned file
       if (orphanFileUrl) {
           console.error("Attempting to delete orphaned file:", orphanFileUrl);
           const orphanRef = ref(clientStorage, orphanFileUrl);
@@ -703,8 +702,8 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
           accept=".pdf,.doc,.docx,.ppt,.pptx"
           disabled={isSubmitting || !!linkValue}
         />
-        {selectedFile?.name && !linkValue && (
-            <p className="text-sm text-muted-foreground mt-2">Selected: {selectedFile.name}</p>
+        {selectedFile && selectedFile.length > 0 && !linkValue && (
+            <p className="text-sm text-muted-foreground mt-2">Selected: {selectedFile[0].name}</p>
         )}
       </div>
 
@@ -716,7 +715,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
       
       <div className="space-y-2">
         <Label htmlFor="resourceLink">Link to Resource</Label>
-        <Input id="resourceLink" {...register("link")} placeholder="https://example.com/resource.pdf" disabled={isSubmitting || !!selectedFile?.name} />
+        <Input id="resourceLink" {...register("link")} placeholder="https://example.com/resource.pdf" disabled={isSubmitting || (!!selectedFile && selectedFile.length > 0)} />
         {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
       </div>
        {errors.file && <p className="text-red-500 text-sm">{errors.file.message}</p>}
@@ -1326,7 +1325,5 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
 
     
