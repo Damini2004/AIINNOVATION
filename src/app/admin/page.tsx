@@ -62,7 +62,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage as clientStorage } from "@/firebase/firebaseConfig";
@@ -122,7 +122,11 @@ const educationalResourceSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  file: z.any().refine(file => file.length == 1, 'File is required.'),
+  file: z.instanceof(File).optional(),
+  link: z.string().url().optional().or(z.literal('')),
+}).refine(data => !!data.file || !!data.link, {
+  message: "Either a file or a link is required.",
+  path: ["file"],
 });
 
 
@@ -578,84 +582,85 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
   );
 }
 
-function EducationalResourceForm({ onSave }: { onSave: () => void }) {
+function EducationalResourceForm({ onSave, resource }: { onSave: () => void; resource?: EducationalResource }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<EducationalResourceFormType>({
+  
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<EducationalResourceFormType>({
     resolver: zodResolver(educationalResourceSchema),
-    defaultValues: { title: "", description: "" },
+    defaultValues: resource || { title: "", description: "", link: "" },
   });
 
+  const fileRef = register("file");
   const selectedFile = watch("file");
+  const linkValue = watch("link");
 
   useEffect(() => {
-    if (selectedFile && selectedFile.length > 0) {
-      setFileName(selectedFile[0].name);
-    } else {
-      setFileName(null);
+    if (resource) {
+      reset(resource);
     }
-  }, [selectedFile]);
+  }, [resource, reset]);
+
+  useEffect(() => {
+    // If user inputs a link, disable file input, and vice-versa
+    if (linkValue) {
+      setValue("file", undefined);
+    }
+  }, [linkValue, setValue]);
+
+  useEffect(() => {
+    if (selectedFile && selectedFile.name) {
+       setValue("link", "");
+    }
+  }, [selectedFile, setValue]);
+
 
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsSubmitting(true);
-    const file = data.file[0];
-    let downloadUrl = '';
 
     try {
-      // 1. Upload file to a permanent path on client-side
-      const permPath = `educational_resources/${Date.now()}_${file.name}`;
-      const storageRef = ref(clientStorage, permPath);
-      await uploadBytes(storageRef, file);
-      downloadUrl = await getDownloadURL(storageRef);
+      let fileUrl = data.link || "";
+      let fileName = "";
+      let fileType = "link";
 
-      // 2. Call server action with metadata and final URL
-      const result = await addEducationalResource({
+      if (data.file) {
+        const file = data.file;
+        const filePath = `educational_resources/${Date.now()}_${file.name}`;
+        const storageRef = ref(clientStorage, filePath);
+        
+        await uploadBytes(storageRef, file);
+        fileUrl = await getDownloadURL(storageRef);
+        fileName = file.name;
+        fileType = file.type;
+      }
+
+      if (!fileUrl) {
+         throw new Error("No file or link provided.");
+      }
+      
+      const resourceData = {
         title: data.title,
         description: data.description,
-        fileUrl: downloadUrl,
-        fileName: file.name,
-        fileType: file.type,
-      });
+        fileUrl,
+        fileName: fileName || "link",
+        fileType,
+      };
+
+      const result = await addEducationalResource(resourceData);
 
       if (result.success) {
-        toast({ title: "Success", description: "Educational resource added." });
+        toast({ title: "Success", description: "Educational resource saved." });
         onSave();
         reset();
       } else {
-        throw new Error(result.error || "Failed to save the resource.");
+        throw new Error(result.error || "Failed to save resource to the database.");
       }
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: `Operation failed: ${error.message}`,
+        title: "Operation Failed",
+        description: error.message,
       });
-      // If DB write fails, but upload succeeded, try to delete the orphaned file.
-      if (downloadUrl) {
-          try {
-              const fileRefToDelete = ref(clientStorage, downloadUrl);
-              await deleteObject(fileRefToDelete);
-              toast({
-                  variant: "destructive",
-                  title: "Cleanup",
-                  description: "Orphaned file was deleted from storage.",
-              });
-          } catch (cleanupError: any) {
-               toast({
-                  variant: "destructive",
-                  title: "Cleanup Failed",
-                  description: `Could not delete orphaned file: ${cleanupError.message}`,
-              });
-          }
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -663,45 +668,49 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Input type="hidden" {...register("id")} />
       <div>
         <Label htmlFor="resourceTitle">Title</Label>
         <Input id="resourceTitle" {...register("title")} disabled={isSubmitting} />
-        {errors.title && (
-          <p className="text-red-500 text-sm">{errors.title.message}</p>
-        )}
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
       </div>
       <div>
         <Label htmlFor="resourceDescription">Description</Label>
-        <Textarea
-          id="resourceDescription"
-          {...register("description")}
-          disabled={isSubmitting}
-        />
-        {errors.description && (
-          <p className="text-red-500 text-sm">{errors.description.message}</p>
-        )}
+        <Textarea id="resourceDescription" {...register("description")} disabled={isSubmitting} />
+        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
       </div>
-      <div>
+
+      <div className="space-y-2">
         <Label htmlFor="resourceFile">Upload File</Label>
         <Input
           id="resourceFile"
           type="file"
-          {...register("file")}
+          {...fileRef}
           accept=".pdf,.doc,.docx,.ppt,.pptx"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !!linkValue}
         />
-        {errors.file && (
-          <p className="text-red-500 text-sm">{errors.file.message as string}</p>
-        )}
-        {fileName && (
-          <p className="text-sm text-muted-foreground mt-2">Selected: {fileName}</p>
+        {selectedFile?.name && !linkValue && (
+            <p className="text-sm text-muted-foreground mt-2">Selected: {selectedFile.name}</p>
         )}
       </div>
+
+      <div className="flex items-center space-x-2">
+        <div className="flex-grow border-t"></div>
+        <span className="text-xs text-muted-foreground">OR</span>
+        <div className="flex-grow border-t"></div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="resourceLink">Link to Resource</Label>
+        <Input id="resourceLink" {...register("link")} placeholder="https://example.com/resource.pdf" disabled={isSubmitting || !!selectedFile?.name} />
+        {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
+      </div>
+       {errors.file && <p className="text-red-500 text-sm">{errors.file.message}</p>}
+
+
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="ghost" disabled={isSubmitting}>
-            Cancel
-          </Button>
+          <Button variant="ghost" disabled={isSubmitting}>Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -871,6 +880,7 @@ export default function AdminPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [journals, setJournals] = useState<Journal[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
+  const [resources, setResources] = useState<EducationalResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -890,18 +900,20 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
       getDigitalLibraryPapers(),
+      getEducationalResources(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
     setEvents(eventsData);
     setJournals(journalsData);
     setPapers(papersData);
+    setResources(resourcesData as EducationalResource[]);
     setLoading(false);
   };
 
@@ -938,6 +950,7 @@ export default function AdminPage() {
     if (fileType.includes("pdf")) return <FileCode className="h-5 w-5 text-red-500" />;
     if (fileType.includes("presentation") || fileType.includes("powerpoint")) return <Presentation className="h-5 w-5 text-orange-500" />;
     if (fileType.includes("document") || fileType.includes("word")) return <FileIcon className="h-5 w-5 text-blue-500" />;
+    if (fileType === 'link') return <LinkIcon className="h-5 w-5 text-gray-500" />;
     return <FileIcon className="h-5 w-5 text-gray-500" />;
   };
 
@@ -960,12 +973,13 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1236,6 +1250,62 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="library">
           <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
+        </TabsContent>
+        <TabsContent value="resources">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Educational Resources</CardTitle>
+                <CardDescription>Add, edit, or delete educational resources.</CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Resource</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Resource</DialogTitle>
+                  </DialogHeader>
+                  <EducationalResourceForm onSave={fetchData} />
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {resources.map((resource) => (
+                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div className="flex items-center gap-4">
+                      {getFileIcon(resource.fileType)}
+                      <div>
+                        <p className="font-semibold">{resource.title}</p>
+                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileUrl}</a>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       {/* Edit functionality can be added here if needed */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the resource "{resource.title}".
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
       </Tabs>

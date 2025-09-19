@@ -57,12 +57,12 @@ const digitalLibraryPaperSchema = z.object({
 });
 
 const educationalResourceSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  fileUrl: z.string().url("File URL is required"),
-  fileName: z.string().min(1, "File name is required"),
-  fileType: z.string().min(1, "File type is required"),
+    id: z.string().optional(),
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    fileUrl: z.string().url("Must be a valid URL"),
+    fileName: z.string().min(1, "File name is required"),
+    fileType: z.string().min(1, "File type is required"),
 });
 
 
@@ -90,8 +90,10 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
     revalidatePath(`/${collectionName}`);
     if (collectionName === 'events') revalidatePath('/');
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
-    if (collectionName === 'educational_resources') revalidatePath('/educationalresources');
-    if (collectionName === 'educational_resources') revalidatePath('/freecourses');
+    if (collectionName === 'educational_resources') {
+        revalidatePath('/educationalresources');
+        revalidatePath('/freecourses');
+    }
 
 
     return { success: true };
