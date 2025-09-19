@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import "./library.css";
 import Image from "next/image";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   return (
@@ -58,7 +60,7 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
 const sortOptions = [
     { value: 'relevance', label: 'Relevance' },
     { value: 'newest', label: 'Newest' },
-    { value: 'oldest', label: 'Oldest' },
+    { value: 'oldest', 'label': 'Oldest' },
     { value: 'alpha-az', label: 'Publication Title A-Z' },
     { value: 'alpha-za', label: 'Publication Title Z-A' },
 ];
@@ -155,16 +157,17 @@ export default function DigitalLibraryPage() {
                     Filter & Sort
                   </h3>
                   <div className="space-y-4">
-                      <Select onValueChange={(value: SortOption) => setSortOrder(value)} defaultValue={sortOrder}>
-                          <SelectTrigger className="w-full h-11 text-sm">
-                              <SelectValue placeholder="Sort by..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                              {sortOptions.map(option => (
-                                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                              ))}
-                          </SelectContent>
-                      </Select>
+                      <RadioGroup value={sortOrder} onValueChange={(value: SortOption) => setSortOrder(value)}>
+                        <h4 className="font-medium text-sm">Sort by</h4>
+                        <div className="space-y-2">
+                          {sortOptions.map(option => (
+                              <div key={option.value} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option.value} id={`sort-${option.value}`} />
+                                <Label htmlFor={`sort-${option.value}`} className="font-normal">{option.label}</Label>
+                              </div>
+                          ))}
+                        </div>
+                      </RadioGroup>
                   </div>
                 </div>
             </aside>
@@ -220,3 +223,5 @@ export default function DigitalLibraryPage() {
     </div>
   );
 }
+
+    
