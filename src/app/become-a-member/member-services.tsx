@@ -85,9 +85,13 @@ export default function MemberServices() {
                     className={`member-service-card ${service.variant === 'gradient' ? 'variant-gradient' : ''}`}
                     variants={itemVariants}
                   >
-                    <div className="service-icon">
+                    <motion.div
+                      className="service-icon"
+                      whileHover={{ scale: 1.1, rotate: -10 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
+                    >
                         {service.icon}
-                    </div>
+                    </motion.div>
                     <div className="service-content">
                         <h3 className="service-title">{service.title}</h3>
                         <p className="service-description">{service.description}</p>
