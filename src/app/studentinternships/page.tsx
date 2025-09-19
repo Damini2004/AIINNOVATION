@@ -21,7 +21,7 @@ export default function StudentInternshipsPage() {
     <div className="bg-background text-foreground">
       {/* Hero Section */}
       <section
-        className="py-20 bg-secondary relative bg-cover bg-center"
+        className="py-24 bg-secondary relative bg-cover bg-center"
         style={{ backgroundImage: "url(/assests/images/brid.png)" }}
         data-ai-hint="abstract geometric"
       >
