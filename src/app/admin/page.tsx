@@ -109,6 +109,7 @@ const digitalLibraryPaperSchema = z.object({
   journalName: z.string().min(1, "Journal Name is required"),
   volumeIssue: z.string().min(1, "Volume/Issue is required"),
   link: z.string().url("Must be a valid URL"),
+  image: z.string().url("Must be a valid image URL"),
 });
 
 
@@ -567,7 +568,7 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
 function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: DigitalLibraryPaper[], onUpdate: () => void }) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
-  const [parsedData, setParsedData] = useState<DigitalLibraryPaper[] | null>(null);
+  const [parsedData, setParsedData] = useState<Omit<DigitalLibraryPaper, 'id'>[] | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -582,13 +583,13 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
           // Basic CSV parsing
           const rows = text.split('\n').filter(row => row.trim() !== '');
           const headers = rows[0].split(',').map(h => h.trim());
-          const expectedHeaders = ["paperTitle", "authorName", "journalName", "volumeIssue", "link"];
+          const expectedHeaders = ["paperTitle", "authorName", "journalName", "volumeIssue", "link", "image"];
           
           if (headers.length !== expectedHeaders.length || !expectedHeaders.every((h, i) => h === headers[i])) {
             throw new Error("CSV headers do not match expected format: " + expectedHeaders.join(', '));
           }
 
-          const data: DigitalLibraryPaper[] = rows.slice(1).map(row => {
+          const data: Omit<DigitalLibraryPaper, 'id'>[] = rows.slice(1).map(row => {
             const values = row.split(',').map(v => v.trim());
             return {
               paperTitle: values[0] || '',
@@ -596,11 +597,12 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
               journalName: values[2] || '',
               volumeIssue: values[3] || '',
               link: values[4] || '',
+              image: values[5] || '',
             };
           });
 
           // Validate with Zod
-          const validatedData = z.array(digitalLibraryPaperSchema).safeParse(data);
+          const validatedData = z.array(digitalLibraryPaperSchema.omit({id: true})).safeParse(data);
           if (!validatedData.success) {
             console.error(validatedData.error);
             throw new Error("CSV data is invalid. Check console for details.");
@@ -660,7 +662,7 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
                     {fileName ? `Selected: ${fileName}` : "Click to upload a CSV file"}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                    Headers: paperTitle, authorName, journalName, volumeIssue, link
+                    Headers: paperTitle, authorName, journalName, volumeIssue, link, image
                 </span>
             </Label>
             <Input id="csv-upload" type="file" className="hidden" accept=".csv" onChange={handleFileChange} disabled={isUploading}/>

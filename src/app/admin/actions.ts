@@ -52,6 +52,7 @@ const digitalLibraryPaperSchema = z.object({
   journalName: z.string().min(1, "Journal Name is required"),
   volumeIssue: z.string().min(1, "Volume/Issue is required"),
   link: z.string().url("Must be a valid URL"),
+  image: z.string().url("Must be a valid image URL"),
 });
 
 type Course = z.infer<typeof courseSchema>;
@@ -135,10 +136,10 @@ export async function deleteJournal(id: string) { return deleteDocFromCollection
 // Digital Library Actions
 export async function getDigitalLibraryPapers(): Promise<DigitalLibraryPaper[]> { return getDocsFromCollection<DigitalLibraryPaper>('digital_library_papers'); }
 export async function deleteDigitalLibraryPaper(id: string) { return deleteDocFromCollection('digital_library_papers', id); }
-export async function bulkAddDigitalLibraryPapers(papers: DigitalLibraryPaper[]) {
+export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPaper, 'id'>[]) {
   try {
     const batch = papers.map(paper => {
-      const validatedData = digitalLibraryPaperSchema.parse(paper);
+      const validatedData = digitalLibraryPaperSchema.omit({id: true}).parse(paper);
       return addDoc(collection(db, "digital_library_papers"), validatedData);
     });
     await Promise.all(batch);

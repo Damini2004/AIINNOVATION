@@ -28,14 +28,16 @@ import Image from "next/image";
 
 function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   return (
-    <Link
-      href={paper.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="paper-card no-underline"
-    >
+    <div className="paper-card">
       <div className="paper-card-content">
-        <h3 className="paper-title">{paper.paperTitle}</h3>
+        <Link
+            href={paper.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="no-underline"
+        >
+            <h3 className="paper-title">{paper.paperTitle}</h3>
+        </Link>
         <p className="paper-authors">
           <User className="inline-icon" /> {paper.authorName}
         </p>
@@ -48,7 +50,16 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
           </span>
         </div>
       </div>
-    </Link>
+      <div className="paper-image-wrapper">
+         <Image 
+            src={paper.image}
+            alt={`Cover for ${paper.paperTitle}`}
+            fill
+            className="object-cover"
+            data-ai-hint="research paper cover"
+        />
+      </div>
+    </div>
   );
 }
 
@@ -56,9 +67,6 @@ const sortOptions = [
     { value: 'relevance', label: 'Relevance' },
     { value: 'newest', label: 'Newest' },
     { value: 'oldest', label: 'Oldest' },
-    { value: 'cited-papers', label: 'Most Cited By Papers' },
-    { value: 'cited-patents', label: 'Most Cited By Patents' },
-    { value: 'popular', label: 'Most Popular' },
     { value: 'alpha-az', label: 'Publication Title A-Z' },
     { value: 'alpha-za', label: 'Publication Title Z-A' },
 ];
@@ -100,11 +108,7 @@ export default function DigitalLibraryPage() {
           return a.paperTitle.localeCompare(b.paperTitle);
         case 'alpha-za':
             return b.paperTitle.localeCompare(a.paperTitle);
-        // Placeholder for other sorting logic
         case 'relevance':
-        case 'cited-papers':
-        case 'cited-patents':
-        case 'popular':
         default:
           return (b.id ?? "").localeCompare(a.id ?? ""); // Default to newest for now
       }
@@ -192,13 +196,16 @@ export default function DigitalLibraryPage() {
               <div className="space-y-6">
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-6 border rounded-lg space-y-4">
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
-                      <div className="flex gap-4">
-                        <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-4 w-1/4" />
+                    <div key={i} className="flex items-center p-6 border rounded-lg space-x-6">
+                      <div className="flex-1 space-y-4">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <div className="flex gap-4 pt-2">
+                          <Skeleton className="h-4 w-1/4" />
+                          <Skeleton className="h-4 w-1/4" />
+                        </div>
                       </div>
+                      <Skeleton className="h-32 w-32 rounded-lg" />
                     </div>
                   ))
                 ) : sortedAndFilteredPapers.length > 0 ? (
