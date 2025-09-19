@@ -20,7 +20,6 @@ export function Footer() {
                      alt="Datatech Logo"
                      width={200} // adjust size
                      height={50}
-                     priority
                    />
             </div>
             <p className="text-base text-muted-foreground leading-relaxed">
