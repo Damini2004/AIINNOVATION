@@ -63,8 +63,9 @@ export function AppHeader() {
       <Image
         src="/assests/images/logo.png" // replace with your logo path inside public folder
         alt="Datatech Logo"
-        width={200} // adjust size
-        height={50}
+        width={160}
+        height={40}
+        className="h-10 w-auto"
       />
     </Link>
 
