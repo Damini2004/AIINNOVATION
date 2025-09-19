@@ -38,8 +38,10 @@ import {
   getDigitalLibraryPapers,
   bulkAddDigitalLibraryPapers,
   deleteDigitalLibraryPaper,
+  getCounters,
+  updateCounters,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -64,8 +66,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode } from "lucide-react";
 import Image from "next/image";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { storage as clientStorage } from "@/firebase/firebaseConfig";
 
 
 // Zod Schemas
@@ -130,12 +130,20 @@ const educationalResourceSchema = z.object({
   path: ["file"],
 });
 
+const counterSchema = z.object({
+  members: z.number().min(0),
+  projects: z.number().min(0),
+  journals: z.number().min(0),
+  subscribers: z.number().min(0),
+});
+
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
 type EducationalResourceFormType = z.infer<typeof educationalResourceSchema>;
+type CounterFormType = z.infer<typeof counterSchema>;
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
@@ -936,6 +944,70 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
   )
 }
 
+function CounterForm({ onSave }: { onSave: () => void }) {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CounterFormType>({
+    resolver: zodResolver(counterSchema),
+    defaultValues: async () => {
+        const counters = await getCounters();
+        return counters || { members: 0, projects: 0, journals: 0, subscribers: 0 }
+    }
+  });
+
+  const onSubmit: SubmitHandler<CounterFormType> = async (data) => {
+    setIsSubmitting(true);
+    const result = await updateCounters(data);
+    if (result.success) {
+      toast({ title: "Success", description: "Counters updated successfully." });
+      onSave();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+    setIsSubmitting(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Homepage Counters</CardTitle>
+        <CardDescription>Update the statistics displayed on the homepage.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="members">Members</Label>
+              <Input id="members" type="number" {...register("members", { valueAsNumber: true })} />
+              {errors.members && <p className="text-red-500 text-sm">{errors.members.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="projects">Projects</Label>
+              <Input id="projects" type="number" {...register("projects", { valueAsNumber: true })} />
+              {errors.projects && <p className="text-red-500 text-sm">{errors.projects.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="journals">International Journals</Label>
+              <Input id="journals" type="number" {...register("journals", { valueAsNumber: true })} />
+              {errors.journals && <p className="text-red-500 text-sm">{errors.journals.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="subscribers">Subscribers</Label>
+              <Input id="subscribers" type="number" {...register("subscribers", { valueAsNumber: true })} />
+              {errors.subscribers && <p className="text-red-500 text-sm">{errors.subscribers.message}</p>}
+            </div>
+          </div>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Counters
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 export default function AdminPage() {
   const router = useRouter();
@@ -1038,13 +1110,14 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
+          <TabsTrigger value="counters">Counters</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1382,6 +1455,9 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="counters">
+          <CounterForm onSave={fetchData} />
+        </TabsContent>
 
       </Tabs>
     </div>
@@ -1393,4 +1469,5 @@ export default function AdminPage() {
     
 
   
+
 

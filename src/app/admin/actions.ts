@@ -3,7 +3,7 @@
 "use server";
 
 import { z } from "zod";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
 import { ref, getStorage, deleteObject } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
@@ -67,6 +67,13 @@ const educationalResourceSchema = z.object({
     image: z.string().optional(),
 });
 
+const counterSchema = z.object({
+  members: z.number().min(0),
+  projects: z.number().min(0),
+  journals: z.number().min(0),
+  subscribers: z.number().min(0),
+});
+
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
@@ -74,6 +81,7 @@ type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
 export type DigitalLibraryPaper = z.infer<typeof digitalLibraryPaperSchema>;
 export type EducationalResource = z.infer<typeof educationalResourceSchema>;
+export type Counter = z.infer<typeof counterSchema>;
 
 
 // Generic function to add or update a document
@@ -96,6 +104,7 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
         revalidatePath('/educationalresources');
         revalidatePath('/freecourses');
     }
+    if (collectionName === 'site_settings') revalidatePath('/');
 
 
     return { success: true };
@@ -203,4 +212,35 @@ export async function deleteEducationalResource(id: string, fileName: string) {
 
 export async function addOrUpdateEducationalResource(data: EducationalResource) {
     return addOrUpdateDoc('educational_resources', data, educationalResourceSchema);
+}
+
+// Counter Actions
+const COUNTER_COLLECTION = 'site_settings';
+const COUNTER_DOC_ID = 'counters';
+
+export async function getCounters(): Promise<Counter | null> {
+  try {
+    const docRef = doc(db, COUNTER_COLLECTION, COUNTER_DOC_ID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as Counter;
+    }
+    // Return default values if document doesn't exist
+    return { members: 2000, projects: 200, journals: 23, subscribers: 4000 };
+  } catch (error) {
+    console.error("Error fetching counters:", error);
+    return null;
+  }
+}
+
+export async function updateCounters(data: Counter) {
+  try {
+    const validatedData = counterSchema.parse(data);
+    const docRef = doc(db, COUNTER_COLLECTION, COUNTER_DOC_ID);
+    await setDoc(docRef, validatedData, { merge: true });
+    revalidatePath('/');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }

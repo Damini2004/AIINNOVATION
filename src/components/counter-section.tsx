@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,22 +8,39 @@ import {
   Sparkles,
   ClipboardCheck,
 } from "lucide-react";
+import { getCounters } from "@/app/admin/actions";
+import type { Counter } from "@/app/admin/actions";
 
 export default function CounterSection() {
-  const counters = [
-    { icon: GraduationCap, number: 2000, suffix: "+", label: "Members" },
-    { icon: ClipboardCheck, number: 200, suffix: "+", label: "Projects" },
-    { icon: Sparkles, number: 23, suffix: "", label: "International Journals" },
-    { icon: Users, number: 4000, suffix: "+", label: "Subscribers" },
-  ];
-
+    const [counters, setCounters] = useState([
+        { icon: GraduationCap, number: 0, suffix: "+", label: "Members" },
+        { icon: ClipboardCheck, number: 0, suffix: "+", label: "Projects" },
+        { icon: Sparkles, number: 0, suffix: "", label: "International Journals" },
+        { icon: Users, number: 0, suffix: "+", label: "Subscribers" },
+    ]);
   const [counts, setCounts] = useState(counters.map(() => 0));
   const [animationTriggered, setAnimationTriggered] = useState(false);
+  
+  useEffect(() => {
+    const fetchAndSetCounters = async () => {
+        const data = await getCounters();
+        if (data) {
+            setCounters([
+                { icon: GraduationCap, number: data.members, suffix: "+", label: "Members" },
+                { icon: ClipboardCheck, number: data.projects, suffix: "+", label: "Projects" },
+                { icon: Sparkles, number: data.journals, suffix: "", label: "International Journals" },
+                { icon: Users, number: data.subscribers, suffix: "+", label: "Subscribers" },
+            ]);
+        }
+    }
+    fetchAndSetCounters();
+  }, []);
 
   useEffect(() => {
     const section = document.getElementById("counter-section");
     const handleScroll = () => {
-      if (!section || animationTriggered) return;
+      if (!section || animationTriggered || counters.every(c => c.number === 0)) return;
+
       const top = section.getBoundingClientRect().top;
       if (top < window.innerHeight - 100) {
         setAnimationTriggered(true);
