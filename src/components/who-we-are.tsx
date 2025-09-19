@@ -16,7 +16,7 @@ export default function WhoWeAre() {
               alt="About AI Innovation Society"
               width={600}
               height={600}
-              className="w-full rounded-lg shadow-xl"
+              className="w-full rounded-lg"
               data-ai-hint="team collaboration"
             />
           </div>
