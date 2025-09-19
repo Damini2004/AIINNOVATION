@@ -105,7 +105,7 @@ export default function JournalsPage() {
       <main className="py-24">
         <div className="container mx-auto px-6">
           
-          <section className="mb-20 space-y-12">
+          <section className="mb-20 space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
                 <div>
                     <CardHeader className="px-0 pt-0">
