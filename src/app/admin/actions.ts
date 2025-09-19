@@ -3,8 +3,8 @@
 
 import { z } from "zod";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL, getStorage, deleteObject } from "firebase/storage";
-import { db, storage as clientStorage } from "@/firebase/firebaseConfig";
+import { ref, getStorage, deleteObject } from "firebase/storage";
+import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
 
 // Zod Schemas
@@ -53,7 +53,7 @@ const digitalLibraryPaperSchema = z.object({
   journalName: z.string().min(1, "Journal Name is required"),
   volumeIssue: z.string().min(1, "Volume/Issue is required"),
   link: z.string().url("Must be a valid URL"),
-  image: z.string().url("Must be a valid image URL"),
+  image: z.string().url("Must be a valid image URL").optional().or(z.literal('')),
 });
 
 const educationalResourceSchema = z.object({
@@ -91,6 +91,7 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
     if (collectionName === 'events') revalidatePath('/');
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
     if (collectionName === 'educational_resources') revalidatePath('/educationalresources');
+    if (collectionName === 'educational_resources') revalidatePath('/freecourses');
 
 
     return { success: true };
@@ -111,15 +112,31 @@ async function getDocsFromCollection<T>(collectionName: string): Promise<T[]> {
 }
 
 // Generic function to delete a document
-async function deleteDocFromCollection(collectionName: string, id: string) {
+async function deleteDocFromCollection(collectionName: string, id: string, filePath?: string) {
   try {
     const docRef = doc(db, collectionName, id);
     await deleteDoc(docRef);
+
+    if (filePath) {
+        try {
+            const storage = getStorage();
+            const fileRef = ref(storage, filePath);
+            await deleteObject(fileRef);
+        } catch (storageError) {
+            console.error("Error deleting file from storage, but document was deleted from Firestore:", storageError);
+            // Don't throw error, just log it. The main goal was to delete the record.
+        }
+    }
+
+
     revalidatePath('/admin');
     revalidatePath(`/${collectionName}`);
      if (collectionName === 'events') revalidatePath('/');
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
-    if (collectionName === 'educational_resources') revalidatePath('/educationalresources');
+    if (collectionName === 'educational_resources') {
+      revalidatePath('/educationalresources');
+      revalidatePath('/freecourses');
+    }
 
     return { success: true };
   } catch (error: any) {
@@ -168,50 +185,35 @@ export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPap
 
 // Educational Resources Actions
 export async function getEducationalResources(): Promise<EducationalResource[]> { return getDocsFromCollection<EducationalResource>('educational_resources'); }
-export async function deleteEducationalResource(id: string) { 
-    // Also delete from storage
-    return deleteDocFromCollection('educational_resources', id); 
+
+export async function deleteEducationalResource(id: string, fileName: string) {
+    const filePath = `educational_resources/${fileName}`;
+    return deleteDocFromCollection('educational_resources', id, filePath);
 }
 
-export async function addEducationalResource(data: { title: string; description: string; filePath: string; fileName: string; fileType: string; }) {
-  const { title, description, filePath, fileName, fileType } = data;
-  const storage = getStorage();
-  const tempRef = ref(storage, filePath);
 
-  try {
-    const permPath = `educational_resources/${Date.now()}_${fileName}`;
-    const permRef = ref(storage, permPath);
-    
-    // Copy file from temp to permanent location
-    const fileSnapshot = await getDownloadURL(tempRef);
-    const fileResponse = await fetch(fileSnapshot);
-    const fileBlob = await fileResponse.blob();
-    await uploadString(permRef, await fileBlob.text(), 'raw', { contentType: fileType });
-    const fileUrl = await getDownloadURL(permRef);
-    
-    // Delete temp file
-    await deleteObject(tempRef);
+export async function addEducationalResource(data: Omit<EducationalResource, 'id'>) {
+    try {
+        const validatedData = educationalResourceSchema.omit({id: true}).parse(data);
+        await addDoc(collection(db, "educational_resources"), validatedData);
 
-    const resourceData: Omit<EducationalResource, 'id'> = {
-      title,
-      description,
-      fileUrl,
-      fileName,
-      fileType,
-    };
-    
-    const validatedData = educationalResourceSchema.omit({id: true}).parse(resourceData);
-    await addDoc(collection(db, "educational_resources"), validatedData);
+        revalidatePath('/admin');
+        revalidatePath('/educationalresources');
+        revalidatePath('/freecourses');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Add resource error:", error);
+        
+        // If DB write fails, attempt to delete the orphaned file from storage
+        try {
+            const storage = getStorage();
+            const fileRef = ref(storage, data.fileUrl);
+            await deleteObject(fileRef);
+            console.log("Orphaned file deleted from storage.");
+        } catch (storageError) {
+            console.error("Failed to delete orphaned file from storage:", storageError);
+        }
 
-    revalidatePath('/admin');
-    revalidatePath('/educationalresources');
-    revalidatePath('/freecourses');
-    return { success: true };
-
-  } catch (error: any) {
-     console.error("Add resource error:", error);
-    // Cleanup temp file if something fails
-    try { await deleteObject(tempRef); } catch (e) {}
-    return { success: false, error: error.message };
-  }
+        return { success: false, error: error.message };
+    }
 }

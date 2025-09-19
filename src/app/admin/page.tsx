@@ -64,7 +64,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode } from "lucide-react";
 import Image from "next/image";
-import { ref, uploadBytes } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage as clientStorage } from "@/firebase/firebaseConfig";
 
 
@@ -115,7 +115,7 @@ const digitalLibraryPaperSchema = z.object({
   journalName: z.string().min(1, "Journal Name is required"),
   volumeIssue: z.string().min(1, "Volume/Issue is required"),
   link: z.string().url("Must be a valid URL"),
-  image: z.string().url("Must be a valid image URL"),
+  image: z.string().url("Must be a valid image URL").optional().or(z.literal('')),
 });
 
 const educationalResourceSchema = z.object({
@@ -609,16 +609,17 @@ function EducationalResourceForm({ onSave }: { onSave: () => void }) {
     const file = data.file[0];
 
     try {
-      // 1. Upload file to a temporary path on client-side
-      const tempPath = `temp/${Date.now()}_${file.name}`;
-      const storageRef = ref(clientStorage, tempPath);
+      // 1. Upload file to a permanent path on client-side
+      const permPath = `educational_resources/${Date.now()}_${file.name}`;
+      const storageRef = ref(clientStorage, permPath);
       await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
 
-      // 2. Call server action with metadata and temp path
+      // 2. Call server action with metadata and final URL
       const result = await addEducationalResource({
         title: data.title,
         description: data.description,
-        filePath: tempPath,
+        fileUrl: downloadUrl,
         fileName: file.name,
         fileType: file.type,
       });
@@ -899,14 +900,19 @@ export default function AdminPage() {
   };
 
 
-  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string) => {
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string, fileName?: string) => {
     let result;
     if (collection === 'courses') result = await deleteCourse(id);
     if (collection === 'partners') result = await deletePartner(id);
     if (collection === 'events') result = await deleteEvent(id);
     if (collection === 'journals') result = await deleteJournal(id);
     if (collection === 'digital_library_papers') result = await deleteDigitalLibraryPaper(id);
-    if (collection === 'educational_resources') result = await deleteEducationalResource(id);
+    if (collection === 'educational_resources' && fileName) {
+        result = await deleteEducationalResource(id, fileName);
+    } else if (collection === 'educational_resources') {
+        toast({ variant: "destructive", title: "Error", description: "File name not provided for deletion." });
+        return;
+    }
 
     if (result?.success) {
       toast({ title: "Success", description: "Item deleted successfully." });
@@ -1265,7 +1271,7 @@ export default function AdminPage() {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
