@@ -37,7 +37,7 @@ export default function Slider() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-6">
               <Link
                 href="/contact"
-                className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium shadow hover:bg-primary/90 transition w-full sm:w-auto justify-center"
+                className="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-primary to-accent text-primary-foreground font-medium shadow-lg hover:shadow-primary/40 transition-all duration-300 bg-[length:200%_auto] hover:bg-right w-full sm:w-auto justify-center"
               >
                 Contact Us <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
