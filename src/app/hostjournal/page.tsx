@@ -119,7 +119,7 @@ export default function HostJournalPage() {
       </main>
 
        {/* Services Section */}
-      <section className="journal-service-area py-20 bg-blue-50 border-t">
+      <section className="journal-service-area py-20 bg-blue-950 text-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h5 className="text-primary font-semibold uppercase">Our Services</h5>
@@ -130,7 +130,7 @@ export default function HostJournalPage() {
             {services.map((service, index) => (
               <div key={index} className="journal-service-card">
                 <div className="journal-service-icon">{service.icon}</div>
-                <h3 className="text-xl font-bold mt-4 mb-2">{service.title}</h3>
+                <h3 className="text-xl font-bold mt-4 mb-2 text-foreground">{service.title}</h3>
                 <p className="text-muted-foreground">{service.description}</p>
               </div>
             ))}
