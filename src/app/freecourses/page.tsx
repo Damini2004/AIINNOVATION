@@ -15,10 +15,13 @@ import {
   Presentation,
   File,
   Download,
+  X
 } from "lucide-react";
 import "../educationalresources/resources.css";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 
 function ResourceCard({ resource }: { resource: EducationalResource }) {
   const getIcon = (fileType: string) => {
@@ -126,8 +129,8 @@ export default function FreeCoursesPage() {
       {/* Main Content */}
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-6">
-          <div className="mb-12">
-            <div className="relative max-w-2xl mx-auto">
+           <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
+            <div className="relative w-full max-w-2xl">
               <Input
                 type="text"
                 placeholder="Search resources by title or description..."
@@ -142,36 +145,55 @@ export default function FreeCoursesPage() {
                 <Search className="h-5 w-5 text-primary-foreground" />
               </Button>
             </div>
-          </div>
-
-          <div className="grid lg:grid-cols-12 gap-12">
-            <aside className="lg:col-span-3">
-              <div className="p-6 bg-card border rounded-lg sticky top-24">
-                <h3 className="text-lg font-semibold flex items-center mb-4">
-                  <Filter className="h-5 w-5 mr-2 text-primary" />
-                  Filter by Type
-                </h3>
-                <div className="space-y-3">
-                  {allFileTypes.map(fileType => (
-                    <div key={fileType} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`filter-${fileType}`} 
-                        checked={fileTypeFilters.includes(fileType)}
-                        onCheckedChange={() => handleFilterChange(fileType)}
-                      />
-                      <Label htmlFor={`filter-${fileType}`} className="font-normal capitalize">
-                        {fileType.split('/')[1] || fileType}
-                      </Label>
-                    </div>
-                  ))}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-12 rounded-full relative">
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter
+                  {fileTypeFilters.length > 0 && (
+                    <Badge variant="secondary" className="absolute -top-2 -right-2 h-6 w-6 justify-center rounded-full bg-primary text-primary-foreground p-0">
+                      {fileTypeFilters.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">File Type</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Select file types to display.
+                    </p>
+                  </div>
+                   <div className="space-y-3">
+                    {allFileTypes.map(fileType => (
+                      <div key={fileType} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`filter-${fileType}-free`} 
+                          checked={fileTypeFilters.includes(fileType)}
+                          onCheckedChange={() => handleFilterChange(fileType)}
+                        />
+                        <Label htmlFor={`filter-${fileType}-free`} className="font-normal capitalize">
+                          {fileType.split('/')[1] || fileType}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  {fileTypeFilters.length > 0 && (
+                     <Button variant="ghost" onClick={() => setFileTypeFilters([])}>
+                       <X className="mr-2 h-4 w-4" />
+                       Clear filters
+                     </Button>
+                  )}
                 </div>
-              </div>
-            </aside>
+              </PopoverContent>
+            </Popover>
+          </div>
             
-            <div className="lg:col-span-9">
+          <div>
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {Array.from({ length: 6 }).map((_, i) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="p-6 border rounded-lg space-y-4">
                       <Skeleton className="h-10 w-10 rounded-full" />
                       <Skeleton className="h-5 w-3/4" />
@@ -182,7 +204,7 @@ export default function FreeCoursesPage() {
                 </div>
               ) : paginatedResources.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {paginatedResources.map((resource) => (
                       <ResourceCard key={resource.id} resource={resource} />
                     ))}
@@ -217,7 +239,6 @@ export default function FreeCoursesPage() {
                 </div>
               )}
             </div>
-          </div>
         </div>
       </main>
     </div>
