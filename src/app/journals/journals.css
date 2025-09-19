@@ -1,0 +1,13 @@
+
+@keyframes continuous-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animated-check-icon {
+  animation: continuous-bounce 2s ease-in-out infinite;
+}

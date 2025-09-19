@@ -8,6 +8,7 @@ import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { getJournals } from "@/app/admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import "./journals.css";
 
 type Journal = {
   id: string;
@@ -121,7 +122,7 @@ export default function JournalsPage() {
                             "Targeted Marketing & Promotion"
                         ].map((item, index) => (
                             <li key={index} className="flex items-start">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0 animated-check-icon" />
                             <span>{item}</span>
                             </li>
                         ))}
@@ -162,7 +163,7 @@ export default function JournalsPage() {
                         <ul className="space-y-3">
                         {pros.map((item, index) => (
                             <li key={index} className="flex items-start">
-                            <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0 animated-check-icon" />
                             <span>{item}</span>
                             </li>
                         ))}
@@ -185,7 +186,7 @@ export default function JournalsPage() {
                         <ul className="space-y-3">
                         {cons.map((item, index) => (
                             <li key={index} className="flex items-start">
-                            <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0" />
+                            <XCircle className="w-5 h-5 text-red-500 mr-2 mt-1 flex-shrink-0 animated-check-icon" />
                             <span>{item}</span>
                             </li>
                         ))}
@@ -238,7 +239,3 @@ export default function JournalsPage() {
     </div>
   );
 }
-
-    
-
-    
