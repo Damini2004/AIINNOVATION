@@ -3,7 +3,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Database, Search, Globe, Award, ShieldCheck, Users } from "lucide-react";
+import "./host-journal-services.css";
 
 export default function HostJournalPage() {
   const keyPoints = [
@@ -13,6 +14,39 @@ export default function HostJournalPage() {
     "Support for open-access publishing and ethical guidelines.",
     "Opportunities for special issues linked to AIIS conferences and events.",
     "Streamlined peer-review and publication management support.",
+  ];
+
+  const services = [
+    {
+        icon: <Database />,
+        title: "Indexing Support",
+        description: "Assistance with indexing in Scopus, Web of Science, and other major databases to enhance visibility."
+    },
+    {
+        icon: <Search />,
+        title: "Peer Review Management",
+        description: "Access to a robust platform and a global network of expert reviewers to ensure rigorous peer review."
+    },
+    {
+        icon: <Globe />,
+        title: "Global Promotion",
+        description: "Promotion of your journal through AIIS's international channels, including conferences and newsletters."
+    },
+    {
+        icon: <Award />,
+        title: "DOI & CrossRef",
+        description: "Full support for DOI registration and CrossRef integration to ensure permanent and citable links."
+    },
+    {
+        icon: <ShieldCheck />,
+        title: "Quality Assurance",
+        description: "Dedicated editorial support to maintain the highest standards of academic quality and integrity."
+    },
+    {
+        icon: <Users />,
+        title: "Website & Hosting",
+        description: "A professional, mobile-friendly journal website with hosting and technical support included."
+    }
   ];
 
   return (
@@ -83,6 +117,26 @@ export default function HostJournalPage() {
           </div>
         </div>
       </main>
+
+       {/* Services Section */}
+      <section className="journal-service-area py-20 bg-secondary">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h5 className="text-primary font-semibold uppercase">Our Services</h5>
+            <h2 className="text-3xl font-bold">What We Provide</h2>
+            <div className="em_bar_bg mt-4"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <div key={index} className="journal-service-card">
+                <div className="journal-service-icon">{service.icon}</div>
+                <h3 className="text-xl font-bold mt-4 mb-2">{service.title}</h3>
+                <p className="text-muted-foreground">{service.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,0 +1,40 @@
+
+.journal-service-area {
+    background-color: hsl(var(--secondary));
+}
+
+.journal-service-card {
+    background: hsl(var(--card));
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px solid hsl(var(--border));
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.journal-service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px hsl(var(--primary) / 0.1);
+}
+
+.journal-service-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    color: hsl(var(--primary-foreground));
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.journal-service-card:hover .journal-service-icon {
+    transform: scale(1.1) rotate(-10deg);
+}
+
+.journal-service-icon svg {
+    width: 40px;
+    height: 40px;
+}
