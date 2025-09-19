@@ -24,19 +24,22 @@ import {
   addOrUpdatePartner,
   addOrUpdateEvent,
   addOrUpdateJournal,
+  addEducationalResource,
   getCourses,
   getPartners,
   getEvents,
   getJournals,
+  getEducationalResources,
   deleteCourse,
   deletePartner,
   deleteEvent,
   deleteJournal,
+  deleteEducationalResource,
   getDigitalLibraryPapers,
   bulkAddDigitalLibraryPapers,
   deleteDigitalLibraryPaper,
 } from "./actions";
-import type { DigitalLibraryPaper } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -59,7 +62,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, FileCode } from "lucide-react";
 import Image from "next/image";
 
 // Zod Schemas
@@ -112,11 +115,19 @@ const digitalLibraryPaperSchema = z.object({
   image: z.string().url("Must be a valid image URL"),
 });
 
+const educationalResourceSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  file: z.any().refine(file => file.length == 1, 'File is required.'),
+});
+
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
+type EducationalResourceFormType = z.infer<typeof educationalResourceSchema>;
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
@@ -564,6 +575,102 @@ function JournalForm({ journal, onSave }: { journal?: Journal; onSave: () => voi
   );
 }
 
+function EducationalResourceForm({ onSave }: { onSave: () => void }) {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch
+  } = useForm<EducationalResourceFormType>({
+    resolver: zodResolver(educationalResourceSchema),
+    defaultValues: { title: "", description: "" }
+  });
+
+  const selectedFile = watch("file");
+
+  useEffect(() => {
+    if (selectedFile && selectedFile.length > 0) {
+      setFileName(selectedFile[0].name);
+    } else {
+      setFileName(null);
+    }
+  }, [selectedFile]);
+
+  const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
+    setIsUploading(true);
+    const file = data.file[0];
+    const reader = new FileReader();
+    
+    reader.onload = async (e) => {
+      const fileData = e.target?.result as string;
+      if (!fileData) {
+          toast({ variant: "destructive", title: "Error", description: "Could not read file data." });
+          setIsUploading(false);
+          return;
+      }
+      
+      const result = await addEducationalResource({
+        title: data.title,
+        description: data.description,
+        fileData,
+        fileName: file.name,
+        fileType: file.type,
+      });
+
+      if (result.success) {
+        toast({ title: "Success", description: "Educational resource added." });
+        onSave();
+        reset();
+      } else {
+        toast({ variant: "destructive", title: "Error", description: result.error });
+      }
+      setIsUploading(false);
+    };
+
+    reader.onerror = () => {
+      toast({ variant: "destructive", title: "Error", description: "Failed to read file." });
+      setIsUploading(false);
+    }
+
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Label htmlFor="resourceTitle">Title</Label>
+        <Input id="resourceTitle" {...register("title")} disabled={isUploading}/>
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="resourceDescription">Description</Label>
+        <Textarea id="resourceDescription" {...register("description")} disabled={isUploading}/>
+        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="resourceFile">Upload File</Label>
+        <Input id="resourceFile" type="file" {...register("file")} accept=".pdf,.doc,.docx,.ppt,.pptx" disabled={isUploading}/>
+        {errors.file && <p className="text-red-500 text-sm">{errors.file.message as string}</p>}
+        {fileName && <p className="text-sm text-muted-foreground mt-2">Selected: {fileName}</p>}
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost" disabled={isUploading}>Cancel</Button>
+        </DialogClose>
+        <Button type="submit" disabled={isUploading}>
+           {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+           Save Resource
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
 
 function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: DigitalLibraryPaper[], onUpdate: () => void }) {
   const { toast } = useToast();
@@ -723,6 +830,7 @@ export default function AdminPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [journals, setJournals] = useState<Journal[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
+  const [resources, setResources] = useState<EducationalResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -742,18 +850,20 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
       getDigitalLibraryPapers(),
+      getEducationalResources(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
     setEvents(eventsData);
     setJournals(journalsData);
     setPapers(papersData);
+    setResources(resourcesData);
     setLoading(false);
   };
 
@@ -764,13 +874,14 @@ export default function AdminPage() {
   };
 
 
-  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers', id: string) => {
+  const handleDelete = async (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string) => {
     let result;
     if (collection === 'courses') result = await deleteCourse(id);
     if (collection === 'partners') result = await deletePartner(id);
     if (collection === 'events') result = await deleteEvent(id);
     if (collection === 'journals') result = await deleteJournal(id);
     if (collection === 'digital_library_papers') result = await deleteDigitalLibraryPaper(id);
+    if (collection === 'educational_resources') result = await deleteEducationalResource(id);
 
     if (result?.success) {
       toast({ title: "Success", description: "Item deleted successfully." });
@@ -779,6 +890,13 @@ export default function AdminPage() {
       toast({ variant: "destructive", title: "Error", description: result?.error });
     }
   }
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.includes("pdf")) return <FileCode className="h-5 w-5 text-red-500" />;
+    if (fileType.includes("presentation") || fileType.includes("powerpoint")) return <Presentation className="h-5 w-5 text-orange-500" />;
+    if (fileType.includes("document") || fileType.includes("word")) return <FileIcon className="h-5 w-5 text-blue-500" />;
+    return <FileIcon className="h-5 w-5 text-gray-500" />;
+  };
 
   if (!isAuthenticated) {
      return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
@@ -799,12 +917,13 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="courses">Manage Courses</TabsTrigger>
-          <TabsTrigger value="partners">Manage Partners</TabsTrigger>
-          <TabsTrigger value="events">Manage Events</TabsTrigger>
-          <TabsTrigger value="journals">Manage Journals</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="courses">Courses</TabsTrigger>
+          <TabsTrigger value="partners">Partners</TabsTrigger>
+          <TabsTrigger value="events">Events</TabsTrigger>
+          <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1073,9 +1192,66 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
-         <TabsContent value="library">
+        <TabsContent value="library">
           <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
         </TabsContent>
+
+        <TabsContent value="resources">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Educational Resources</CardTitle>
+                <CardDescription>Add or delete educational resources like PDFs, PPTs, etc.</CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add New Resource</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Resource</DialogTitle>
+                  </DialogHeader>
+                  <EducationalResourceForm onSave={() => fetchData()} />
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {resources.map((resource) => (
+                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div className="flex items-center gap-4">
+                      {getFileIcon(resource.fileType)}
+                      <div className="truncate">
+                        <p className="font-semibold truncate">{resource.title}</p>
+                        <p className="text-sm text-muted-foreground truncate">{resource.fileName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action will permanently delete the resource: "{resource.title}".
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
       </Tabs>
     </div>
   );

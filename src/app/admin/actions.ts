@@ -3,7 +3,8 @@
 
 import { z } from "zod";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
 
 // Zod Schemas
@@ -55,11 +56,22 @@ const digitalLibraryPaperSchema = z.object({
   image: z.string().url("Must be a valid image URL"),
 });
 
+const educationalResourceSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  fileUrl: z.string().url(),
+  fileName: z.string(),
+  fileType: z.string(),
+});
+
+
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
 export type DigitalLibraryPaper = z.infer<typeof digitalLibraryPaperSchema>;
+export type EducationalResource = z.infer<typeof educationalResourceSchema>;
 
 
 // Generic function to add or update a document
@@ -78,6 +90,7 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
     revalidatePath(`/${collectionName}`);
     if (collectionName === 'events') revalidatePath('/');
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
+    if (collectionName === 'educational_resources') revalidatePath('/educationalresources');
 
 
     return { success: true };
@@ -106,6 +119,7 @@ async function deleteDocFromCollection(collectionName: string, id: string) {
     revalidatePath(`/${collectionName}`);
      if (collectionName === 'events') revalidatePath('/');
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
+    if (collectionName === 'educational_resources') revalidatePath('/educationalresources');
 
     return { success: true };
   } catch (error: any) {
@@ -131,7 +145,7 @@ export async function deleteEvent(id: string) { return deleteDocFromCollection('
 // Journal Actions
 export async function addOrUpdateJournal(data: Journal) { return addOrUpdateDoc('journals', data, journalSchema); }
 export async function getJournals(): Promise<Journal[]> { return getDocsFromCollection<Journal>('journals'); }
-export async function deleteJournal(id: string) { return deleteDocFromCollection('journals', id); }
+export async function deleteJournal(id: string) { return deleteDocFromCollection('journals',id); }
 
 // Digital Library Actions
 export async function getDigitalLibraryPapers(): Promise<DigitalLibraryPaper[]> { return getDocsFromCollection<DigitalLibraryPaper>('digital_library_papers'); }
@@ -148,6 +162,38 @@ export async function bulkAddDigitalLibraryPapers(papers: Omit<DigitalLibraryPap
     return { success: true, count: papers.length };
   } catch (error: any) {
     console.error("Bulk add error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Educational Resources Actions
+export async function getEducationalResources(): Promise<EducationalResource[]> { return getDocsFromCollection<EducationalResource>('educational_resources'); }
+export async function deleteEducationalResource(id: string) { return deleteDocFromCollection('educational_resources', id); }
+export async function addEducationalResource(data: { title: string; description: string; fileData: string; fileName: string; fileType: string; }) {
+  try {
+    const { title, description, fileData, fileName, fileType } = data;
+    
+    // Upload file to Firebase Storage
+    const storageRef = ref(storage, `educational_resources/${Date.now()}_${fileName}`);
+    const uploadResult = await uploadString(storageRef, fileData, 'data_url');
+    const fileUrl = await getDownloadURL(uploadResult.ref);
+
+    const resourceData: Omit<EducationalResource, 'id'> = {
+      title,
+      description,
+      fileUrl,
+      fileName,
+      fileType,
+    };
+    
+    const validatedData = educationalResourceSchema.omit({id: true}).parse(resourceData);
+    await addDoc(collection(db, "educational_resources"), validatedData);
+
+    revalidatePath('/admin');
+    revalidatePath('/educationalresources');
+    return { success: true };
+  } catch (error: any) {
+    console.error("Add resource error:", error);
     return { success: false, error: error.message };
   }
 }
