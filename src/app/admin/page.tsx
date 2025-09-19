@@ -947,8 +947,8 @@ export default function AdminPage() {
     if (collection === 'educational_resources' && fileName) {
         result = await deleteEducationalResource(id, fileName);
     } else if (collection === 'educational_resources') {
-        toast({ variant: "destructive", title: "Error", description: "File name not provided for deletion." });
-        return;
+        // This case handles links, where fileName can be 'link'
+         result = await deleteEducationalResource(id, fileName || 'link');
     }
 
     if (result?.success) {
@@ -1325,5 +1325,7 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
 
     

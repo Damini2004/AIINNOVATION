@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { z } from "zod";
@@ -119,14 +120,19 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
     const docRef = doc(db, collectionName, id);
     await deleteDoc(docRef);
 
-    if (filePath) {
+    if (filePath && filePath !== 'link') {
         try {
             const storage = getStorage();
             const fileRef = ref(storage, filePath);
             await deleteObject(fileRef);
         } catch (storageError) {
-            console.error("Error deleting file from storage, but document was deleted from Firestore:", storageError);
-            // Don't throw error, just log it. The main goal was to delete the record.
+            // Check for specific error code if file does not exist
+            if ((storageError as any).code === 'storage/object-not-found') {
+                console.warn("File not found in storage, but document was deleted from Firestore. This might be okay if it was a link or already deleted.");
+            } else {
+                console.error("Error deleting file from storage, but document was deleted from Firestore:", storageError);
+                 // Don't re-throw, just log. The main goal was to delete the record.
+            }
         }
     }
 
@@ -190,6 +196,8 @@ export async function getEducationalResources(): Promise<EducationalResource[]> 
 
 export async function deleteEducationalResource(id: string, fileName: string) {
     const filePath = `educational_resources/${fileName}`;
+    // For links, fileName is 'link', so filePath will be 'educational_resources/link', which won't exist.
+    // The check in deleteDocFromCollection handles this.
     return deleteDocFromCollection('educational_resources', id, filePath);
 }
 
@@ -210,3 +218,5 @@ export async function addEducationalResource(data: Omit<EducationalResource, 'id
         return { success: false, error: error.message };
     }
 }
+
+    
