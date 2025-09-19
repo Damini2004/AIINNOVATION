@@ -36,6 +36,8 @@ function Showcase() {
       if (snippetFromUrl) {
         setSelectedSnippet(snippetFromUrl);
       }
+    } else {
+      setSelectedSnippet(null);
     }
   }, [searchParams, snippets]);
 
