@@ -66,12 +66,15 @@ const sortOptions = [
 ];
 type SortOption = typeof sortOptions[number]['value'];
 
+const PAPERS_PER_PAGE = 15;
+
 
 export default function DigitalLibraryPage() {
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOption>("relevance");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchPapers = async () => {
@@ -108,6 +111,16 @@ export default function DigitalLibraryPage() {
       }
     });
 
+  const totalPages = Math.ceil(sortedAndFilteredPapers.length / PAPERS_PER_PAGE);
+  const paginatedPapers = sortedAndFilteredPapers.slice(
+    (currentPage - 1) * PAPERS_PER_PAGE,
+    currentPage * PAPERS_PER_PAGE
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  }
+
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
@@ -139,7 +152,10 @@ export default function DigitalLibraryPage() {
                     type="text"
                     placeholder="Search by paper title, author, or journal..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1); // Reset to first page on new search
+                    }}
                     className="h-12 text-base rounded-full pr-14"
                 />
                 <Button variant="default" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full h-10 w-10" style={{backgroundColor: 'hsl(var(--primary))'}}>
@@ -157,7 +173,10 @@ export default function DigitalLibraryPage() {
                     Filter & Sort
                   </h3>
                   <div className="space-y-4">
-                      <RadioGroup value={sortOrder} onValueChange={(value: SortOption) => setSortOrder(value)}>
+                      <RadioGroup value={sortOrder} onValueChange={(value: SortOption) => {
+                        setSortOrder(value);
+                        setCurrentPage(1); // Reset to first page on sort change
+                      }}>
                         <h4 className="font-medium text-sm">Sort by</h4>
                         <div className="space-y-2">
                           {sortOptions.map(option => (
@@ -188,10 +207,31 @@ export default function DigitalLibraryPage() {
                       </div>
                     </div>
                   ))
-                ) : sortedAndFilteredPapers.length > 0 ? (
-                  sortedAndFilteredPapers.map((paper) => (
-                    <PaperCard key={paper.id} paper={paper} />
-                  ))
+                ) : paginatedPapers.length > 0 ? (
+                  <>
+                    {paginatedPapers.map((paper) => (
+                      <PaperCard key={paper.id} paper={paper} />
+                    ))}
+                    {totalPages > 1 && (
+                      <div className="flex justify-between items-center pt-8">
+                        <Button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                          Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="text-center py-16 border-2 border-dashed rounded-lg">
                     <BookText className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -223,5 +263,3 @@ export default function DigitalLibraryPage() {
     </div>
   );
 }
-
-    
