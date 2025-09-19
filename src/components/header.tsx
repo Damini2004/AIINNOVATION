@@ -63,13 +63,13 @@ export function AppHeader() {
         alt="Datatech Logo"
         width={160}
         height={40}
-        className="h-10 w-auto"
+        className="h-16 w-auto"
       />
     </Link>
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl text-black"
+            className="lg:hidden text-2xl"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}
@@ -301,3 +301,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
