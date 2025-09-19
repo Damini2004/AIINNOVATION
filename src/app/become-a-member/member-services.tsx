@@ -41,7 +41,7 @@ export default function MemberServices() {
 
 
   return (
-    <div className="member-service-area py-20 bg-secondary">
+    <div className="member-service-area py-20 bg-blue-950 text-white">
       <div className="container mx-auto px-6">
         <div className="text-center pb-12">
           <h5 className="text-primary font-semibold uppercase">Member Services</h5>
