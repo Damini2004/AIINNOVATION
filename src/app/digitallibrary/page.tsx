@@ -146,26 +146,30 @@ export default function DigitalLibraryPage() {
           </div>
 
           <div className="grid lg:grid-cols-12 gap-12">
-            {/* Left Content: Filters & Papers List */}
-            <div className="lg:col-span-8">
-              <div className="p-6 bg-card border rounded-lg mb-8">
-                <h3 className="text-lg font-semibold flex items-center mb-4">
-                  <Filter className="h-5 w-5 mr-2 text-primary" />
-                  Filter & Sort
-                </h3>
-                <div className="space-y-4">
-                     <Select onValueChange={(value: SortOption) => setSortOrder(value)} defaultValue={sortOrder}>
-                        <SelectTrigger className="w-full h-11 text-sm">
-                            <SelectValue placeholder="Sort by..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {sortOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            {/* Left Sidebar: Filters */}
+            <aside className="lg:col-span-4">
+              <div className="p-6 bg-card border rounded-lg sticky top-24">
+                  <h3 className="text-lg font-semibold flex items-center mb-4">
+                    <Filter className="h-5 w-5 mr-2 text-primary" />
+                    Filter & Sort
+                  </h3>
+                  <div className="space-y-4">
+                      <Select onValueChange={(value: SortOption) => setSortOrder(value)} defaultValue={sortOrder}>
+                          <SelectTrigger className="w-full h-11 text-sm">
+                              <SelectValue placeholder="Sort by..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {sortOptions.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                  </div>
                 </div>
-              </div>
+            </aside>
+            
+            {/* Right Content: Papers List */}
+            <div className="lg:col-span-8">
               <div className="space-y-2">
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
@@ -195,23 +199,6 @@ export default function DigitalLibraryPage() {
                 )}
               </div>
             </div>
-             {/* Right Sidebar: Image */}
-            <aside className="lg:col-span-4 space-y-8">
-              <div className="relative h-[600px] rounded-lg overflow-hidden shadow-lg sticky top-24">
-                <Image
-                  src="https://picsum.photos/seed/library-side/400/600"
-                  alt="Digital Library"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="books knowledge"
-                />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                 <div className="absolute bottom-0 left-0 p-6">
-                    <h3 className="text-2xl font-bold text-white">Explore Our Archives</h3>
-                    <p className="text-white/90 mt-2 text-sm">A curated collection of research and innovation.</p>
-                 </div>
-              </div>
-            </aside>
           </div>
         </div>
       </main>
