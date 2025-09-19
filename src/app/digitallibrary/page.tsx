@@ -21,7 +21,6 @@ import {
   FileText,
   User,
   Newspaper,
-  Calendar,
   Filter,
 } from "lucide-react";
 import "./library.css";
@@ -53,11 +52,24 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   );
 }
 
+const sortOptions = [
+    { value: 'relevance', label: 'Relevance' },
+    { value: 'newest', label: 'Newest' },
+    { value: 'oldest', label: 'Oldest' },
+    { value: 'cited-papers', label: 'Most Cited By Papers' },
+    { value: 'cited-patents', label: 'Most Cited By Patents' },
+    { value: 'popular', label: 'Most Popular' },
+    { value: 'alpha-az', label: 'Publication Title A-Z' },
+    { value: 'alpha-za', label: 'Publication Title Z-A' },
+];
+type SortOption = typeof sortOptions[number]['value'];
+
+
 export default function DigitalLibraryPage() {
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState<"latest" | "alpha">("latest");
+  const [sortOrder, setSortOrder] = useState<SortOption>("relevance");
 
   useEffect(() => {
     const fetchPapers = async () => {
@@ -79,11 +91,23 @@ export default function DigitalLibraryPage() {
       );
     })
     .sort((a, b) => {
-      if (sortOrder === "alpha") {
-        return a.paperTitle.localeCompare(b.paperTitle);
+      switch (sortOrder) {
+        case 'newest':
+          return (b.id ?? "").localeCompare(a.id ?? "");
+        case 'oldest':
+            return (a.id ?? "").localeCompare(b.id ?? "");
+        case 'alpha-az':
+          return a.paperTitle.localeCompare(b.paperTitle);
+        case 'alpha-za':
+            return b.paperTitle.localeCompare(a.paperTitle);
+        // Placeholder for other sorting logic
+        case 'relevance':
+        case 'cited-papers':
+        case 'cited-patents':
+        case 'popular':
+        default:
+          return (b.id ?? "").localeCompare(a.id ?? ""); // Default to newest for now
       }
-      // "latest" is default - Firestore auto-IDs are roughly time-ordered
-      return (b.id ?? "").localeCompare(a.id ?? "");
     });
 
   return (
@@ -135,13 +159,14 @@ export default function DigitalLibraryPage() {
                   Filter & Sort
                 </h3>
                 <div className="space-y-4">
-                     <Select onValueChange={(value: "latest" | "alpha") => setSortOrder(value)} defaultValue={sortOrder}>
+                     <Select onValueChange={(value: SortOption) => setSortOrder(value)} defaultValue={sortOrder}>
                         <SelectTrigger className="w-full h-11 text-sm">
                             <SelectValue placeholder="Sort by..." />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="latest">Sort by Latest</SelectItem>
-                            <SelectItem value="alpha">Sort by A-Z</SelectItem>
+                            {sortOptions.map(option => (
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
