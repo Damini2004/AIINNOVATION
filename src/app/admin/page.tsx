@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
@@ -1110,7 +1109,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
@@ -1465,9 +1464,3 @@ export default function AdminPage() {
 }
 
     
-
-    
-
-  
-
-
