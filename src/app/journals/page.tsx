@@ -31,14 +31,6 @@ export default function JournalsPage() {
     fetchJournals();
   }, []);
 
-  const benefits = [
-    "Wider reach and global visibility through AIIS's network.",
-    "Credibility enhancement via association with a recognized society.",
-    "Access to a broad pool of expert reviewers and editors.",
-    "Streamlined submission and peer-review process management.",
-    "Marketing and promotional support for calls for papers and new issues.",
-  ];
-
   const pros = [
     "Increased submission rates due to AIIS's reputation.",
     "Opportunities for special issues linked to AIIS events.",
@@ -164,6 +156,9 @@ export default function JournalsPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="px-0 pb-0">
+                        <p className="text-muted-foreground mt-4 mb-4">
+                            Journals that partner with us gain a significant competitive edge. The association with AIIS boosts submission rates by signaling a commitment to quality and innovation. Furthermore, our-hosted events provide unique opportunities for special issues, and we offer expert support in forming collaborative and diverse editorial boards, enriching the journal's scope and expertise.
+                        </p>
                         <ul className="space-y-3">
                         {pros.map((item, index) => (
                             <li key={index} className="flex items-start">
@@ -184,6 +179,9 @@ export default function JournalsPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="px-0 pb-0">
+                         <p className="text-muted-foreground mt-4 mb-4">
+                           While collaboration offers many advantages, it's important to consider all aspects. Partnering with AIIS means embracing a shared branding identity, which may influence a journal's unique positioning. There can be an administrative learning curve as your team aligns with our processes. Additionally, all publications must adhere to AIIS's overarching policies to ensure consistency and quality across our network.
+                        </p>
                         <ul className="space-y-3">
                         {cons.map((item, index) => (
                             <li key={index} className="flex items-start">
@@ -240,3 +238,5 @@ export default function JournalsPage() {
     </div>
   );
 }
+
+    
