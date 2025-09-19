@@ -28,7 +28,7 @@ import Image from "next/image";
 
 function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   return (
-    <div className="paper-card">
+    <div className="paper-item">
       <div className="paper-card-content">
         <Link
             href={paper.link}
@@ -50,7 +50,7 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
           </span>
         </div>
       </div>
-      <div className="paper-image-wrapper">
+       <Link href={paper.link} target="_blank" rel="noopener noreferrer" className="paper-image-wrapper">
          <Image 
             src={paper.image}
             alt={`Cover for ${paper.paperTitle}`}
@@ -58,7 +58,7 @@ function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
             className="object-cover"
             data-ai-hint="research paper cover"
         />
-      </div>
+      </Link>
     </div>
   );
 }
@@ -193,7 +193,7 @@ export default function DigitalLibraryPage() {
 
             {/* Right Content: Papers List */}
             <div className="lg:col-span-9">
-              <div className="space-y-6">
+              <div className="space-y-2">
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="flex items-center p-6 border rounded-lg space-x-6">
