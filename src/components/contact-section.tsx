@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -33,7 +34,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section className="bg-secondary py-24">
+    <section className="bg-blue-950 py-24">
       <div className="max-w-6xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Contact Info */}
         <div className="bg-primary rounded-lg p-8 space-y-6">
@@ -94,11 +95,11 @@ export default function ContactSection() {
         <div>
           <div className="mb-8">
             <h5 className="text-primary text-sm font-semibold uppercase">CONTACT US</h5>
-            <h2 className="text-3xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl font-bold text-white mt-2">
               Get In Touch
             </h2>
             <div className="em_bar_bg text-left"></div>
-            <p className="text-lg text-muted-foreground mt-4">
+            <p className="text-lg text-gray-300 mt-4">
               Be a part of something bigger. Reach out to us for queries,
               collaborations.
             </p>
@@ -112,6 +113,7 @@ export default function ContactSection() {
                 value={form.name}
                 onChange={handleChange}
                 placeholder="Name"
+                className="bg-white/10 text-white placeholder:text-gray-400"
               />
               <Input
                 type="email"
@@ -119,6 +121,7 @@ export default function ContactSection() {
                 value={form.email}
                 onChange={handleChange}
                 placeholder="Email"
+                 className="bg-white/10 text-white placeholder:text-gray-400"
               />
               <Input
                 type="text"
@@ -126,6 +129,7 @@ export default function ContactSection() {
                 value={form.phone}
                 onChange={handleChange}
                 placeholder="Phone"
+                 className="bg-white/10 text-white placeholder:text-gray-400"
               />
               <Input
                 type="text"
@@ -133,6 +137,7 @@ export default function ContactSection() {
                 value={form.website}
                 onChange={handleChange}
                 placeholder="Website"
+                 className="bg-white/10 text-white placeholder:text-gray-400"
               />
             </div>
             <Textarea
@@ -140,7 +145,7 @@ export default function ContactSection() {
               value={form.message}
               onChange={handleChange}
               placeholder="Message"
-              className="h-44"
+              className="h-44 bg-white/10 text-white placeholder:text-gray-400"
             />
             <Button
               type="submit"
