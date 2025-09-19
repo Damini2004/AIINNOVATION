@@ -34,7 +34,19 @@ export default function TechnologyArea() {
             </div>
 
             {/* Card 2 - Research */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-colors duration-300 hover:bg-gradient-to-r from-primary to-accent hover:text-primary-foreground">
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+                 style={{
+                   backgroundSize: "cover",
+                   backgroundPosition: "center",
+                   backgroundRepeat: "no-repeat",
+                 }}
+                 onMouseOver={e => {
+                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
+                 }}
+                 onMouseOut={e => {
+                    e.currentTarget.style.backgroundImage = "";
+                 }}
+                 >
               <ClipboardCheck className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
               <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">Research</h2>
               <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
@@ -43,7 +55,19 @@ export default function TechnologyArea() {
             </div>
 
             {/* Card 3 - AI for Social Good */}
-            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-colors duration-300 hover:bg-gradient-to-r from-primary to-accent hover:text-primary-foreground">
+            <div className="group rounded-xl shadow-lg p-8 text-foreground bg-card flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:text-primary-foreground"
+                 style={{
+                   backgroundSize: "cover",
+                   backgroundPosition: "center",
+                   backgroundRepeat: "no-repeat",
+                 }}
+                 onMouseOver={e => {
+                    e.currentTarget.style.backgroundImage = "url(/assests/images/feature.png), linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))";
+                 }}
+                 onMouseOut={e => {
+                    e.currentTarget.style.backgroundImage = "";
+                 }}
+                >
               <Sparkles className="w-12 h-12 mb-2 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
               <h2 className="font-bold text-xl text-foreground transition-colors duration-300 group-hover:text-primary-foreground">AI for Social Good</h2>
               <p className="text-base leading-relaxed max-w-xs text-muted-foreground transition-colors duration-300 group-hover:text-primary-foreground/80">
