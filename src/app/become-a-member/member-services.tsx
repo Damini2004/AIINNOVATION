@@ -2,6 +2,7 @@
 "use client";
 
 import { Library, Users, GitMerge, Award, Briefcase, MessageSquare } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function MemberServices() {
     const services = [
@@ -39,6 +40,27 @@ export default function MemberServices() {
         }
     ];
 
+    const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.1,
+        },
+      },
+    };
+
+    const itemVariants = {
+      hidden: { y: 20, opacity: 0 },
+      visible: {
+        y: 0,
+        opacity: 1,
+        transition: {
+          duration: 0.5,
+        },
+      },
+    };
+
 
   return (
     <div className="member-service-area py-20 bg-blue-950 text-white">
@@ -50,9 +72,19 @@ export default function MemberServices() {
           </h2>
           <div className="em_bar_bg"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+        >
             {services.map((service, index) => (
-                 <div key={index} className={`member-service-card ${service.variant === 'gradient' ? 'variant-gradient' : ''}`}>
+                 <motion.div
+                    key={index}
+                    className={`member-service-card ${service.variant === 'gradient' ? 'variant-gradient' : ''}`}
+                    variants={itemVariants}
+                  >
                     <div className="service-icon">
                         {service.icon}
                     </div>
@@ -60,9 +92,9 @@ export default function MemberServices() {
                         <h3 className="service-title">{service.title}</h3>
                         <p className="service-description">{service.description}</p>
                     </div>
-                </div>
+                </motion.div>
             ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
