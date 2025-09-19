@@ -62,7 +62,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode } from "lucide-react";
 import Image from "next/image";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage as clientStorage } from "@/firebase/firebaseConfig";
