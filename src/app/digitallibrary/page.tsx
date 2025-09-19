@@ -111,8 +111,8 @@ export default function DigitalLibraryPage() {
         <div className="container mx-auto px-6">
           
           {/* Search Bar */}
-          <div className="mb-8">
-              <div className="relative max-w-lg mx-auto">
+          <div className="mb-12">
+              <div className="relative max-w-2xl mx-auto">
                 <Input
                     type="text"
                     placeholder="Search by paper title, author, or journal..."
