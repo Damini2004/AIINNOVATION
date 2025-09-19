@@ -592,7 +592,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   });
 
   const fileRef = register("file");
-  const selectedFile = watch("file");
+  const selectedFile = watch("file")?.[0];
   const linkValue = watch("link");
 
   useEffect(() => {
@@ -609,7 +609,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
   }, [linkValue, setValue]);
 
   useEffect(() => {
-    if (selectedFile && selectedFile.name) {
+    if (selectedFile) {
        setValue("link", "");
     }
   }, [selectedFile, setValue]);
@@ -617,14 +617,16 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
 
   const onSubmit: SubmitHandler<EducationalResourceFormType> = async (data) => {
     setIsSubmitting(true);
+    let orphanFileUrl: string | null = null;
 
     try {
       let fileUrl = data.link || "";
       let fileName = "";
       let fileType = "link";
 
-      if (data.file) {
-        const file = data.file;
+      // If a file is provided, upload it to Firebase Storage
+      if (data.file?.[0]) {
+        const file = data.file[0];
         const filePath = `educational_resources/${Date.now()}_${file.name}`;
         const storageRef = ref(clientStorage, filePath);
         
@@ -632,6 +634,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         fileUrl = await getDownloadURL(storageRef);
         fileName = file.name;
         fileType = file.type;
+        orphanFileUrl = fileUrl; // Keep track for cleanup on DB error
       }
 
       if (!fileUrl) {
@@ -642,7 +645,7 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: data.title,
         description: data.description,
         fileUrl,
-        fileName: fileName || "link",
+        fileName: fileName || "link", // Store file name or 'link'
         fileType,
       };
 
@@ -661,6 +664,17 @@ function EducationalResourceForm({ onSave, resource }: { onSave: () => void; res
         title: "Operation Failed",
         description: error.message,
       });
+      // If DB save failed but a file was uploaded, try to delete the orphaned file
+      if (orphanFileUrl) {
+          console.error("Attempting to delete orphaned file:", orphanFileUrl);
+          const orphanRef = ref(clientStorage, orphanFileUrl);
+          try {
+            await deleteObject(orphanRef);
+            console.log("Orphaned file deleted successfully.");
+          } catch (deleteError) {
+              console.error("Failed to delete orphaned file:", deleteError);
+          }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -1312,5 +1326,7 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
 
     
