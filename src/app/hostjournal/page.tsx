@@ -119,7 +119,7 @@ export default function HostJournalPage() {
       </main>
 
        {/* Services Section */}
-      <section className="journal-service-area py-20 bg-secondary">
+      <section className="journal-service-area py-20 bg-blue-50 border-t">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h5 className="text-primary font-semibold uppercase">Our Services</h5>

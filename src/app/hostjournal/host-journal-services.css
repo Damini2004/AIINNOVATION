@@ -1,6 +1,7 @@
 
+
 .journal-service-area {
-    background-color: hsl(var(--secondary));
+    /* The background is now set directly on the component */
 }
 
 .journal-service-card {
