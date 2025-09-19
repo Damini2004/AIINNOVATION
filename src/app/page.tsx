@@ -57,9 +57,6 @@ function Showcase() {
       <EventsSection />
       <ContactSection />
       <QuickButtonArea />
-      <main className="flex-1 px-4 py-8 md:px-8 md:py-12">
-        
-      </main>
       <CodeSnippetView
         snippet={selectedSnippet}
         open={!!selectedSnippet}
