@@ -274,7 +274,7 @@ export function AppHeader() {
               <li className="hover:bg-gray-100 rounded px-3 py-2">
                 <button
                   type="button"
-                  className="flex justify-between w-full font-medium"
+                  className="flex justify-between w-full font-medium text-black"
                   onClick={() => toggleDropdown("membership")}
                 >
                   Membership {openDropdown === "membership" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
