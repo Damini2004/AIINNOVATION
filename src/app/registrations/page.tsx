@@ -6,6 +6,7 @@ import { useState } from "react";
 import RegistrationForm from "./registration-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import LoginForm from "./login-form";
 
 export default function RegistrationsPage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -88,18 +89,7 @@ export default function RegistrationsPage() {
                     animate="visible"
                     exit="exit"
                   >
-                    <h2 className="text-3xl font-bold text-center mb-2">
-                        Login to Your Account
-                    </h2>
-                    <p className="text-muted-foreground text-center mb-10">
-                        Welcome back! Please enter your details.
-                    </p>
-                    {/* You can create a LoginForm component similar to RegistrationForm */}
-                    <div className="space-y-6">
-                        <input className="w-full p-3 border rounded-md" placeholder="Email" />
-                        <input className="w-full p-3 border rounded-md" type="password" placeholder="Password" />
-                        <Button className="w-full" size="lg">Login</Button>
-                    </div>
+                    <LoginForm />
                 </motion.div>
                ) : (
                  <motion.div
