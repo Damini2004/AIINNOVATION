@@ -14,6 +14,7 @@ const registrationSchema = z.object({
   photo: z.string().url(),
   socials: z.string().url().optional().or(z.literal('')),
   scholarLink: z.string().url().optional().or(z.literal('')),
+  privacyPolicy: z.literal(true),
 });
 
 export async function handleRegistration(data: unknown) {
@@ -22,13 +23,15 @@ export async function handleRegistration(data: unknown) {
   if (!validatedData.success) {
     return {
       success: false,
-      error: "Invalid data: " + validatedData.error.flatten().fieldErrors,
+      error: "Invalid data: " + JSON.stringify(validatedData.error.flatten().fieldErrors),
     };
   }
 
   try {
+    const { privacyPolicy, ...docDataToSave } = validatedData.data;
+    
     const docData = {
-      ...validatedData.data,
+      ...docDataToSave,
       createdAt: new Date(),
     };
     await addDoc(collection(db, "registrations"), docData);
@@ -45,5 +48,3 @@ export async function handleRegistration(data: unknown) {
     };
   }
 }
-
-    
