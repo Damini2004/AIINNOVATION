@@ -29,7 +29,7 @@ export function AppHeader() {
     if (isOpen) {
       setIsOpen(false);
     }
-  }, [pathname]);
+  }, [pathname, isOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,8 +46,7 @@ export function AppHeader() {
 
   const AuthLink = () => {
     if (!isClient) {
-      // Render a consistent placeholder on the server and initial client render
-      return <li><Link href="/registrations">Registrations</Link></li>;
+      return null;
     }
     
     if (isAdmin) {
@@ -62,7 +61,7 @@ export function AppHeader() {
 
   const MobileAuthLink = () => {
      if (!isClient) {
-       return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+       return null;
     }
     
     if (isAdmin) {
