@@ -162,7 +162,17 @@ export function AppHeader() {
                   <li><Link href="/membership-benefits">Membership Benefits</Link></li>
                 </ul>
               </li>
-              <li><Link href="/registrations" target={isClient && !isLoggedIn ? "_blank" : undefined} rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}>{isClient && isLoggedIn ? "Profile" : ""}</Link></li>
+              <li
+  style={{ display: "none" }}
+>
+  <Link
+    href="/registrations"
+    target={isClient && !isLoggedIn ? "_blank" : undefined}
+    rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}
+  >
+    {isClient && isLoggedIn ? "Profile" : ""}
+  </Link>
+</li>
               <li><Link href="/contact-us">Contact</Link></li>
                <DashboardLink />
             </ul>

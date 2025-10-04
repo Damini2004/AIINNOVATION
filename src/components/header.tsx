@@ -50,7 +50,7 @@ export function AppHeader() {
   const AuthLink = () => {
     if (!isClient) {
       // On the server, and initial client render, render the default link
-      return <li><Link href="/registrations">Registrations</Link></li>;
+      return <li><Link href="/registrations"></Link></li>;
     }
     
     if (isAdmin) {
@@ -60,7 +60,7 @@ export function AppHeader() {
       return <li><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return <li><Link href="/registrations">Registrations</Link></li>;
+    return <li><Link href="/registrations"></Link></li>;
   };
 
   const MobileAuthLink = () => {
