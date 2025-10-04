@@ -1,5 +1,7 @@
 
 import Link from "next/link";
+import MemberServices from "../become-a-member/member-services";
+import "../become-a-member/member-services.css";
 
 export default function MembershipBenefitsPage() {
   return (
@@ -23,14 +25,7 @@ export default function MembershipBenefitsPage() {
       </section>
 
       {/* Main Content */}
-      <main className="py-24">
-        <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold">Content Coming Soon</h2>
-            <p className="mt-4 text-muted-foreground">This page is under construction. Check back later for details about our membership benefits.</p>
-        </div>
-      </main>
+      <MemberServices />
     </div>
   );
 }
-
-    
