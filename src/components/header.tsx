@@ -11,14 +11,14 @@ import { usePathname } from "next/navigation";
 export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
-    setIsAdminLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true");
+    setIsLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true" || localStorage.getItem("isUserLoggedIn") === "true");
      // Close mobile menu on navigation
     setIsOpen(false);
   }, [pathname]);
@@ -36,16 +36,31 @@ export function AppHeader() {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
 
-  const AdminLink = () => {
-     if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
-     return (
-       <li>
-         <Link href={isAdminLoggedIn ? "/dashboard" : "/login"}>
-           Dashboard
-         </Link>
-       </li>
-     )
-   };
+  const AuthLink = () => {
+    if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
+    
+    if (isLoggedIn) {
+      const isAdmin = localStorage.getItem("isAdminLoggedIn") === "true";
+      return (
+        <>
+          <li>
+            <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
+              Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
+              Profile
+            </Link>
+          </li>
+        </>
+      );
+    }
+    
+    return (
+       <li><Link href="/registrations">Registrations</Link></li>
+    );
+  };
 
 
   return (
@@ -159,9 +174,8 @@ export function AppHeader() {
                   <li><Link href="/membership-benefits">Membership Benefits</Link></li>
                 </ul>
               </li>
-              <li><Link href="/registrations" target={isClient ? "_blank" : undefined} rel={isClient ? "noopener noreferrer" : undefined}>Registrations</Link></li>
+              <AuthLink />
               <li><Link href="/contact-us">Contact</Link></li>
-               <AdminLink />
             </ul>
           </nav>
         </div>
@@ -293,13 +307,10 @@ export function AppHeader() {
                   </ul>
                 )}
               </li>
-               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations" target={isClient ? "_blank" : undefined} rel={isClient ? "noopener noreferrer" : undefined}>Registrations</Link></li>
+              <li className="hover:bg-gray-100 rounded px-3 py-2">
+                <AuthLink />
+              </li>
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
-              {isClient ? (
-                <li className="hover:bg-gray-100 rounded px-3 py-2">
-                  <Link href={isAdminLoggedIn ? "/dashboard" : "/login"}>Dashboard</Link>
-                </li>
-              ) :  <li style={{display: 'none'}} /> }
             </ul>
           </nav>
         )}
