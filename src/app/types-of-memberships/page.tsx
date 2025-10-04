@@ -33,7 +33,7 @@ export default function TypesOfMembershipsPage() {
       <main className="py-24">
         <div className="container mx-auto px-6">
           <Tabs defaultValue="professionals" className="w-full text-center">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 bg-muted">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
               <TabsTrigger value="professionals">Professionals</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
               <TabsTrigger value="stories">Member Stories</TabsTrigger>
