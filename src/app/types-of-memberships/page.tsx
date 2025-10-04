@@ -188,6 +188,7 @@ export default function TypesOfMembershipsPage() {
                         </div>
                     </div>
                     <div className="mt-20 text-left max-w-4xl mx-auto">
+                        <div className="border-b border-border my-8"></div>
                         <div className="mb-12">
                             <h3 className="text-3xl font-bold mb-4">Qualifications</h3>
                             <p className="text-muted-foreground mb-6">
@@ -205,6 +206,7 @@ export default function TypesOfMembershipsPage() {
                             <li>Law and Policy</li>
                             </ul>
                         </div>
+                        <div className="border-b border-border my-8"></div>
 
                         <div>
                             <h3 className="text-3xl font-bold mb-4">Annual Dues</h3>
