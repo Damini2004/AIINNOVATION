@@ -75,7 +75,7 @@ export default function TypesOfMembershipsPage() {
       <main className="py-20">
         <div className="container mx-auto px-6">
           <Tabs defaultValue="professionals" className="w-full text-center">
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
+             <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
               <TabsTrigger value="professionals">Professionals</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
               <TabsTrigger value="stories">Member Stories</TabsTrigger>
@@ -129,8 +129,8 @@ export default function TypesOfMembershipsPage() {
                   ></motion.div>
                 </div>
                  
-                <TabsContent value="professionals" className="mt-8 max-w-4xl mx-auto text-left">
-                    <p className="text-muted-foreground text-center">
+                 <TabsContent value="professionals" className="mt-8 text-left">
+                    <p className="text-muted-foreground text-center max-w-3xl mx-auto">
                         Join AIIS as a professional and get immediate access to a global community of engineers and technology experts. Tap into the latest technological news, research, and courses, plus countless other valuable benefits.
                     </p>
                      <div className="mt-16">
@@ -138,27 +138,27 @@ export default function TypesOfMembershipsPage() {
                             <h3 className="text-3xl font-bold">AIIS Membership Benefits for Professionals</h3>
                             <div className="em_bar_bg mt-4"></div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="md:col-span-1">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                            <div className="md:col-span-4">
                                 <ul className="space-y-2">
                                     {professionalBenefits.map(benefit => (
                                         <li key={benefit.title}>
                                             <button 
                                                 onClick={() => setActiveBenefit(benefit.title)}
-                                                className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${activeBenefit === benefit.title ? 'bg-primary/10 text-primary font-semibold' : 'hover:bg-secondary/70'}`}
+                                                className={`w-full text-left p-4 rounded-lg transition-all duration-300 text-lg ${activeBenefit === benefit.title ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-secondary/70 font-medium'}`}
                                             >
                                                 {benefit.title}
                                             </button>
                                         </li>
                                     ))}
                                     <li>
-                                        <Link href="/membership-benefits" className="w-full text-left p-4 rounded-lg transition-all duration-300 hover:bg-secondary/70 block font-semibold text-primary">
+                                        <Link href="/membership-benefits" className="w-full text-left p-4 rounded-lg transition-all duration-300 hover:bg-secondary/70 block font-semibold text-primary text-lg">
                                             All Membership Benefits
                                         </Link>
                                     </li>
                                 </ul>
                             </div>
-                            <div className="md:col-span-2 bg-blue-950 rounded-lg p-8 text-white min-h-[250px]">
+                            <div className="md:col-span-8 bg-blue-950 rounded-lg p-8 text-white min-h-[300px]">
                                  <AnimatePresence mode="wait">
                                     <motion.div
                                         key={activeBenefit}
