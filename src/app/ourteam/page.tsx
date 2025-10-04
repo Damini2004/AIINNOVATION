@@ -96,9 +96,9 @@ export default function OurTeamPage() {
                     />
                     <div className="team-overlay">
                       <div className="team-social">
-                        {member.facebookUrl && <a href={member.facebookUrl}><Facebook className="h-5 w-5" /></a>}
-                        {member.twitterUrl && <a href={member.twitterUrl}><Twitter className="h-5 w-5" /></a>}
-                        {member.linkedinUrl && <a href={member.linkedinUrl}><Linkedin className="h-5 w-5" /></a>}
+                        {member.facebookUrl && <a href={member.facebookUrl} target="_blank" rel="noopener noreferrer"><Facebook className="h-5 w-5" /></a>}
+                        {member.twitterUrl && <a href={member.twitterUrl} target="_blank" rel="noopener noreferrer"><Twitter className="h-5 w-5" /></a>}
+                        {member.linkedinUrl && <a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer"><Linkedin className="h-5 w-5" /></a>}
                       </div>
                     </div>
                   </div>
