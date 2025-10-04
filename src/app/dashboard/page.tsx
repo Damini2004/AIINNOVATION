@@ -39,8 +39,11 @@ import {
   deleteDigitalLibraryPaper,
   getCounters,
   updateCounters,
+  getPendingRegistrations,
+  approveRegistration,
+  rejectRegistration,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource, Counter } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter, Registration } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -63,7 +66,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X } from "lucide-react";
 import Image from "next/image";
 
 
@@ -1009,6 +1012,68 @@ function CounterForm({ onSave }: { onSave: () => void }) {
   );
 }
 
+function RegistrationManager({ registrations, onUpdate }: { registrations: Registration[], onUpdate: () => void }) {
+    const { toast } = useToast();
+    const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+    const handleApprove = async (registration: Registration) => {
+        setIsProcessing(registration.id!);
+        const result = await approveRegistration(registration);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration approved." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
+
+    const handleReject = async (registrationId: string) => {
+        setIsProcessing(registrationId);
+        const result = await rejectRegistration(registrationId);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration rejected." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Pending Registrations</CardTitle>
+                <CardDescription>Review and approve or reject new member registrations.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                    {registrations.length === 0 && <p className="text-muted-foreground text-center py-4">No pending registrations.</p>}
+                    {registrations.map((reg) => (
+                        <div key={reg.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                            <div className="flex items-center gap-4">
+                                <Image src={reg.photo} alt={reg.name} width={48} height={48} className="rounded-full object-cover" />
+                                <div>
+                                    <p className="font-semibold">{reg.name}</p>
+                                    <p className="text-sm text-muted-foreground">{reg.email}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm">View Details</Button>
+                                <Button size="sm" onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
+                                    {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                </Button>
+                                <Button variant="destructive" size="sm" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
+                                    {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 export default function AdminPage() {
   const router = useRouter();
@@ -1019,6 +1084,7 @@ export default function AdminPage() {
   const [journals, setJournals] = useState<Journal[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [resources, setResources] = useState<EducationalResource[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -1038,13 +1104,14 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
       getDigitalLibraryPapers(),
       getEducationalResources(),
+      getPendingRegistrations(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
@@ -1052,6 +1119,7 @@ export default function AdminPage() {
     setJournals(journalsData);
     setPapers(papersData);
     setResources(resourcesData as EducationalResource[]);
+    setRegistrations(registrationsData);
     setLoading(false);
   };
 
@@ -1106,7 +1174,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 h-auto lg:h-10">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
@@ -1114,6 +1182,7 @@ export default function AdminPage() {
           <TabsTrigger value="library">Digital Library</TabsTrigger>
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
+          <TabsTrigger value="registrations">Registrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1460,10 +1529,11 @@ export default function AdminPage() {
         <TabsContent value="counters">
           <CounterForm onSave={fetchData} />
         </TabsContent>
+        <TabsContent value="registrations">
+            <RegistrationManager registrations={registrations} onUpdate={fetchData} />
+        </TabsContent>
 
       </Tabs>
     </div>
   );
 }
-
-    

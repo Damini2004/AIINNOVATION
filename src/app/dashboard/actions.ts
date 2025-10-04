@@ -3,7 +3,7 @@
 "use server";
 
 import { z } from "zod";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query } from "firebase/firestore";
 import { ref, getStorage, deleteObject } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
@@ -74,6 +74,30 @@ const counterSchema = z.object({
   subscribers: z.number().min(0),
 });
 
+const registrationSchema = z.object({
+  id: z.string().optional(),
+  registrationType: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  contact: z.string(),
+  biography: z.string(),
+  photo: z.string().url(),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  twitterUrl: z.string().url().optional().or(z.literal('')),
+  otherSocialUrl: z.string().url().optional().or(z.literal('')),
+  scholarLink: z.string().url().optional().or(z.literal('')),
+  status: z.enum(['pending', 'approved', 'rejected']),
+});
+
+const memberSchema = z.object({
+    id: z.string().optional(),
+    name: z.string(),
+    role: z.string(),
+    img: z.string().url(),
+    linkedinUrl: z.string().url().optional().or(z.literal('')),
+    twitterUrl: z.string().url().optional().or(z.literal('')),
+    facebookUrl: z.string().url().optional().or(z.literal('')),
+});
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
@@ -82,6 +106,8 @@ type Journal = z.infer<typeof journalSchema>;
 export type DigitalLibraryPaper = z.infer<typeof digitalLibraryPaperSchema>;
 export type EducationalResource = z.infer<typeof educationalResourceSchema>;
 export type Counter = z.infer<typeof counterSchema>;
+export type Registration = z.infer<typeof registrationSchema>;
+export type Member = z.infer<typeof memberSchema>;
 
 
 // Generic function to add or update a document
@@ -243,4 +269,56 @@ export async function updateCounters(data: Counter) {
   }
 }
 
-    
+// Registration Actions
+export async function getPendingRegistrations(): Promise<Registration[]> {
+    try {
+        const q = query(collection(db, "registrations"), where("status", "==", "pending"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Registration[];
+    } catch (error) {
+        console.error("Error fetching pending registrations:", error);
+        return [];
+    }
+}
+
+export async function approveRegistration(registration: Registration) {
+    try {
+        // 1. Add to members collection
+        const memberData: Omit<Member, 'id'> = {
+            name: registration.name,
+            role: registration.registrationType,
+            img: registration.photo,
+            linkedinUrl: registration.linkedinUrl,
+            twitterUrl: registration.twitterUrl,
+        };
+        const validatedMember = memberSchema.omit({id: true}).parse(memberData);
+        await addDoc(collection(db, "members"), validatedMember);
+        
+        // 2. Update registration status
+        const registrationRef = doc(db, "registrations", registration.id!);
+        await updateDoc(registrationRef, { status: "approved" });
+        
+        revalidatePath('/dashboard');
+        revalidatePath('/ourteam');
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function rejectRegistration(registrationId: string) {
+    try {
+        const registrationRef = doc(db, "registrations", registrationId);
+        await updateDoc(registrationRef, { status: "rejected" });
+        revalidatePath('/dashboard');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+// Member Actions
+export async function getMembers(): Promise<Member[]> {
+    return getDocsFromCollection<Member>('members');
+}

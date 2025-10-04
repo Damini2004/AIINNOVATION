@@ -11,7 +11,7 @@ const registrationSchema = z.object({
   email: z.string().email(),
   contact: z.string().min(10),
   biography: z.string().max(2000).min(10),
-  photo: z.string().url(),
+  photo: z.string().min(1, "Photo is required"), // Assuming base64 string
   linkedinUrl: z.string().url().optional().or(z.literal('')),
   twitterUrl: z.string().url().optional().or(z.literal('')),
   otherSocialUrl: z.string().url().optional().or(z.literal('')),
@@ -34,8 +34,10 @@ export async function handleRegistration(data: unknown) {
     
     const docData = {
       ...docDataToSave,
+      status: "pending", // Add a status for admin approval
       createdAt: new Date(),
     };
+
     await addDoc(collection(db, "registrations"), docData);
 
     // In a real application, you might also want to:

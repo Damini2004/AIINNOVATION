@@ -5,18 +5,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { getMembers } from "../dashboard/actions";
+import type { Member } from "../dashboard/actions";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export default function OurTeamPage() {
-  const members = [
-    { name: "Dr. Anishkumar D", role: "Head - AI and Industry", img: "https://picsum.photos/seed/anish/400/400" },
-    { name: "Dr. Sukhvinder Dari", role: "Head - AI and LAW", img: "https://picsum.photos/seed/dari/400/400" },
-    { name: "Dr. Nitin Sherje", role: "Mentor - AI and Automation", img: "https://picsum.photos/seed/sherje/400/400" },
-    { name: "Dr. Parikshit Mahalle", role: "Head - AI and DS Lead Trainer", img: "https://picsum.photos/seed/parikshit/400/400" },
-    { name: "Dr. Vivek Deshpande", role: "Head - AI and Technology (Industry)", img: "https://picsum.photos/seed/vivek/400/400" },
-    { name: "Dr. Dippanita Mondal", role: "AI and Medical Imaging", img: "https://picsum.photos/seed/mondal/400/400" },
-    { name: "Dr. Naveen Jain", role: "Head - AI and Administration", img: "https://picsum.photos/seed/naveen/400/400" },
-    { name: "Dr. Avinash Pawar", role: "Mentor - AI and Mechatronics", img: "https://picsum.photos/seed/avinash/400/400" },
-  ];
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      setLoading(true);
+      const membersData = await getMembers();
+      setMembers(membersData);
+      setLoading(false);
+    }
+    fetchMembers();
+  }, []);
 
   return (
     <div className="bg-background text-foreground">
@@ -62,33 +69,47 @@ export default function OurTeamPage() {
             </Button>
           </div>
 
-          <div className="team-grid">
-            {members.map((member, index) => (
-              <div key={index} className="team-card">
-                <div className="team-img-wrapper">
-                  <Image
-                    src={member.img}
-                    alt={member.name}
-                    width={400}
-                    height={400}
-                    className="team-img"
-                    data-ai-hint="member portrait"
-                  />
-                  <div className="team-overlay">
-                    <div className="team-social">
-                      <a href="#"><Facebook className="h-5 w-5" /></a>
-                      <a href="#"><Twitter className="h-5 w-5" /></a>
-                      <a href="#"><Linkedin className="h-5 w-5" /></a>
+          {loading ? (
+             <div className="team-grid">
+               {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="team-card">
+                    <Skeleton className="team-img" style={{height: '250px'}}/>
+                    <div className="team-info">
+                        <Skeleton className="h-5 w-3/4 mb-2"/>
+                        <Skeleton className="h-4 w-1/2"/>
+                    </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="team-grid">
+              {members.map((member) => (
+                <div key={member.id} className="team-card">
+                  <div className="team-img-wrapper">
+                    <Image
+                      src={member.img}
+                      alt={member.name}
+                      width={400}
+                      height={400}
+                      className="team-img"
+                      data-ai-hint="member portrait"
+                    />
+                    <div className="team-overlay">
+                      <div className="team-social">
+                        {member.facebookUrl && <a href={member.facebookUrl}><Facebook className="h-5 w-5" /></a>}
+                        {member.twitterUrl && <a href={member.twitterUrl}><Twitter className="h-5 w-5" /></a>}
+                        {member.linkedinUrl && <a href={member.linkedinUrl}><Linkedin className="h-5 w-5" /></a>}
+                      </div>
                     </div>
                   </div>
+                  <div className="team-info">
+                    <h4>{member.name}</h4>
+                    <p>{member.role}</p>
+                  </div>
                 </div>
-                <div className="team-info">
-                  <h4>{member.name}</h4>
-                  <p>{member.role}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
