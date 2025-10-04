@@ -3,7 +3,7 @@
 "use server";
 
 import { z } from "zod";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query, Timestamp } from "firebase/firestore";
 import { ref, getStorage, deleteObject } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
@@ -87,7 +87,9 @@ const registrationSchema = z.object({
   otherSocialUrl: z.string().url().optional().or(z.literal('')),
   scholarLink: z.string().url().optional().or(z.literal('')),
   status: z.enum(['pending', 'approved', 'rejected']),
+  createdAt: z.union([z.instanceof(Timestamp), z.string()]).optional(),
 });
+
 
 const memberSchema = z.object({
     id: z.string().optional(),
@@ -274,12 +276,20 @@ export async function getPendingRegistrations(): Promise<Registration[]> {
     try {
         const q = query(collection(db, "registrations"), where("status", "==", "pending"));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Registration[];
+        
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Serialize Firestore Timestamps
+            const plainObject = JSON.parse(JSON.stringify(data));
+            return { id: doc.id, ...plainObject } as Registration;
+        });
+
     } catch (error) {
         console.error("Error fetching pending registrations:", error);
         return [];
     }
 }
+
 
 export async function approveRegistration(registration: Registration) {
     try {
