@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import "./member-stories.css";
+import WhoWeAre from "@/components/who-we-are";
 
 export default function TypesOfMembershipsPage() {
   const [activeBenefit, setActiveBenefit] = useState("Find Community");
@@ -293,18 +294,6 @@ export default function TypesOfMembershipsPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="border-b border-border my-8"></div>
-                            <div className="mt-16 text-center">
-                                <h3 className="text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
-                                <div className="mt-6">
-                                    <Button asChild size="lg">
-                                        <Link href="/registrations">Join Now</Link>
-                                    </Button>
-                                </div>
-                                <p className="text-muted-foreground max-w-2xl mx-auto mt-6">
-                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
-                                </p>
-                           </div>
                         </div>
                     </TabsContent>
                 <TabsContent value="students" className="mt-8 text-left">
@@ -365,6 +354,19 @@ export default function TypesOfMembershipsPage() {
                             </div>
                         </div>
                     </div>
+                     <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
+                        <div className="mt-16 text-center">
+                                <h3 className="text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
+                                <div className="mt-6">
+                                    <Button asChild size="lg">
+                                        <Link href="/registrations">Join Now</Link>
+                                    </Button>
+                                </div>
+                                <p className="text-muted-foreground max-w-2xl mx-auto mt-6">
+                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
+                                </p>
+                           </div>
+                     </div>
                 </TabsContent>
                 <TabsContent value="stories" className="mt-8">
                      <div className="member-stories-section">
@@ -436,6 +438,7 @@ export default function TypesOfMembershipsPage() {
           </Tabs>
         </div>
       </main>
+      <WhoWeAre />
     </div>
   );
 }
