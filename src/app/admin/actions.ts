@@ -3,7 +3,7 @@
 "use server";
 
 import { z } from "zod";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query, Timestamp } from "firebase/firestore";
 import { ref, getStorage, deleteObject } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
@@ -74,6 +74,33 @@ const counterSchema = z.object({
   subscribers: z.number().min(0),
 });
 
+const registrationSchema = z.object({
+  id: z.string().optional(),
+  registrationType: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  contact: z.string(),
+  biography: z.string(),
+  photo: z.string().url(),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  twitterUrl: z.string().url().optional().or(z.literal('')),
+  otherSocialUrl: z.string().url().optional().or(z.literal('')),
+  scholarLink: z.string().url().optional().or(z.literal('')),
+  status: z.enum(['pending', 'approved', 'rejected']),
+  createdAt: z.union([z.instanceof(Timestamp), z.string()]).optional(),
+});
+
+
+const memberSchema = z.object({
+    id: z.string().optional(),
+    registrationId: z.string().optional(),
+    name: z.string(),
+    role: z.string(),
+    img: z.string().url(),
+    linkedinUrl: z.string().url().optional().or(z.literal('')),
+    twitterUrl: z.string().url().optional().or(z.literal('')),
+    facebookUrl: z.string().url().optional().or(z.literal('')),
+});
 
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
@@ -82,6 +109,8 @@ type Journal = z.infer<typeof journalSchema>;
 export type DigitalLibraryPaper = z.infer<typeof digitalLibraryPaperSchema>;
 export type EducationalResource = z.infer<typeof educationalResourceSchema>;
 export type Counter = z.infer<typeof counterSchema>;
+export type Registration = z.infer<typeof registrationSchema>;
+export type Member = z.infer<typeof memberSchema>;
 
 
 // Generic function to add or update a document
@@ -242,3 +271,109 @@ export async function updateCounters(data: Counter) {
     return { success: false, error: error.message };
   }
 }
+
+// Registration Actions
+export async function getRegistrations(): Promise<Registration[]> {
+    try {
+        const querySnapshot = await getDocs(collection(db, "registrations"));
+        
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Serialize Firestore Timestamps
+            const plainObject = JSON.parse(JSON.stringify(data));
+            return { id: doc.id, ...plainObject } as Registration;
+        });
+
+    } catch (error) {
+        console.error("Error fetching registrations:", error);
+        return [];
+    }
+}
+
+
+export async function approveRegistration(registration: Registration) {
+    try {
+        // 1. Add to members collection
+        const memberData: Omit<Member, 'id'> = {
+            registrationId: registration.id,
+            name: registration.name,
+            role: registration.registrationType,
+            img: registration.photo,
+            linkedinUrl: registration.linkedinUrl,
+            twitterUrl: registration.twitterUrl,
+        };
+        const validatedMember = memberSchema.omit({id: true}).parse(memberData);
+        await addDoc(collection(db, "members"), validatedMember);
+        
+        // 2. Update registration status
+        const registrationRef = doc(db, "registrations", registration.id!);
+        await updateDoc(registrationRef, { status: "approved" });
+        
+        revalidatePath('/admin');
+        revalidatePath('/ourteam');
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function rejectRegistration(registrationId: string) {
+    try {
+        const registrationRef = doc(db, "registrations", registrationId);
+        await updateDoc(registrationRef, { status: "rejected" });
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateRegistrationStatus(registrationId: string, status: 'pending' | 'approved' | 'rejected', currentStatus: 'pending' | 'approved' | 'rejected', registration: Registration) {
+    try {
+        if (status === currentStatus) return { success: true, message: "No change in status." };
+
+        // Handle becoming approved
+        if (status === 'approved' && currentStatus !== 'approved') {
+            await approveRegistration(registration);
+        } 
+        // Handle revoking approval
+        else if (status !== 'approved' && currentStatus === 'approved') {
+            // Find and delete from members collection
+            const membersRef = collection(db, "members");
+            const q = query(membersRef, where("registrationId", "==", registrationId));
+            const querySnapshot = await getDocs(q);
+            const deletePromises: Promise<void>[] = [];
+            querySnapshot.forEach((doc) => {
+                deletePromises.push(deleteDoc(doc.ref));
+            });
+            await Promise.all(deletePromises);
+
+            // Update registration status
+            const registrationRef = doc(db, "registrations", registrationId);
+            await updateDoc(registrationRef, { status });
+        }
+        // Handle other status changes (e.g., pending -> rejected, rejected -> pending)
+        else {
+             const registrationRef = doc(db, "registrations", registrationId);
+             await updateDoc(registrationRef, { status });
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/ourteam');
+
+        return { success: true };
+
+    } catch (error: any) {
+        console.error("Error updating status:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+
+// Member Actions
+export async function getMembers(): Promise<Member[]> {
+    return getDocsFromCollection<Member>('members');
+}
+
+    

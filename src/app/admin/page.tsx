@@ -1,7 +1,8 @@
 
+
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useMemo } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +19,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   addOrUpdateCourse,
   addOrUpdatePartner,
@@ -39,8 +49,12 @@ import {
   deleteDigitalLibraryPaper,
   getCounters,
   updateCounters,
+  getRegistrations,
+  approveRegistration,
+  rejectRegistration,
+  updateRegistrationStatus,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource, Counter } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter, Registration } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -63,8 +77,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw } from "lucide-react";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 
 // Zod Schemas
@@ -1009,6 +1025,174 @@ function CounterForm({ onSave }: { onSave: () => void }) {
   );
 }
 
+function RegistrationManager({ registrations, onUpdate }: { registrations: Registration[], onUpdate: () => void }) {
+    const { toast } = useToast();
+    const [isProcessing, setIsProcessing] = useState<string | null>(null);
+    const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending');
+
+    const handleApprove = async (registration: Registration) => {
+        setIsProcessing(registration.id!);
+        const result = await approveRegistration(registration);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration approved." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
+
+    const handleReject = async (registrationId: string) => {
+        setIsProcessing(registrationId);
+        const result = await rejectRegistration(registrationId);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration rejected." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
+    
+    const handleStatusChange = async (registration: Registration, newStatus: 'pending' | 'approved' | 'rejected') => {
+        if (newStatus === registration.status) return;
+        setIsProcessing(registration.id!);
+        const result = await updateRegistrationStatus(registration.id!, newStatus, registration.status, registration);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration status updated." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
+
+    const filteredRegistrations = useMemo(() => {
+        return registrations.filter(reg => reg.status === filter);
+    }, [registrations, filter]);
+
+    const ActionButtons = ({reg}: {reg: Registration}) => {
+        if (reg.status === 'pending') {
+            return (
+                <>
+                    <Button size="sm" onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
+                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
+                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
+                    </Button>
+                </>
+            );
+        }
+        return null;
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Member Registrations</CardTitle>
+                <CardDescription>Review and manage new member registrations.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex gap-2 mb-4">
+                    <Button variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>Pending</Button>
+                    <Button variant={filter === 'approved' ? 'default' : 'outline'} onClick={() => setFilter('approved')}>Approved</Button>
+                    <Button variant={filter === 'rejected' ? 'default' : 'outline'} onClick={() => setFilter('rejected')}>Rejected</Button>
+                </div>
+                <div className="space-y-4">
+                    {filteredRegistrations.length === 0 && <p className="text-muted-foreground text-center py-4">No {filter} registrations.</p>}
+                    {filteredRegistrations.map((reg) => (
+                        <div key={reg.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                            <div className="flex items-center gap-4">
+                                <Image src={reg.photo} alt={reg.name} width={48} height={48} className="rounded-full object-cover" />
+                                <div>
+                                    <p className="font-semibold">{reg.name}</p>
+                                    <p className="text-sm text-muted-foreground">{reg.email}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="sm">View Details</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle>Registration Details</DialogTitle>
+                                            <DialogDescription>Reviewing application for {reg.name}</DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
+                                            <div className="md:col-span-1 flex flex-col items-center space-y-4">
+                                                <Image src={reg.photo} alt={reg.name} width={128} height={128} className="rounded-full object-cover" />
+                                                <div className="text-center">
+                                                    <h3 className="font-bold text-lg">{reg.name}</h3>
+                                                    <p className="text-sm text-muted-foreground">{reg.email}</p>
+                                                    <p className="text-sm text-muted-foreground">{reg.contact}</p>
+                                                    <Badge variant="secondary" className="mt-2 capitalize">{reg.registrationType}</Badge>
+                                                </div>
+                                            </div>
+                                            <div className="md:col-span-2 space-y-4">
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Biography</h4>
+                                                    <p className="text-sm text-muted-foreground mt-1 max-h-32 overflow-y-auto">{reg.biography}</p>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Social & Professional Links</h4>
+                                                    <div className="flex flex-col space-y-2 mt-2">
+                                                        {reg.linkedinUrl && <a href={reg.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><Linkedin /> LinkedIn</a>}
+                                                        {reg.twitterUrl && <a href={reg.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><Twitter /> Twitter</a>}
+                                                        {reg.otherSocialUrl && <a href={reg.otherSocialUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><LinkIcon /> Other Link</a>}
+                                                        {reg.scholarLink && <a href={reg.scholarLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><FileText /> Google Scholar</a>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0 justify-between w-full">
+                                            <div className="flex items-center gap-2">
+                                               {reg.status === 'pending' ? (
+                                                <>
+                                                    <Button variant="destructive" onClick={() => {handleReject(reg.id!); (document.querySelector('[data-radix-dialog-close]') as HTMLElement)?.click();}} disabled={isProcessing === reg.id}>
+                                                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
+                                                        Reject
+                                                    </Button>
+                                                    <Button onClick={() => {handleApprove(reg); (document.querySelector('[data-radix-dialog-close]') as HTMLElement)?.click();}} disabled={isProcessing === reg.id}>
+                                                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                                                        Approve
+                                                    </Button>
+                                                </>
+                                               ) : (
+                                                <Select onValueChange={(newStatus: 'pending' | 'approved' | 'rejected') => handleStatusChange(reg, newStatus)} disabled={isProcessing === reg.id}>
+                                                  <SelectTrigger className="w-[180px]">
+                                                    <div className="flex items-center gap-2">
+                                                      {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                                                      <span>Change Status</span>
+                                                    </div>
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel>New Status</SelectLabel>
+                                                      <SelectItem value="pending" disabled={reg.status === 'pending'}>Pending</SelectItem>
+                                                      <SelectItem value="approved" disabled={reg.status === 'approved'}>Approve</SelectItem>
+                                                      <SelectItem value="rejected" disabled={reg.status === 'rejected'}>Reject</SelectItem>
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                               )}
+                                            </div>
+                                            <DialogClose asChild>
+                                                <Button variant="ghost">Close</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                                <ActionButtons reg={reg} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 export default function AdminPage() {
   const router = useRouter();
@@ -1019,6 +1203,7 @@ export default function AdminPage() {
   const [journals, setJournals] = useState<Journal[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [resources, setResources] = useState<EducationalResource[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -1038,13 +1223,14 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
       getJournals(),
       getDigitalLibraryPapers(),
       getEducationalResources(),
+      getRegistrations(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
@@ -1052,6 +1238,7 @@ export default function AdminPage() {
     setJournals(journalsData);
     setPapers(papersData);
     setResources(resourcesData as EducationalResource[]);
+    setRegistrations(registrationsData);
     setLoading(false);
   };
 
@@ -1106,7 +1293,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 h-auto lg:h-10">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
@@ -1114,6 +1301,7 @@ export default function AdminPage() {
           <TabsTrigger value="library">Digital Library</TabsTrigger>
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
+          <TabsTrigger value="registrations">Registrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1460,8 +1648,13 @@ export default function AdminPage() {
         <TabsContent value="counters">
           <CounterForm onSave={fetchData} />
         </TabsContent>
+        <TabsContent value="registrations">
+            <RegistrationManager registrations={registrations} onUpdate={fetchData} />
+        </TabsContent>
 
       </Tabs>
     </div>
   );
 }
+
+    
