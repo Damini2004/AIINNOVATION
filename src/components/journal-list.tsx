@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Search } from "lucide-react";
-import { getJournals } from "@/app/admin/actions";
+import { getJournals } from "@/app/dashboard/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 
@@ -122,3 +122,5 @@ export default function JournalList() {
     </section>
   )
 }
+
+    

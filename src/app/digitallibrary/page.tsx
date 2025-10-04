@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getDigitalLibraryPapers } from "@/app/admin/actions";
-import type { DigitalLibraryPaper } from "@/app/admin/actions";
+import { getDigitalLibraryPapers } from "@/app/dashboard/actions";
+import type { DigitalLibraryPaper } from "@/app/dashboard/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -263,3 +263,5 @@ export default function DigitalLibraryPage() {
     </div>
   );
 }
+
+    

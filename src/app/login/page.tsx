@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (localStorage.getItem("isAdminLoggedIn") === "true") {
-      router.replace("/admin");
+      router.replace("/dashboard");
     } else {
       setIsCheckingAuth(false);
     }
@@ -36,9 +36,9 @@ export default function LoginPage() {
         localStorage.setItem("isAdminLoggedIn", "true");
         toast({
           title: "Login Successful",
-          description: "Redirecting to admin dashboard...",
+          description: "Redirecting to dashboard...",
         });
-        router.push("/admin");
+        router.push("/dashboard");
       } else {
         toast({
           variant: "destructive",

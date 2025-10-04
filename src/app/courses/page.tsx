@@ -8,7 +8,7 @@ import { ImageIcon, LinkIcon, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import "./courses.css";
-import { getCourses } from "../admin/actions";
+import { getCourses } from "../dashboard/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Course = {
@@ -170,3 +170,5 @@ export default function CoursesPage() {
     </div>
   );
 }
+
+    

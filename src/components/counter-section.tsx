@@ -8,8 +8,8 @@ import {
   Sparkles,
   ClipboardCheck,
 } from "lucide-react";
-import { getCounters } from "@/app/admin/actions";
-import type { Counter } from "@/app/admin/actions";
+import { getCounters } from "@/app/dashboard/actions";
+import type { Counter } from "@/app/dashboard/actions";
 
 export default function CounterSection() {
     const [counters, setCounters] = useState([
@@ -131,3 +131,5 @@ export default function CounterSection() {
     </section>
   );
 }
+
+    

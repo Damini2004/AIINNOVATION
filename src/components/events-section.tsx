@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEvents } from "@/app/admin/actions";
+import { getEvents } from "@/app/dashboard/actions";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -104,3 +105,5 @@ export default function EventsSection() {
     </section>
   );
 }
+
+    

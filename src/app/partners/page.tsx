@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getPartners } from "../admin/actions";
+import { getPartners } from "../dashboard/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Facebook, Linkedin, Twitter, Link as LinkIcon } from "lucide-react";
 import "../members.css";
@@ -115,3 +115,5 @@ export default function PartnersPage() {
     </div>
   );
 }
+
+    

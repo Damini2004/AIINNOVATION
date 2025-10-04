@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getEducationalResources } from "@/app/admin/actions";
-import type { EducationalResource } from "@/app/admin/actions";
+import { getEducationalResources } from "@/app/dashboard/actions";
+import type { EducationalResource } from "@/app/dashboard/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -260,3 +260,5 @@ export default function EducationalResourcesPage() {
     </div>
   );
 }
+
+    
