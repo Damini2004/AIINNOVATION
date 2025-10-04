@@ -296,14 +296,14 @@ export default function TypesOfMembershipsPage() {
                             <div className="border-b border-border my-8"></div>
                             <div className="mt-16 text-center">
                                 <h3 className="text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
-                                <p className="text-muted-foreground max-w-2xl mx-auto">
-                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
-                                </p>
                                 <div className="mt-6">
                                     <Button asChild size="lg">
                                         <Link href="/registrations">Join Now</Link>
                                     </Button>
                                 </div>
+                                <p className="text-muted-foreground max-w-2xl mx-auto mt-6">
+                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
+                                </p>
                            </div>
                         </div>
                     </TabsContent>
