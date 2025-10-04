@@ -12,13 +12,17 @@ export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
-    setIsLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true" || localStorage.getItem("isUserLoggedIn") === "true");
+    const userLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
+    const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
+    setIsLoggedIn(userLoggedIn || adminLoggedIn);
+    setIsAdmin(adminLoggedIn);
      // Close mobile menu on navigation
     setIsOpen(false);
   }, [pathname]);
@@ -36,25 +40,14 @@ export function AppHeader() {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
 
-  const AuthLink = () => {
+   const AuthLink = () => {
     if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
     
+    if (isAdmin) {
+      return <li><Link href="/admin">Dashboard</Link></li>;
+    }
     if (isLoggedIn) {
-      const isAdmin = localStorage.getItem("isAdminLoggedIn") === "true";
-      return (
-        <>
-          <li>
-            <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
-              Profile
-            </Link>
-          </li>
-        </>
-      );
+      return <li><Link href="/user-dashboard">Profile</Link></li>;
     }
     
     return (
@@ -318,3 +311,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
