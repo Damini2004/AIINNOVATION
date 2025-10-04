@@ -187,6 +187,37 @@ export default function TypesOfMembershipsPage() {
                             </div>
                         </div>
                     </div>
+                    <div className="mt-20 text-left max-w-4xl mx-auto">
+                        <div className="mb-12">
+                            <h3 className="text-3xl font-bold mb-4">Qualifications</h3>
+                            <p className="text-muted-foreground mb-6">
+                            You qualify for professional membership if you provide evidence of competence in an AIIS-designated field, including:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                            <li>Engineering</li>
+                            <li>Computer Sciences and Information Technology</li>
+                            <li>Physical Sciences</li>
+                            <li>Biological and Medical Sciences</li>
+                            <li>Mathematics</li>
+                            <li>Technical Communications</li>
+                            <li>Education</li>
+                            <li>Management</li>
+                            <li>Law and Policy</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 className="text-3xl font-bold mb-4">Annual Dues</h3>
+                            <p className="text-muted-foreground mb-6">
+                            Select your country to view your annual membership dues. AIIS offers various secure payment options for members worldwide, including new regional methods.
+                            </p>
+                            <Button asChild variant="link" className="p-0 h-auto text-primary text-base">
+                                <Link href="#">
+                                    &gt; Learn More About Payment Options
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
                 </TabsContent>
                 <TabsContent value="students" className="mt-8 max-w-3xl mx-auto">
                     <p className="text-muted-foreground">
