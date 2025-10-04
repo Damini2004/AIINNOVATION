@@ -10,6 +10,10 @@ const registrationSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   contact: z.string().min(10),
+  // Password is collected but not stored.
+  // In a real app, this would be hashed and stored securely.
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
   biography: z.string().max(2000).min(10),
   photo: z.string().min(1, "Photo is required"), // Assuming base64 string
   linkedinUrl: z.string().url().optional().or(z.literal('')),
@@ -17,6 +21,9 @@ const registrationSchema = z.object({
   otherSocialUrl: z.string().url().optional().or(z.literal('')),
   scholarLink: z.string().url().optional().or(z.literal('')),
   privacyPolicy: z.literal(true),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
 });
 
 export async function handleRegistration(data: unknown) {
@@ -30,7 +37,7 @@ export async function handleRegistration(data: unknown) {
   }
 
   try {
-    const { privacyPolicy, ...docDataToSave } = validatedData.data;
+    const { privacyPolicy, password, confirmPassword, ...docDataToSave } = validatedData.data;
     
     const docData = {
       ...docDataToSave,
@@ -40,7 +47,8 @@ export async function handleRegistration(data: unknown) {
 
     await addDoc(collection(db, "registrations"), docData);
 
-    // In a real application, you might also want to:
+    // In a real application, you would also want to:
+    // - Hash the password before storing it (NEVER store plain text passwords)
     // - Upload the base64 photo to a file storage (like Firebase Storage) and save the URL.
     // - Send a confirmation email.
 
@@ -52,3 +60,5 @@ export async function handleRegistration(data: unknown) {
     };
   }
 }
+
+    

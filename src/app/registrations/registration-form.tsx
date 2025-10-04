@@ -37,6 +37,8 @@ const registrationSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
   contact: z.string().min(10, "Please enter a valid contact number."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters."),
   biography: z
     .string()
     .max(2000, "Biography must not exceed 400 words (approx. 2000 characters).")
@@ -49,6 +51,9 @@ const registrationSchema = z.object({
   privacyPolicy: z.literal(true, {
     errorMap: () => ({ message: "You must accept the privacy policy to continue." }),
   }),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
 });
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
@@ -65,6 +70,8 @@ export default function RegistrationForm() {
       name: "",
       email: "",
       contact: "",
+      password: "",
+      confirmPassword: "",
       biography: "",
       photo: "",
       linkedinUrl: "",
@@ -104,7 +111,7 @@ export default function RegistrationForm() {
   const handleNext = async () => {
     let fieldsToValidate: (keyof RegistrationFormValues)[] = [];
     if (step === 1) {
-      fieldsToValidate = ["registrationType", "name", "email", "contact"];
+      fieldsToValidate = ["registrationType", "name", "email", "contact", "password", "confirmPassword"];
     } else if (step === 2) {
       fieldsToValidate = ["photo", "biography"];
     }
@@ -218,6 +225,32 @@ export default function RegistrationForm() {
                       <FormLabel>Contact Number</FormLabel>
                       <FormControl>
                         <Input placeholder="+1 234 567 890" {...field} disabled={isSubmitting}/>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} disabled={isSubmitting}/>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} disabled={isSubmitting}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -402,3 +435,5 @@ export default function RegistrationForm() {
     </div>
   );
 }
+
+    
