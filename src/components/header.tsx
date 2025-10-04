@@ -19,6 +19,7 @@ export function AppHeader() {
 
   useEffect(() => {
     setIsClient(true);
+    // This logic now runs only on the client, after the initial render
     const userLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
     const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
     setIsLoggedIn(userLoggedIn || adminLoggedIn);
@@ -32,6 +33,7 @@ export function AppHeader() {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check on initial mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -41,8 +43,9 @@ export function AppHeader() {
   };
 
    const AuthLink = () => {
+    // This component now waits for the client-side check to complete
     if (!isClient) {
-      return null;
+      return null; // Render nothing on the server and initial client render
     }
     
     if (isAdmin) {
