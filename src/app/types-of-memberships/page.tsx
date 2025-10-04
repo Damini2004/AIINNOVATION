@@ -30,7 +30,7 @@ export default function TypesOfMembershipsPage() {
       </section>
 
       {/* Main Content */}
-      <main className="py-24">
+      <main className="py-20">
         <div className="container mx-auto px-6">
           <Tabs defaultValue="professionals" className="w-full text-center">
             <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
