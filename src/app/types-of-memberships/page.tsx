@@ -46,7 +46,44 @@ export default function TypesOfMembershipsPage() {
     },
   ];
 
-  const currentBenefit = professionalBenefits.find(b => b.title === activeBenefit);
+  const studentBenefits = [
+    {
+      title: "Expand Your Network",
+      content: [
+          "Connect with fellow students and experts.",
+          "Join local activities and meet-ups.",
+          "Connect with mentors.",
+      ]
+    },
+    {
+        title: "Develop Your Professional Skills",
+        content: [
+            "Participate in hands-on workshops.",
+            "Contribute to open-source projects.",
+            "Gain leadership experience in chapter roles.",
+        ]
+    },
+    {
+        title: "Find Financial Support",
+        content: [
+            "Apply for exclusive scholarships and grants.",
+            "Get discounts on conference registrations.",
+            "Find funding for your student projects.",
+        ]
+    },
+    {
+        title: "Unlock Benefits",
+        content: [
+            "Access to a digital library of research papers.",
+            "Free or discounted access to AIIS certification programs.",
+            "Career guidance and internship opportunities.",
+        ]
+    }
+  ];
+
+  const currentProfessionalBenefit = professionalBenefits.find(b => b.title === activeBenefit);
+  const [activeStudentBenefit, setActiveStudentBenefit] = useState(studentBenefits[0].title);
+  const currentStudentBenefit = studentBenefits.find(b => b.title === activeStudentBenefit);
 
 
   return (
@@ -167,9 +204,9 @@ export default function TypesOfMembershipsPage() {
                                         exit={{ opacity: 0, y: -10 }}
                                         transition={{ duration: 0.2 }}
                                     >
-                                        <h4 className="text-2xl font-bold mb-6">{currentBenefit?.title}</h4>
+                                        <h4 className="text-2xl font-bold mb-6">{currentProfessionalBenefit?.title}</h4>
                                         <ul className="space-y-4">
-                                            {currentBenefit?.content.map((item, index) => (
+                                            {currentProfessionalBenefit?.content.map((item, index) => (
                                                 <motion.li 
                                                     key={index}
                                                     className="flex items-start"
@@ -247,10 +284,64 @@ export default function TypesOfMembershipsPage() {
                         </div>
                     </div>
                 </TabsContent>
-                <TabsContent value="students" className="mt-8 max-w-3xl mx-auto">
-                    <p className="text-muted-foreground">
-                       As a student member, you'll gain access to resources that will help you succeed in your studies and future career. Connect with mentors, find internships, and start building your professional network early.
+                <TabsContent value="students" className="mt-8 text-left">
+                    <p className="text-muted-foreground text-center max-w-3xl mx-auto">
+                        Join AIIS as a student and benefit from our extensive engineering and technological expertise. Connect instantly to a network of STEM professionals, mentors, and other Student members. You'll also have access to scholarships, grants, conferences, and your university's local student branch.
                     </p>
+                    <div className="mt-16">
+                        <div className="text-center mb-12">
+                            <h3 className="text-3xl font-bold">AIIS Membership Benefits for Students</h3>
+                            <div className="em_bar_bg mt-4"></div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                            <div className="md:col-span-4">
+                                <ul className="space-y-2">
+                                    {studentBenefits.map(benefit => (
+                                        <li key={benefit.title}>
+                                            <button
+                                                onClick={() => setActiveStudentBenefit(benefit.title)}
+                                                className={`w-full text-left p-4 rounded-lg transition-all duration-300 text-lg ${activeStudentBenefit === benefit.title ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-secondary/70 font-medium'}`}
+                                            >
+                                                {benefit.title}
+                                            </button>
+                                        </li>
+                                    ))}
+                                    <li>
+                                        <Link href="/membership-benefits" className="w-full text-left p-4 rounded-lg transition-all duration-300 hover:bg-secondary/70 block font-semibold text-primary text-lg">
+                                            All Membership Benefits
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="md:col-span-8 bg-blue-950 rounded-lg p-8 text-white min-h-[300px]">
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={activeStudentBenefit}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <h4 className="text-2xl font-bold mb-6">{currentStudentBenefit?.title}</h4>
+                                        <ul className="space-y-4">
+                                            {currentStudentBenefit?.content.map((item, index) => (
+                                                <motion.li
+                                                    key={index}
+                                                    className="flex items-start"
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                                                >
+                                                    <CheckCircle className="w-5 h-5 text-primary mr-3 mt-1 shrink-0"/>
+                                                    <span>{item}</span>
+                                                </motion.li>
+                                            ))}
+                                        </ul>
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
+                        </div>
+                    </div>
                 </TabsContent>
                 <TabsContent value="stories" className="mt-8 max-w-3xl mx-auto">
                      <p className="text-muted-foreground">
@@ -265,5 +356,3 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
-
-    
