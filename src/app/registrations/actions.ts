@@ -91,6 +91,7 @@ export async function handleLogin(data: unknown) {
         // In a real application, you would compare a hashed password.
         // This is for demonstration purposes only and is not secure.
         if (userData.password === password) {
+             // We only return isAdmin: false, and user data for non-admin users.
             return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
         } else {
             return { success: false, error: "Invalid email or password." };
