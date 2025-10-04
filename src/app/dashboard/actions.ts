@@ -93,6 +93,7 @@ const registrationSchema = z.object({
 
 const memberSchema = z.object({
     id: z.string().optional(),
+    registrationId: z.string().optional(),
     name: z.string(),
     role: z.string(),
     img: z.string().url(),
@@ -294,6 +295,7 @@ export async function approveRegistration(registration: Registration) {
     try {
         // 1. Add to members collection
         const memberData: Omit<Member, 'id'> = {
+            registrationId: registration.id,
             name: registration.name,
             role: registration.registrationType,
             img: registration.photo,
@@ -326,6 +328,48 @@ export async function rejectRegistration(registrationId: string) {
         return { success: false, error: error.message };
     }
 }
+
+export async function updateRegistrationStatus(registrationId: string, status: 'pending' | 'approved' | 'rejected', currentStatus: 'pending' | 'approved' | 'rejected', registration: Registration) {
+    try {
+        if (status === currentStatus) return { success: true, message: "No change in status." };
+
+        // Handle becoming approved
+        if (status === 'approved' && currentStatus !== 'approved') {
+            await approveRegistration(registration);
+        } 
+        // Handle revoking approval
+        else if (status !== 'approved' && currentStatus === 'approved') {
+            // Find and delete from members collection
+            const membersRef = collection(db, "members");
+            const q = query(membersRef, where("registrationId", "==", registrationId));
+            const querySnapshot = await getDocs(q);
+            const deletePromises: Promise<void>[] = [];
+            querySnapshot.forEach((doc) => {
+                deletePromises.push(deleteDoc(doc.ref));
+            });
+            await Promise.all(deletePromises);
+
+            // Update registration status
+            const registrationRef = doc(db, "registrations", registrationId);
+            await updateDoc(registrationRef, { status });
+        }
+        // Handle other status changes (e.g., pending -> rejected, rejected -> pending)
+        else {
+             const registrationRef = doc(db, "registrations", registrationId);
+             await updateDoc(registrationRef, { status });
+        }
+
+        revalidatePath('/dashboard');
+        revalidatePath('/ourteam');
+
+        return { success: true };
+
+    } catch (error: any) {
+        console.error("Error updating status:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 
 // Member Actions
 export async function getMembers(): Promise<Member[]> {

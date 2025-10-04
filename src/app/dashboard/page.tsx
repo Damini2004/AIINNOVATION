@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -18,6 +19,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   addOrUpdateCourse,
   addOrUpdatePartner,
@@ -42,6 +52,7 @@ import {
   getRegistrations,
   approveRegistration,
   rejectRegistration,
+  updateRegistrationStatus,
 } from "./actions";
 import type { DigitalLibraryPaper, EducationalResource, Counter, Registration } from "./actions";
 import {
@@ -66,7 +77,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -1042,6 +1053,19 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
         }
         setIsProcessing(null);
     }
+    
+    const handleStatusChange = async (registration: Registration, newStatus: 'pending' | 'approved' | 'rejected') => {
+        if (newStatus === registration.status) return;
+        setIsProcessing(registration.id!);
+        const result = await updateRegistrationStatus(registration.id!, newStatus, registration.status, registration);
+        if (result.success) {
+            toast({ title: "Success", description: "Registration status updated." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    }
 
     const filteredRegistrations = useMemo(() => {
         return registrations.filter(reg => reg.status === filter);
@@ -1123,8 +1147,8 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                                             </div>
                                         </div>
                                         <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0 justify-between w-full">
-                                            <div className="flex gap-2">
-                                               {reg.status === 'pending' && (
+                                            <div className="flex items-center gap-2">
+                                               {reg.status === 'pending' ? (
                                                 <>
                                                     <Button variant="destructive" onClick={() => {handleReject(reg.id!); (document.querySelector('[data-radix-dialog-close]') as HTMLElement)?.click();}} disabled={isProcessing === reg.id}>
                                                         {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
@@ -1135,6 +1159,23 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                                                         Approve
                                                     </Button>
                                                 </>
+                                               ) : (
+                                                <Select onValueChange={(newStatus: 'pending' | 'approved' | 'rejected') => handleStatusChange(reg, newStatus)} disabled={isProcessing === reg.id}>
+                                                  <SelectTrigger className="w-[180px]">
+                                                    <div className="flex items-center gap-2">
+                                                      {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                                                      <span>Change Status</span>
+                                                    </div>
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel>New Status</SelectLabel>
+                                                      <SelectItem value="pending" disabled={reg.status === 'pending'}>Pending</SelectItem>
+                                                      <SelectItem value="approved" disabled={reg.status === 'approved'}>Approve</SelectItem>
+                                                      <SelectItem value="rejected" disabled={reg.status === 'rejected'}>Reject</SelectItem>
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
                                                )}
                                             </div>
                                             <DialogClose asChild>
