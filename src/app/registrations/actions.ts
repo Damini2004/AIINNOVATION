@@ -12,7 +12,9 @@ const registrationSchema = z.object({
   contact: z.string().min(10),
   biography: z.string().max(2000).min(10),
   photo: z.string().url(),
-  socials: z.string().url().optional().or(z.literal('')),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  twitterUrl: z.string().url().optional().or(z.literal('')),
+  otherSocialUrl: z.string().url().optional().or(z.literal('')),
   scholarLink: z.string().url().optional().or(z.literal('')),
   privacyPolicy: z.literal(true),
 });

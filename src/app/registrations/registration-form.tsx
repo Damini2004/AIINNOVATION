@@ -42,7 +42,9 @@ const registrationSchema = z.object({
     .max(2000, "Biography must not exceed 400 words (approx. 2000 characters).")
     .min(10, "Biography is required."),
   photo: z.string().url("Photo upload is required.").min(1, "Photo upload is required."),
-  socials: z.string().url("Please enter a valid URL for social links.").optional().or(z.literal('')),
+  linkedinUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  twitterUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  otherSocialUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
   scholarLink: z.string().url("Please enter a valid Google Scholar URL.").optional().or(z.literal('')),
   privacyPolicy: z.literal(true, {
     errorMap: () => ({ message: "You must accept the privacy policy to continue." }),
@@ -65,7 +67,9 @@ export default function RegistrationForm() {
       contact: "",
       biography: "",
       photo: "",
-      socials: "",
+      linkedinUrl: "",
+      twitterUrl: "",
+      otherSocialUrl: "",
       scholarLink: "",
     },
   });
@@ -293,14 +297,40 @@ export default function RegistrationForm() {
             <>
               <h3 className="form-section-title">Step 3: Professional Links & Submission</h3>
               <div className="space-y-6">
-                <FormField
+                 <FormField
                   control={form.control}
-                  name="socials"
+                  name="linkedinUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Socials (LinkedIn, Twitter, etc.)</FormLabel>
+                      <FormLabel>LinkedIn Profile</FormLabel>
                       <FormControl>
                         <Input placeholder="https://www.linkedin.com/in/yourprofile/" {...field} disabled={isSubmitting} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="twitterUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Twitter Profile</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://twitter.com/yourprofile" {...field} disabled={isSubmitting} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="otherSocialUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Other Social Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://github.com/yourprofile" {...field} disabled={isSubmitting} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
