@@ -42,8 +42,7 @@ export function AppHeader() {
 
    const AuthLink = () => {
     if (!isClient) {
-      // Render a placeholder or null on the server to prevent hydration mismatch
-      return <li><Link href="/registrations">Registrations</Link></li>;
+      return null;
     }
     
     if (isAdmin) {
@@ -314,5 +313,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
