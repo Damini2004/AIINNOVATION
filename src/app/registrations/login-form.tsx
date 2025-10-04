@@ -50,19 +50,20 @@ export default function LoginForm() {
         localStorage.setItem("isAdminLoggedIn", "true");
         toast({
           title: "Admin Login Successful",
-          description: "Redirecting to dashboard...",
+          description: "Redirecting to admin dashboard...",
         });
-        router.push("/dashboard");
+        router.push("/admin");
       } else {
          localStorage.setItem("isUserLoggedIn", "true");
          if (result.user) {
             localStorage.setItem("userName", result.user.name);
+            localStorage.setItem("userEmail", result.user.email);
          }
          toast({
           title: "Login Successful",
           description: `Welcome back, ${result.user?.name || 'user'}!`,
         });
-        router.push("/"); // Redirect to homepage or a user dashboard
+        router.push("/user-dashboard"); // Redirect to user dashboard
       }
     } else {
        toast({

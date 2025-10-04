@@ -2,8 +2,9 @@
 "use server";
 
 import { z } from "zod";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import { revalidatePath } from "next/cache";
 
 const registrationSchema = z.object({
   registrationType: z.enum(["student", "professional", "member"]),
@@ -22,6 +23,17 @@ const registrationSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
+});
+
+const userProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  contact: z.string().min(10, "Please enter a valid contact number."),
+  biography: z.string().max(2000, "Biography must not exceed 400 words.").min(10, "Biography is required."),
+  photo: z.string().min(1, "Photo is required."),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  twitterUrl: z.string().url().optional().or(z.literal('')),
+  otherSocialUrl: z.string().url().optional().or(z.literal('')),
+  scholarLink: z.string().url().optional().or(z.literal('')),
 });
 
 
@@ -99,5 +111,41 @@ export async function handleLogin(data: unknown) {
 
     } catch (error: any) {
         return { success: false, error: error.message || "An unexpected error occurred." };
+    }
+}
+
+export async function getUserProfile(email: string) {
+    if (!email) return { success: false, error: "Email not provided" };
+
+    try {
+        const q = query(collection(db, "registrations"), where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return { success: false, error: "User not found" };
+        }
+        const userDoc = querySnapshot.docs[0];
+        const userData = { id: userDoc.id, ...userDoc.data() };
+        return { success: true, data: JSON.parse(JSON.stringify(userData)) };
+    } catch(error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateUserProfile(docId: string, data: unknown) {
+    const validatedData = userProfileSchema.safeParse(data);
+    if (!validatedData.success) {
+        return {
+          success: false,
+          error: "Invalid data: " + JSON.stringify(validatedData.error.flatten().fieldErrors),
+        };
+    }
+    
+    try {
+        const docRef = doc(db, 'registrations', docId);
+        await updateDoc(docRef, validatedData.data);
+        revalidatePath('/user-dashboard');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
     }
 }
