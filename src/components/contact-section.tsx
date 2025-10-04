@@ -43,13 +43,9 @@ export default function ContactSection() {
             <MapPin className="w-12 h-12 text-primary-foreground mt-2 mr-6 shrink-0" />
             <div>
               <h4 className="text-xl font-bold text-primary-foreground mb-2">Location</h4>
-              <p className="text-primary-foreground/90">
-                504, Swaminarayan Society
-                <br />
-                Nagpur Maharashtra India
-              </p>
+            
               <p className="text-primary-foreground/90 mt-2">
-                202, Planet Apt.
+                201, Planet Apt.
                 <br />
                 Omkar Nagar, Nagpur Maharashtra India
               </p>
@@ -66,7 +62,7 @@ export default function ContactSection() {
             <Phone className="w-12 h-12 text-primary-foreground mt-2 mr-6 shrink-0" />
             <div>
               <h4 className="text-xl font-bold text-primary-foreground mb-2">Make A Call</h4>
-              <p className="text-primary-foreground/90">+91 9890481177</p>
+              <p className="text-primary-foreground/90">+91 7020892896</p>
             </div>
           </div>
 

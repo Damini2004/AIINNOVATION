@@ -83,10 +83,8 @@ export function Footer() {
               Be a part of something bigger. Reach out to us for queries,
               collaborations.
             </p>
-            <p className="text-base text-muted-foreground mb-2">
-              504, Swaminarayan Enclave, Nagpur India
-            </p>
-            <p className="text-base text-muted-foreground mb-2">+91 9890481177</p>
+           
+            <p className="text-base text-muted-foreground mb-2">+91 7020892896</p>
             <p className="text-base text-muted-foreground">info@aiinsociety.in</p>
           </div>
         </div>
