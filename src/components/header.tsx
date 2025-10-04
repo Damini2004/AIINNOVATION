@@ -24,12 +24,15 @@ export function AppHeader() {
     const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
     setIsLoggedIn(userLoggedIn || adminLoggedIn);
     setIsAdmin(adminLoggedIn);
+  }, []); // Run only once on mount
 
+  useEffect(() => {
     // Close mobile menu on navigation
     if (isOpen) {
       setIsOpen(false);
     }
   }, [pathname, isOpen]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,7 +49,8 @@ export function AppHeader() {
 
   const AuthLink = () => {
     if (!isClient) {
-      return null;
+      // On the server, and initial client render, render the default link
+      return <li><Link href="/registrations">Registrations</Link></li>;
     }
     
     if (isAdmin) {
@@ -61,7 +65,7 @@ export function AppHeader() {
 
   const MobileAuthLink = () => {
      if (!isClient) {
-       return null;
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
     }
     
     if (isAdmin) {
