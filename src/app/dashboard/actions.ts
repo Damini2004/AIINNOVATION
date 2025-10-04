@@ -272,10 +272,9 @@ export async function updateCounters(data: Counter) {
 }
 
 // Registration Actions
-export async function getPendingRegistrations(): Promise<Registration[]> {
+export async function getRegistrations(): Promise<Registration[]> {
     try {
-        const q = query(collection(db, "registrations"), where("status", "==", "pending"));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(collection(db, "registrations"));
         
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -285,7 +284,7 @@ export async function getPendingRegistrations(): Promise<Registration[]> {
         });
 
     } catch (error) {
-        console.error("Error fetching pending registrations:", error);
+        console.error("Error fetching registrations:", error);
         return [];
     }
 }

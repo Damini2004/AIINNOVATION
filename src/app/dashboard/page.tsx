@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useMemo } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ import {
   deleteDigitalLibraryPaper,
   getCounters,
   updateCounters,
-  getPendingRegistrations,
+  getRegistrations,
   approveRegistration,
   rejectRegistration,
 } from "./actions";
@@ -69,6 +69,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 
 // Zod Schemas
@@ -1016,6 +1017,7 @@ function CounterForm({ onSave }: { onSave: () => void }) {
 function RegistrationManager({ registrations, onUpdate }: { registrations: Registration[], onUpdate: () => void }) {
     const { toast } = useToast();
     const [isProcessing, setIsProcessing] = useState<string | null>(null);
+    const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending');
 
     const handleApprove = async (registration: Registration) => {
         setIsProcessing(registration.id!);
@@ -1041,16 +1043,41 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
         setIsProcessing(null);
     }
 
+    const filteredRegistrations = useMemo(() => {
+        return registrations.filter(reg => reg.status === filter);
+    }, [registrations, filter]);
+
+    const ActionButtons = ({reg}: {reg: Registration}) => {
+        if (reg.status === 'pending') {
+            return (
+                <>
+                    <Button size="sm" onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
+                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
+                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
+                    </Button>
+                </>
+            );
+        }
+        return null;
+    }
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Pending Registrations</CardTitle>
-                <CardDescription>Review and approve or reject new member registrations.</CardDescription>
+                <CardTitle>Member Registrations</CardTitle>
+                <CardDescription>Review and manage new member registrations.</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="flex gap-2 mb-4">
+                    <Button variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>Pending</Button>
+                    <Button variant={filter === 'approved' ? 'default' : 'outline'} onClick={() => setFilter('approved')}>Approved</Button>
+                    <Button variant={filter === 'rejected' ? 'default' : 'outline'} onClick={() => setFilter('rejected')}>Rejected</Button>
+                </div>
                 <div className="space-y-4">
-                    {registrations.length === 0 && <p className="text-muted-foreground text-center py-4">No pending registrations.</p>}
-                    {registrations.map((reg) => (
+                    {filteredRegistrations.length === 0 && <p className="text-muted-foreground text-center py-4">No {filter} registrations.</p>}
+                    {filteredRegistrations.map((reg) => (
                         <div key={reg.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                             <div className="flex items-center gap-4">
                                 <Image src={reg.photo} alt={reg.name} width={48} height={48} className="rounded-full object-cover" />
@@ -1095,27 +1122,28 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                                                 </div>
                                             </div>
                                         </div>
-                                        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
-                                            <Button variant="destructive" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
-                                                {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
-                                                Reject
-                                            </Button>
-                                            <Button onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
-                                                {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
-                                                Approve
-                                            </Button>
+                                        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0 justify-between w-full">
+                                            <div className="flex gap-2">
+                                               {reg.status === 'pending' && (
+                                                <>
+                                                    <Button variant="destructive" onClick={() => {handleReject(reg.id!); (document.querySelector('[data-radix-dialog-close]') as HTMLElement)?.click();}} disabled={isProcessing === reg.id}>
+                                                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
+                                                        Reject
+                                                    </Button>
+                                                    <Button onClick={() => {handleApprove(reg); (document.querySelector('[data-radix-dialog-close]') as HTMLElement)?.click();}} disabled={isProcessing === reg.id}>
+                                                        {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                                                        Approve
+                                                    </Button>
+                                                </>
+                                               )}
+                                            </div>
                                             <DialogClose asChild>
                                                 <Button variant="ghost">Close</Button>
                                             </DialogClose>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
-                                <Button size="sm" onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
-                                    {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                                </Button>
-                                <Button variant="destructive" size="sm" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
-                                    {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
-                                </Button>
+                                <ActionButtons reg={reg} />
                             </div>
                         </div>
                     ))}
@@ -1161,7 +1189,7 @@ export default function AdminPage() {
       getJournals(),
       getDigitalLibraryPapers(),
       getEducationalResources(),
-      getPendingRegistrations(),
+      getRegistrations(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
