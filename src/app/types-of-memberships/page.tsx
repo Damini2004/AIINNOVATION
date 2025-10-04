@@ -112,7 +112,7 @@ export default function TypesOfMembershipsPage() {
       <main className="py-20">
         <div className="container mx-auto px-6">
           <Tabs defaultValue="professionals" className="w-full text-center">
-             <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
+             <TabsList className="items-center justify-center p-1 text-muted-foreground grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
               <TabsTrigger value="professionals">Professionals</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
               <TabsTrigger value="stories">Member Stories</TabsTrigger>
@@ -286,7 +286,7 @@ export default function TypesOfMembershipsPage() {
                 </TabsContent>
                 <TabsContent value="students" className="mt-8 text-left">
                     <p className="text-muted-foreground text-center max-w-3xl mx-auto">
-                        Join AIIS as a student and benefit from our extensive engineering and technological expertise. Connect instantly to a network of STEM professionals, mentors, and other Student members. You'll also have access to scholarships, grants, conferences, and your university's local student branch.
+                        Join AIIS as a student and benefit from our extensive engineering and technological expertise. Connect instantly to a network of STEM professionals, mentors, and other Student members.
                     </p>
                     <div className="mt-16">
                         <div className="text-center mb-12">
