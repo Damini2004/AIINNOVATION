@@ -18,11 +18,17 @@ export function AppHeader() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // This effect runs only on the client, after the component has mounted.
     setIsClient(true);
     const userLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
     const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
     setIsLoggedIn(userLoggedIn || adminLoggedIn);
     setIsAdmin(adminLoggedIn);
+
+    // Close mobile menu on navigation
+    if (isOpen) {
+      setIsOpen(false);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -40,7 +46,8 @@ export function AppHeader() {
 
   const AuthLink = () => {
     if (!isClient) {
-      return <li><Link href="/registrations">Registrations</Link></li>; // Render default on server
+      // Render a consistent placeholder on the server and initial client render
+      return <li><Link href="/registrations">Registrations</Link></li>;
     }
     
     if (isAdmin) {
@@ -55,7 +62,7 @@ export function AppHeader() {
 
   const MobileAuthLink = () => {
      if (!isClient) {
-      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+       return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
     }
     
     if (isAdmin) {
