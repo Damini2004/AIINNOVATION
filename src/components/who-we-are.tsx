@@ -39,39 +39,6 @@ export default function WhoWeAre() {
               AI Innovation Society (AIIS) is a non-profit initiative dedicated to promoting responsible artificial intelligence through education, ethical research, global events, and collaborative innovation. We connect researchers, educators, developers, and change-makers to harness AI for the greater good.
             </p>
 
-            {/* Icon Boxes */}
-            <div className="mt-6 space-y-4">
-
-              <div className="flex items-start">
-                <CheckCircle2 className="text-primary h-5 w-5 mt-1 mr-4 shrink-0" />
-                <p className="text-foreground font-medium text-base">
-                  Promoting AI Education in Schools and Universities.
-                </p>
-              </div>
-
-              <div className="flex items-start">
-                <CheckCircle2 className="text-primary h-5 w-5 mt-1 mr-4 shrink-0" />
-                <p className="text-foreground font-medium text-base">
-                  Empowering Research Publication in field of AI.
-                </p>
-              </div>
-
-              <div className="flex items-start">
-                <CheckCircle2 className="text-primary h-5 w-5 mt-1 mr-4 shrink-0" />
-                <p className="text-foreground font-medium text-base">
-                  Connecting a strong network of researchers and scientists in field of AI.
-                </p>
-              </div>
-
-              <div className="flex items-start">
-                <CheckCircle2 className="text-primary h-5 w-5 mt-1 mr-4 shrink-0" />
-                <p className="text-foreground font-medium text-base">
-                  Organizing events like conferences and workshops in field of AI.
-                </p>
-              </div>
-
-            </div>
-
           </div>
         </div>
       </div>
