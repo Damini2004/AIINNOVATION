@@ -57,11 +57,11 @@ export function Footer() {
             <h4 className="text-xl font-semibold mt-5 mb-4 text-foreground">Journals</h4>
             <ul className="space-y-3 relative">
               {[
-                "AI In Engineering",
-                "AI in Education",
-                "AI in Social Science",
-                "AI in Law and Politics",
-                "AI in Medicine",
+                "Engineering",
+                "Management",
+                "Social Science",
+                "Arts & Humanities",
+                "Medicine",
               ].map((item, i) => (
                 <li key={i} className="pl-6 relative">
                   <span className="absolute left-0 top-2 w-2.5 h-0.5 bg-primary" />
