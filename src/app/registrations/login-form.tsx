@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { handleLogin } from "./actions";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -39,27 +40,37 @@ export default function LoginForm() {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    // This is a mock authentication.
-    // In a real app, you'd call an authentication service.
-    setTimeout(() => {
-      if (data.email === "admin@aiis.com" && data.password === "password") {
+    const result = await handleLogin(data);
+    setIsLoading(false);
+
+    if (result.success) {
+      if (result.isAdmin) {
         localStorage.setItem("isAdminLoggedIn", "true");
         toast({
-          title: "Login Successful",
+          title: "Admin Login Successful",
           description: "Redirecting to dashboard...",
         });
         router.push("/dashboard");
       } else {
-        toast({
+         localStorage.setItem("isUserLoggedIn", "true");
+         if (result.user) {
+            localStorage.setItem("userName", result.user.name);
+         }
+         toast({
+          title: "Login Successful",
+          description: `Welcome back, ${result.user?.name || 'user'}!`,
+        });
+        router.push("/"); // Redirect to homepage or a user dashboard
+      }
+    } else {
+       toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid email or password.",
+          description: result.error || "An unknown error occurred.",
         });
-        setIsLoading(false);
-      }
-    }, 1000);
+    }
   };
 
   return (
@@ -81,7 +92,7 @@ export default function LoginForm() {
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="admin@aiis.com"
+                    placeholder="your.email@example.com"
                     {...field}
                     disabled={isLoading}
                   />
@@ -99,7 +110,7 @@ export default function LoginForm() {
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="password"
+                    placeholder="********"
                     {...field}
                     disabled={isLoading}
                   />
