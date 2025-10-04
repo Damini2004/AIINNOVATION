@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 
 export default function TypesOfMembershipsPage() {
   const [activeBenefit, setActiveBenefit] = useState("Find Community");
@@ -207,6 +207,44 @@ export default function TypesOfMembershipsPage() {
                             </ul>
                         </div>
                         <div className="border-b border-border my-8"></div>
+                        <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
+
+                          {/* Reduced Dues Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-3xl font-bold">Reduced AIIS Membership Dues for Special Circumstances</h3>
+                            <p className="text-muted-foreground">
+                              AIIS supports its members through all of life's transitions. If you're retired, unemployed, permanently disabled, or experiencing financial hardship, you may qualify for reduced dues under our Special Circumstances program. AIIS also offers discounted electronic memberships for individuals living in eligible countries.
+                            </p>
+                            <div className="space-y-2">
+                              <Link href="#" className="flex items-center text-primary font-semibold hover:underline">
+                                <ArrowRight className="w-4 h-4 mr-2 transform -rotate-45" /> Learn More About Special Circumstances
+                              </Link>
+                              <Link href="#" className="flex items-center text-primary font-semibold hover:underline">
+                                <ArrowRight className="w-4 h-4 mr-2 transform -rotate-45" /> Check Eligibility for Electronic Membership
+                              </Link>
+                            </div>
+                          </div>
+
+                          {/* Grades Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-3xl font-bold">Grades</h3>
+                            <p className="text-muted-foreground">
+                              Join AIIS as a member, Associate member, Student member, or Graduate Student member, depending on your qualifications. You may also reach special designations of Life member, Senior member, or Fellow.
+                            </p>
+                            <Link href="#" className="flex items-center text-primary font-semibold hover:underline">
+                                <ArrowRight className="w-4 h-4 mr-2 transform -rotate-45" /> Learn more
+                            </Link>
+                          </div>
+                          
+                           {/* Final CTA */}
+                          <div className="text-center space-y-6 pt-8">
+                             <div className="h-16 w-px bg-border mx-auto"></div>
+                             <h2 className="text-4xl font-bold">Innovate the Future. Join AIIS.</h2>
+                              <Button asChild size="lg">
+                                <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                              </Button>
+                          </div>
+                        </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="students" className="mt-8 max-w-3xl mx-auto">
@@ -227,3 +265,5 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
+
+    
