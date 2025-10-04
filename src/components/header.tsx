@@ -155,6 +155,8 @@ export function AppHeader() {
                   <li><Link href="/become-a-member">Become a Member</Link></li>
                   <li><Link href="/institution-chapter">Institution Chapter</Link></li>
                   <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
+                  <li><Link href="/types-of-memberships">Types of Memberships</Link></li>
+                  <li><Link href="/membership-benefits">Membership Benefits</Link></li>
                 </ul>
               </li>
 
@@ -286,6 +288,8 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/become-a-member">Become a Member</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/institution-chapter">Institution Chapter</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/types-of-memberships">Types of Memberships</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/membership-benefits">Membership Benefits</Link></li>
                   </ul>
                 )}
               </li>
@@ -303,5 +307,7 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
 
     
