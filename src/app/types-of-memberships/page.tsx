@@ -179,10 +179,10 @@ export default function TypesOfMembershipsPage() {
 
                 <div className="mt-10 flex flex-wrap justify-center gap-4">
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/become-a-member">Join as a Professional</Link>
+                    <Link href="/registrations">Join as a Professional</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/become-a-member">Join as a Student</Link>
+                    <Link href="/registrations">Join as a Student</Link>
                   </Button>
                   <Button asChild size="lg">
                     <Link href="/membership-benefits">Explore Member Benefits</Link>
@@ -236,7 +236,7 @@ export default function TypesOfMembershipsPage() {
                              <div className="h-16 w-px bg-border mx-auto"></div>
                              <h2 className="text-4xl font-bold">Innovate the Future. Join AIIS.</h2>
                               <Button asChild size="lg">
-                                <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                                <Link href="/registrations">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
                           <div className="border-b border-border my-8"></div>
