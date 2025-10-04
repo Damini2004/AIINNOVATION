@@ -282,6 +282,7 @@ export default function TypesOfMembershipsPage() {
                                 <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
+                           <div className="border-b border-border my-8"></div>
                            <div className="mt-20 text-center">
                                 <h3 className="text-3xl font-bold mb-8">What Our Members Say</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -374,4 +375,3 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
-
