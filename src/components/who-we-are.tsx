@@ -60,7 +60,7 @@ export default function WhoWeAre() {
 
           {/* Right Content */}
           <div className="pl-0 lg:pl-8">
-            <div className="mb-6">
+            <div className="flex mb-6">
                 {memberStories.map((story) => (
                     <button
                         key={story.name}
