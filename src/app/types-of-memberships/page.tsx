@@ -207,18 +207,6 @@ export default function TypesOfMembershipsPage() {
                             </ul>
                         </div>
                         <div className="border-b border-border my-8"></div>
-
-                        <div>
-                            <h3 className="text-3xl font-bold mb-4">Annual Dues</h3>
-                            <p className="text-muted-foreground mb-6">
-                            Select your country to view your annual membership dues. AIIS offers various secure payment options for members worldwide, including new regional methods.
-                            </p>
-                            <Button asChild variant="link" className="p-0 h-auto text-primary text-base">
-                                <Link href="#">
-                                    &gt; Learn More About Payment Options
-                                </Link>
-                            </Button>
-                        </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="students" className="mt-8 max-w-3xl mx-auto">
