@@ -2,6 +2,8 @@
 import Link from "next/link";
 import MemberServices from "../become-a-member/member-services";
 import "../become-a-member/member-services.css";
+import ApprovedMembers from "@/components/approved-members";
+import "@/app/members.css";
 
 export default function MembershipBenefitsPage() {
   return (
@@ -26,6 +28,7 @@ export default function MembershipBenefitsPage() {
 
       {/* Main Content */}
       <MemberServices />
+      <ApprovedMembers />
     </div>
   );
 }
