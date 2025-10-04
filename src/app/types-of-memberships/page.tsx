@@ -201,63 +201,7 @@ export default function TypesOfMembershipsPage() {
                     <p className="text-muted-foreground text-center max-w-3xl mx-auto">
                         Join AIIS as a professional and get immediate access to a global community of engineers and technology experts. Tap into the latest technological news, research, and courses, plus countless other valuable benefits.
                     </p>
-                     <div className="mt-16">
-                        <div className="text-center mb-12">
-                            <h3 className="text-3xl font-bold">AIIS Membership Benefits for Professionals</h3>
-                            <div className="em_bar_bg mt-4"></div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                            <div className="md:col-span-4">
-                                <ul className="space-y-2">
-                                    {professionalBenefits.map(benefit => (
-                                        <li key={benefit.title}>
-                                            <button 
-                                                onClick={() => setActiveBenefit(benefit.title)}
-                                                className={`w-full text-left p-4 rounded-lg transition-all duration-300 text-lg ${activeBenefit === benefit.title ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-secondary/70 font-medium'}`}
-                                            >
-                                                {benefit.title}
-                                            </button>
-                                        </li>
-                                    ))}
-                                    <li>
-                                        <Link href="/membership-benefits" className="w-full text-left p-4 rounded-lg transition-all duration-300 hover:bg-secondary/70 block font-semibold text-primary text-lg">
-                                            All Membership Benefits
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="md:col-span-8 bg-blue-950 rounded-lg p-8 text-white min-h-[300px]">
-                                 <AnimatePresence mode="wait">
-                                    <motion.div
-                                        key={activeBenefit}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.2 }}
-                                    >
-                                        <h4 className="text-2xl font-bold mb-6">{currentProfessionalBenefit?.title}</h4>
-                                        <ul className="space-y-4">
-                                            {currentProfessionalBenefit?.content.map((item, index) => (
-                                                <motion.li 
-                                                    key={index}
-                                                    className="flex items-start"
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                                                >
-                                                    <CheckCircle className="w-5 h-5 text-primary mr-3 mt-1 shrink-0"/>
-                                                    <span>{item}</span>
-                                                </motion.li>
-                                            ))}
-                                        </ul>
-                                    </motion.div>
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="mt-20 text-left max-w-4xl mx-auto">
-                        <div className="border-b border-border my-8"></div>
-                        <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
+                    <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
 
                           {/* Reduced Dues Section */}
                           <div className="space-y-4">
@@ -294,7 +238,7 @@ export default function TypesOfMembershipsPage() {
                                 <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
-                           <div className="border-b border-border my-8"></div>
+                          <div className="border-b border-border my-8"></div>
                            <div className="mt-16">
                                 <div className="text-center mb-12">
                                     <h3 className="text-3xl font-bold">AIIS Membership Benefits for Professionals</h3>
@@ -350,15 +294,19 @@ export default function TypesOfMembershipsPage() {
                                 </div>
                             </div>
                             <div className="border-b border-border my-8"></div>
-                            <div className="mt-16">
-                                <h3 className="text-center text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
-                                <p className="text-center text-muted-foreground max-w-2xl mx-auto">
+                            <div className="mt-16 text-center">
+                                <h3 className="text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
+                                <p className="text-muted-foreground max-w-2xl mx-auto">
                                 Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
                                 </p>
+                                <div className="mt-6">
+                                    <Button asChild size="lg">
+                                        <Link href="/registrations">Join Now</Link>
+                                    </Button>
+                                </div>
                            </div>
                         </div>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
                 <TabsContent value="students" className="mt-8 text-left">
                     <p className="text-muted-foreground text-center max-w-3xl mx-auto">
                         Join AIIS as a student and benefit from our extensive engineering and technological expertise. Connect instantly to a network of STEM professionals, mentors, and other Student members.
