@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -34,9 +35,9 @@ export default function WhoWeAre() {
   return (
     <section className="about-area py-24 bg-blue-950 text-white">
       <div className="container mx-auto max-w-6xl px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
           {/* Left Image */}
-          <div className="pr-0 lg:pr-8">
+          <div className="lg:col-span-2">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStory.name}
@@ -58,7 +59,7 @@ export default function WhoWeAre() {
           </div>
 
           {/* Right Content */}
-          <div className="pl-0 lg:pl-8">
+          <div className="lg:col-span-3">
             <div className="flex mb-6">
                 {memberStories.map((story) => (
                     <button
