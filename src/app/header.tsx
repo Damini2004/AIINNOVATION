@@ -296,7 +296,7 @@ export function AppHeader() {
                   </ul>
                 )}
               </li>
-               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations" target={isClient && !isLoggedIn ? "_blank" : undefined} rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}>{isClient && isLoggedIn ? "Profile" : "Registrations"}</Link></li>
+               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations" target={isClient && !isLoggedIn ? "_blank" : undefined} rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}>{isClient && isLoggedIn ? "Profile" : ""}</Link></li>
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
               <DashboardLink />
             </ul>

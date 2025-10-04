@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -1212,7 +1211,7 @@ export default function AdminPage() {
     const checkAuth = () => {
       const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
       if (adminLoggedIn !== "true") {
-        router.push("/login");
+        router.push("/panel");
       } else {
         setIsAuthenticated(true);
         fetchData();
@@ -1656,5 +1655,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    

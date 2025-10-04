@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (localStorage.getItem("isAdminLoggedIn") === "true") {
-      router.replace("/dashboard");
+      router.replace("/admin");
     } else {
       setIsCheckingAuth(false);
     }
@@ -38,7 +39,7 @@ export default function LoginPage() {
           title: "Login Successful",
           description: "Redirecting to dashboard...",
         });
-        router.push("/dashboard");
+        router.push("/admin");
       } else {
         toast({
           variant: "destructive",
@@ -104,5 +105,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
