@@ -66,7 +66,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 
 
@@ -1059,7 +1059,56 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">View Details</Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="sm">View Details</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle>Registration Details</DialogTitle>
+                                            <DialogDescription>Reviewing application for {reg.name}</DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
+                                            <div className="md:col-span-1 flex flex-col items-center space-y-4">
+                                                <Image src={reg.photo} alt={reg.name} width={128} height={128} className="rounded-full object-cover" />
+                                                <div className="text-center">
+                                                    <h3 className="font-bold text-lg">{reg.name}</h3>
+                                                    <p className="text-sm text-muted-foreground">{reg.email}</p>
+                                                    <p className="text-sm text-muted-foreground">{reg.contact}</p>
+                                                    <Badge variant="secondary" className="mt-2 capitalize">{reg.registrationType}</Badge>
+                                                </div>
+                                            </div>
+                                            <div className="md:col-span-2 space-y-4">
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Biography</h4>
+                                                    <p className="text-sm text-muted-foreground mt-1 max-h-32 overflow-y-auto">{reg.biography}</p>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Social & Professional Links</h4>
+                                                    <div className="flex flex-col space-y-2 mt-2">
+                                                        {reg.linkedinUrl && <a href={reg.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><Linkedin /> LinkedIn</a>}
+                                                        {reg.twitterUrl && <a href={reg.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><Twitter /> Twitter</a>}
+                                                        {reg.otherSocialUrl && <a href={reg.otherSocialUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><LinkIcon /> Other Link</a>}
+                                                        {reg.scholarLink && <a href={reg.scholarLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2"><FileText /> Google Scholar</a>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
+                                            <Button variant="destructive" onClick={() => handleReject(reg.id!)} disabled={isProcessing === reg.id}>
+                                                {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
+                                                Reject
+                                            </Button>
+                                            <Button onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
+                                                {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                                                Approve
+                                            </Button>
+                                            <DialogClose asChild>
+                                                <Button variant="ghost">Close</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                                 <Button size="sm" onClick={() => handleApprove(reg)} disabled={isProcessing === reg.id}>
                                     {isProcessing === reg.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                 </Button>
