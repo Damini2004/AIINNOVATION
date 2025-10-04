@@ -19,13 +19,10 @@ export function AppHeader() {
 
   useEffect(() => {
     setIsClient(true);
-    // This logic now runs only on the client, after the initial render
     const userLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
     const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
     setIsLoggedIn(userLoggedIn || adminLoggedIn);
     setIsAdmin(adminLoggedIn);
-     // Close mobile menu on navigation
-    setIsOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -37,15 +34,13 @@ export function AppHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
 
-   const AuthLink = () => {
-    // This component now waits for the client-side check to complete
+  const AuthLink = () => {
     if (!isClient) {
-      return null; // Render nothing on the server and initial client render
+      return <li><Link href="/registrations">Registrations</Link></li>; // Render default on server
     }
     
     if (isAdmin) {
@@ -55,10 +50,23 @@ export function AppHeader() {
       return <li><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return (
-       <li><Link href="/registrations">Registrations</Link></li>
-    );
+    return <li><Link href="/registrations">Registrations</Link></li>;
   };
+
+  const MobileAuthLink = () => {
+     if (!isClient) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+    }
+    
+    if (isAdmin) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/admin">Dashboard</Link></li>;
+    }
+    if (isLoggedIn) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/user-dashboard">Profile</Link></li>;
+    }
+    
+    return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+  }
 
 
   return (
@@ -305,9 +313,7 @@ export function AppHeader() {
                   </ul>
                 )}
               </li>
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
-                <AuthLink />
-              </li>
+              <MobileAuthLink />
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
             </ul>
           </nav>
