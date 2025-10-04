@@ -1,44 +1,98 @@
+
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function WhoWeAre() {
+  const memberStories = [
+    {
+      name: "Dr. Nita Patel",
+      title: "Vice President, Engineering",
+      image: "https://picsum.photos/seed/nita-patel/600/600",
+      imageHint: "professional woman portrait",
+      bio: "It changes your life. AIIS membership helps you establish relationships that are tighter because you already have a lot of things in common in the way you think, work, and want to change the world around you.",
+    },
+    {
+      name: "Dr. Vincent Kaabunga",
+      title: "Lead Data Scientist",
+      image: "https://picsum.photos/seed/vincent-k/600/600",
+      imageHint: "professional man portrait",
+      bio: "Being part of AIIS has accelerated my research and allowed me to collaborate on projects I never thought possible. The community is incredibly supportive.",
+    },
+    {
+      name: "Dr. John McDonald",
+      title: "AI Ethics Consultant",
+      image: "https://picsum.photos/seed/john-mcdonald/600/600",
+      imageHint: "man thinking",
+      bio: "The society's focus on ethics is what drew me in. It's not just about what we can build, but what we should build. AIIS is leading that conversation.",
+    },
+  ];
+
+  const [activeStory, setActiveStory] = useState(memberStories[0]);
+
   return (
-    <section className="about-area py-16 bg-background">
+    <section className="about-area py-24 bg-background">
       <div className="container mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
           {/* Left Image */}
           <div className="pr-0 lg:pr-8">
-            <Image
-              src="/assests/images/ab3.png"
-              alt="About AI Innovation Society"
-              width={600}
-              height={600}
-              className="w-full rounded-lg"
-              data-ai-hint="team collaboration"
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStory.name}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Image
+                  src={activeStory.image}
+                  alt={activeStory.name}
+                  width={600}
+                  height={600}
+                  className="w-full rounded-lg shadow-xl aspect-square object-cover"
+                  data-ai-hint={activeStory.imageHint}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Right Content */}
           <div className="pl-0 lg:pl-8">
-            <h5 className="text-primary text-base uppercase font-bold mb-4">
-              Who We Are
-            </h5>
-            <h2 className="text-4xl font-bold text-foreground">
-              We Thrive Innovation in
-            </h2>
-            <h2 className="text-4xl font-bold text-foreground">
-              Artificial <span className="text-primary">Intelligence</span>
-            </h2>
-
-            <div className="em_bar_bg text-left" style={{ margin: '20px 0' }}></div>
-
-            <p className="pt-3 text-base text-muted-foreground">
-              AI Innovation Society (AIIS) is a non-profit initiative dedicated to promoting responsible artificial intelligence through education, ethical research, global events, and collaborative innovation. We connect researchers, educators, developers, and change-makers to harness AI for the greater good.
-            </p>
-
+            <div className="mb-6">
+                {memberStories.map((story) => (
+                    <button
+                        key={story.name}
+                        onClick={() => setActiveStory(story)}
+                        className={`text-lg font-semibold mr-6 pb-2 transition-colors duration-300 ${
+                        activeStory.name === story.name
+                            ? "text-primary border-b-2 border-primary"
+                            : "text-muted-foreground hover:text-primary"
+                        }`}
+                    >
+                        {story.name}
+                    </button>
+                ))}
+            </div>
+            
+            <AnimatePresence mode="wait">
+                 <motion.div
+                    key={activeStory.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                 >
+                    <h2 className="text-3xl font-bold text-foreground">
+                        {activeStory.title}
+                    </h2>
+                    <div className="em_bar_bg text-left" style={{ margin: '20px 0' }}></div>
+                    <p className="pt-3 text-base text-muted-foreground">
+                        {activeStory.bio}
+                    </p>
+                </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
