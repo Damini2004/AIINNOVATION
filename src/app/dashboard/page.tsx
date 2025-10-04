@@ -68,6 +68,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 
 // Zod Schemas
