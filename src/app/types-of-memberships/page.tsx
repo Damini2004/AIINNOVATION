@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { CheckCircle, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function TypesOfMembershipsPage() {
   const [activeBenefit, setActiveBenefit] = useState("Find Community");
@@ -281,6 +282,23 @@ export default function TypesOfMembershipsPage() {
                                 <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
+                           <div className="mt-20 text-center">
+                                <h3 className="text-3xl font-bold mb-8">What Our Members Say</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="bg-card p-6 rounded-lg shadow-sm border">
+                                        <Image src="https://picsum.photos/seed/member1/100/100" alt="Member 1" width={100} height={100} className="rounded-full mx-auto mb-4" data-ai-hint="person smiling"/>
+                                        <p className="text-muted-foreground mb-4">"Joining AIIS was a game-changer for my career. The networking opportunities and access to cutting-edge research are unparalleled."</p>
+                                        <h4 className="font-bold">- Dr. Jane Doe</h4>
+                                        <p className="text-sm text-primary">Senior AI Researcher</p>
+                                    </div>
+                                    <div className="bg-card p-6 rounded-lg shadow-sm border">
+                                        <Image src="https://picsum.photos/seed/member2/100/100" alt="Member 2" width={100} height={100} className="rounded-full mx-auto mb-4" data-ai-hint="person professional"/>
+                                        <p className="text-muted-foreground mb-4">"As a student, the mentorship program provided invaluable guidance. I was able to connect with industry leaders and kickstart my career in AI."</p>
+                                        <h4 className="font-bold">- John Smith</h4>
+                                        <p className="text-sm text-primary">AI Student Member</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </TabsContent>
@@ -357,4 +375,3 @@ export default function TypesOfMembershipsPage() {
   );
 }
 
-    
