@@ -1,23 +1,17 @@
 
-.form-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: 0 4px 15px hsla(var(--foreground) / 0.05);
-}
-
 .form-section-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid hsl(var(--border));
+    text-align: center;
+    color: hsl(var(--muted-foreground));
 }
 
 .photo-upload-area {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -25,8 +19,8 @@
 .photo-upload-label {
     display: block;
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 9999px;
     border: 2px dashed hsl(var(--border));
     cursor: pointer;

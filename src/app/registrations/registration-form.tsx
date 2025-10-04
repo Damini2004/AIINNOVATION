@@ -153,9 +153,15 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="form-card">
+    <>
+      <h2 className="text-3xl font-bold text-center mb-2">
+        Create an Account
+      </h2>
+      <p className="text-muted-foreground text-center mb-10">
+        Complete the form below to begin your journey.
+      </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {step === 1 && (
             <>
               <h3 className="form-section-title">Step 1: Personal Information</h3>
@@ -185,7 +191,7 @@ export default function RegistrationForm() {
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="name"
@@ -329,7 +335,7 @@ export default function RegistrationForm() {
           {step === 3 && (
             <>
               <h3 className="form-section-title">Step 3: Professional Links & Submission</h3>
-              <div className="space-y-6">
+              <div className="space-y-4">
                  <FormField
                   control={form.control}
                   name="linkedinUrl"
@@ -387,7 +393,7 @@ export default function RegistrationForm() {
                 control={form.control}
                 name="privacyPolicy"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm mt-8">
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm mt-6">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -411,7 +417,7 @@ export default function RegistrationForm() {
             </>
           )}
           
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-6">
             {step > 1 && (
               <Button type="button" variant="outline" onClick={handleBack} disabled={isSubmitting}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -432,8 +438,7 @@ export default function RegistrationForm() {
           </div>
         </form>
       </Form>
-    </div>
+    </>
   );
 }
 
-    
