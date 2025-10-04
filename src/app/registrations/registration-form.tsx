@@ -43,7 +43,7 @@ const registrationSchema = z.object({
     .string()
     .max(2000, "Biography must not exceed 400 words (approx. 2000 characters).")
     .min(10, "Biography is required."),
-  photo: z.string().url("Photo upload is required.").min(1, "Photo upload is required."),
+  photo: z.string().min(1, "Photo upload is required."),
   linkedinUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
   twitterUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
   otherSocialUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
@@ -286,24 +286,15 @@ export default function RegistrationForm() {
                               disabled={isSubmitting}
                           />
                           <label htmlFor="photo-upload" className="photo-upload-label">
-                              {photoPreview ? (
-                              <Image
-                                  src={photoPreview}
-                                  alt="Photo preview"
-                                  fill
-                                  className="object-cover rounded-full"
-                              />
-                              ) : (
                               <div className="photo-upload-placeholder">
                                   <UploadCloud className="h-12 w-12 text-muted-foreground" />
                                   <p className="mt-2 text-sm text-muted-foreground">
-                                  Click to upload
+                                  {photoPreview ? 'File selected' : 'Click to upload'}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
                                   PNG, JPG, GIF up to 2MB
                                   </p>
                               </div>
-                              )}
                           </label>
                           </div>
                       </FormControl>
@@ -441,4 +432,3 @@ export default function RegistrationForm() {
     </>
   );
 }
-
