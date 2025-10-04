@@ -159,7 +159,7 @@ export function AppHeader() {
                   <li><Link href="/membership-benefits">Membership Benefits</Link></li>
                 </ul>
               </li>
-              <li><Link href="/registrations">Registrations</Link></li>
+              <li><Link href="/registrations" target="_blank" rel="noopener noreferrer">Registrations</Link></li>
               <li><Link href="/contact-us">Contact</Link></li>
                <AdminLink />
             </ul>
@@ -293,7 +293,7 @@ export function AppHeader() {
                   </ul>
                 )}
               </li>
-               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>
+               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations" target="_blank" rel="noopener noreferrer">Registrations</Link></li>
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
               {isClient ? (
                 <li className="hover:bg-gray-100 rounded px-3 py-2">
@@ -307,5 +307,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
