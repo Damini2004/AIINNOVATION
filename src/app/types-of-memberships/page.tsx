@@ -257,24 +257,6 @@ export default function TypesOfMembershipsPage() {
                     </div>
                     <div className="mt-20 text-left max-w-4xl mx-auto">
                         <div className="border-b border-border my-8"></div>
-                        <div className="mb-12">
-                            <h3 className="text-3xl font-bold mb-4">Qualifications</h3>
-                            <p className="text-muted-foreground mb-6">
-                            You qualify for professional membership if you provide evidence of competence in an AIIS-designated field, including:
-                            </p>
-                            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                            <li>Engineering</li>
-                            <li>Computer Sciences and Information Technology</li>
-                            <li>Physical Sciences</li>
-                            <li>Biological and Medical Sciences</li>
-                            <li>Mathematics</li>
-                            <li>Technical Communications</li>
-                            <li>Education</li>
-                            <li>Management</li>
-                            <li>Law and Policy</li>
-                            </ul>
-                        </div>
-                        <div className="border-b border-border my-8"></div>
                         <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
 
                           {/* Reduced Dues Section */}
@@ -312,13 +294,6 @@ export default function TypesOfMembershipsPage() {
                                 <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
-                           <div className="border-b border-border my-8"></div>
-                            <div className="mt-16">
-                                <h3 className="text-center text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
-                                <p className="text-center text-muted-foreground max-w-2xl mx-auto">
-                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
-                                </p>
-                           </div>
                            <div className="border-b border-border my-8"></div>
                            <div className="mt-16">
                                 <div className="text-center mb-12">
@@ -374,6 +349,13 @@ export default function TypesOfMembershipsPage() {
                                     </div>
                                 </div>
                             </div>
+                            <div className="border-b border-border my-8"></div>
+                            <div className="mt-16">
+                                <h3 className="text-center text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
+                                <p className="text-center text-muted-foreground max-w-2xl mx-auto">
+                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
+                                </p>
+                           </div>
                         </div>
                     </div>
                 </TabsContent>
