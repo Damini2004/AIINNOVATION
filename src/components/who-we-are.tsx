@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -33,7 +32,7 @@ export default function WhoWeAre() {
   const [activeStory, setActiveStory] = useState(memberStories[0]);
 
   return (
-    <section className="about-area py-24 bg-background">
+    <section className="about-area py-24 bg-blue-950 text-white">
       <div className="container mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Image */}
@@ -68,7 +67,7 @@ export default function WhoWeAre() {
                         className={`text-lg font-semibold mr-6 pb-2 transition-colors duration-300 ${
                         activeStory.name === story.name
                             ? "text-primary border-b-2 border-primary"
-                            : "text-muted-foreground hover:text-primary"
+                            : "text-gray-400 hover:text-primary"
                         }`}
                     >
                         {story.name}
@@ -84,11 +83,11 @@ export default function WhoWeAre() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.4 }}
                  >
-                    <h2 className="text-3xl font-bold text-foreground">
+                    <h2 className="text-3xl font-bold text-white">
                         {activeStory.title}
                     </h2>
                     <div className="em_bar_bg text-left" style={{ margin: '20px 0' }}></div>
-                    <p className="pt-3 text-base text-muted-foreground">
+                    <p className="pt-3 text-base text-gray-300">
                         {activeStory.bio}
                     </p>
                 </motion.div>
