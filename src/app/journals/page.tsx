@@ -1,37 +1,14 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle, XCircle, ThumbsUp, ThumbsDown, BookOpen } from "lucide-react";
-import { getJournals } from "@/app/admin/actions";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import JournalList from "@/components/journal-list";
 import "./journals.css";
 
-type Journal = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  link?: string;
-};
-
 export default function JournalsPage() {
-  const [journals, setJournals] = useState<Journal[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchJournals = async () => {
-      setLoading(true);
-      const journalsData = await getJournals();
-      setJournals(journalsData);
-      setLoading(false);
-    };
-    fetchJournals();
-  }, []);
-
   const pros = [
     "Increased submission rates due to AIIS's reputation.",
     "Opportunities for special issues linked to AIIS events.",
@@ -43,47 +20,6 @@ export default function JournalsPage() {
     "Potential administrative overhead in coordinating with AIIS.",
     "Adherence to AIIS's overarching publication policies required.",
   ];
-
-  const JournalCard = ({ journal }: { journal: Journal }) => {
-    const cardContent = (
-      <div
-        className="journal-card bg-card border rounded-lg overflow-hidden group h-full flex flex-col"
-      >
-        <div className="relative w-full h-48 overflow-hidden">
-          <Image
-            src={journal.image}
-            alt={journal.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
-            data-ai-hint="journal cover"
-          />
-           <div className="journal-card-overlay">
-              <BookOpen className="w-8 h-8 text-white" />
-              <span className="mt-2 text-sm font-semibold">Read More</span>
-          </div>
-        </div>
-        <div className="p-6 flex flex-col flex-grow">
-          <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-            {journal.title}
-          </h3>
-          <p className="text-muted-foreground text-sm line-clamp-3 flex-grow">
-            {journal.description}
-          </p>
-        </div>
-      </div>
-    );
-
-    if (journal.link) {
-      return (
-        <Link href={journal.link} target="_blank" rel="noopener noreferrer" className="h-full block">
-          {cardContent}
-        </Link>
-      );
-    }
-
-    return cardContent;
-  };
-
 
   return (
     <div className="bg-background text-foreground">
@@ -145,7 +81,7 @@ export default function JournalsPage() {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
-                 <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
+                 <div className="relative h-full min-h-[300px] lg:min-h-[400px] order-last lg:order-first">
                     <Image 
                         src="https://picsum.photos/seed/pros/600/500"
                         alt="Pros of Collaboration"
@@ -210,38 +146,9 @@ export default function JournalsPage() {
           </section>
 
           {/* Journals Section */}
-          <section>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold">Our Journals</h2>
-              <div className="em_bar_bg mt-4"></div>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                Explore our portfolio of journals spanning various domains of
-                Artificial Intelligence.
-              </p>
-            </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="space-y-2">
-                    <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {journals.map((journal) => (
-                  <JournalCard key={journal.id} journal={journal} />
-                ))}
-              </div>
-            )}
-          </section>
+          <JournalList />
         </div>
       </main>
     </div>
   );
 }
-
-    

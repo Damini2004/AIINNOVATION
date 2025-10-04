@@ -1,5 +1,8 @@
 
+"use client";
+
 import Link from "next/link";
+import JournalList from "@/components/journal-list";
 
 export default function AssociateJournalPage() {
   return (
@@ -24,9 +27,8 @@ export default function AssociateJournalPage() {
 
       {/* Main Content */}
       <main className="py-24">
-        <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold">Content Coming Soon</h2>
-            <p className="mt-4 text-muted-foreground">This page is under construction. Check back later for more information.</p>
+        <div className="container mx-auto px-6">
+           <JournalList />
         </div>
       </main>
     </div>
