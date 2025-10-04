@@ -41,7 +41,10 @@ export function AppHeader() {
   };
 
    const AuthLink = () => {
-    if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
+    if (!isClient) {
+      // Render a placeholder or null on the server
+      return null;
+    }
     
     if (isAdmin) {
       return <li><Link href="/admin">Dashboard</Link></li>;
@@ -311,5 +314,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
