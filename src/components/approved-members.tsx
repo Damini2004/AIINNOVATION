@@ -4,8 +4,8 @@
 import Image from "next/image";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getMembers } from "@/app/dashboard/actions";
-import type { Member } from "@/app/dashboard/actions";
+import { getMembers } from "@/app/admin/actions";
+import type { Member } from "@/app/admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "./ui/button";
 import Link from "next/link";

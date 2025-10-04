@@ -6,8 +6,8 @@ import Link from "next/link";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { getMembers } from "../dashboard/actions";
-import type { Member } from "../dashboard/actions";
+import { getMembers } from "../admin/actions";
+import type { Member } from "../admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
@@ -65,7 +65,7 @@ export default function OurTeamPage() {
               </p>
             </div>
             <Button asChild size="lg" className="mt-8">
-              <Link href="/join">Join Now</Link>
+              <Link href="/registrations">Join Now</Link>
             </Button>
           </div>
 
