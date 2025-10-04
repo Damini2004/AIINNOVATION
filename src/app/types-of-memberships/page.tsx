@@ -312,7 +312,14 @@ export default function TypesOfMembershipsPage() {
                                 <Link href="/become-a-member">Join Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                               </Button>
                           </div>
-                          <div className="border-b border-border my-8"></div>
+                           <div className="border-b border-border my-8"></div>
+                            <div className="mt-16">
+                                <h3 className="text-center text-2xl font-bold mb-6">Engineer the Future. Join IEEE.</h3>
+                                <p className="text-center text-muted-foreground max-w-2xl mx-auto">
+                                Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
+                                </p>
+                           </div>
+                           <div className="border-b border-border my-8"></div>
                            <div className="mt-16">
                                 <div className="text-center mb-12">
                                     <h3 className="text-3xl font-bold">AIIS Membership Benefits for Professionals</h3>
@@ -502,3 +509,5 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
+
+    
