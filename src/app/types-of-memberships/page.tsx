@@ -266,6 +266,13 @@ export default function TypesOfMembershipsPage() {
                                     </div>
                                 </div>
                             </div>
+                           <div className="border-t my-12"></div>
+                            <div className="text-center">
+                                <h3 className="text-2xl font-bold">Engineer the Future. Join IEEE.</h3>
+                                <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
+                                    Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
+                                </p>
+                            </div>
                         </div>
                     </TabsContent>
                 <TabsContent value="students" className="mt-8 text-left">
