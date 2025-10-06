@@ -360,35 +360,36 @@ export default function TypesOfMembershipsPage() {
              <MemberStories />
            </div>
 
-          <div className="mt-20 text-center">
+           <div className="mt-20 text-center">
             <div className="h-16 w-px bg-border mx-auto"></div>
-             <div className="mt-8 max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
-              <p className="mt-4 text-muted-foreground">
-                Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
-              </p>
-            </div>
-            <div className="mt-8">
+            <div className="relative mt-8">
               <Image
-                src="https://picsum.photos/seed/join-us/800/400"
+                src="https://picsum.photos/seed/join-us/1200/400"
                 alt="Join AIIS Community"
-                width={800}
+                width={1200}
                 height={400}
                 className="rounded-lg object-cover mx-auto shadow-lg"
                 data-ai-hint="community working together"
               />
+              <div className="absolute inset-0 bg-black/50 rounded-lg flex flex-col items-center justify-center text-white p-8">
+                 <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
+                 <p className="mt-4 text-white/80 max-w-3xl">
+                  Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center gap-4">
+                    <Button asChild>
+                        <Link href="/registrations">Join as a Professional</Link>
+                    </Button>
+                    <Button asChild variant="secondary">
+                        <Link href="/registrations">Join as a Student</Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
+                        <Link href="/contact-us">Request More Information</Link>
+                    </Button>
+                </div>
+              </div>
             </div>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Button asChild>
-                <Link href="/registrations">Join as a Professional</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/registrations">Join as a Student</Link>
-              </Button>
-              <Button asChild variant="ghost">
-                <Link href="/contact-us">Request More Information About Membership</Link>
-              </Button>
-            </div>
+            
              <div className="mt-6">
                 <Link href="#" className="text-sm text-primary hover:underline">
                     Renew Your Membership
@@ -401,3 +402,5 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
+
+    
