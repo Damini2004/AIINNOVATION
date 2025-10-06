@@ -57,6 +57,11 @@ export function AppHeader() {
   }, []);
 
   useEffect(() => {
+    // Close mobile menu on navigation
+    setIsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -232,7 +237,7 @@ export function AppHeader() {
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-[110px] w-full h-[calc(100vh-110px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto">
+          <nav className="lg:hidden absolute left-0 top-0 w-full h-screen bg-white shadow-lg datatech_menu z-10 overflow-y-auto pt-[110px] pb-8">
             <ul
               style={{
                 listStyle: "none",
