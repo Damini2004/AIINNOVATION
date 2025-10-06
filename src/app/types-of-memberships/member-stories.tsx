@@ -71,7 +71,7 @@ export default function MemberStories() {
                           "{activeStory.quote}"
                       </blockquote>
                       <p className="mt-6 text-muted-foreground">{activeStory.bio}</p>
-                      <Button variant="link" className="mt-4 p-0 h-auto text-primary">View These Members in This Video <ArrowRight className="ml-2 h-4 w-4"/></Button>
+                      
                   </motion.div>
                 </AnimatePresence>
             </div>
