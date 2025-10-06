@@ -6,6 +6,23 @@ import Link from "next/link";
 import { Icons } from "./icons";
 
 export function Footer() {
+  const usefulLinks = [
+    { label: "Become a Member", href: "/become-a-member" },
+    { label: "Ongoing Courses", href: "/courses" },
+    { label: "About Society", href: "/aboutus" },
+    { label: "Event Information", href: "/upcomingevents" },
+    { label: "Collaborations", href: "/partners" },
+  ];
+
+  const journalLinks = [
+    { label: "Engineering", href: "/journals" },
+    { label: "Management", href: "/journals" },
+    { label: "Social Science", href: "/journals" },
+    { label: "Arts & Humanities", href: "/journals" },
+    { label: "Medicine", href: "/journals" },
+  ];
+
+
   return (
     <footer
       className="pt-20 pb-3 bg-cover bg-center bg-secondary"
@@ -28,20 +45,14 @@ export function Footer() {
           <div>
             <h4 className="text-xl font-semibold mt-5 mb-4 text-foreground">Useful Links</h4>
             <ul className="space-y-3 relative">
-              {[
-                "Become a Member",
-                "Ongoing Courses",
-                "About Society",
-                "Event Information",
-                "Collaborations",
-              ].map((item, i) => (
+              {usefulLinks.map((link, i) => (
                 <li key={i} className="pl-6 relative">
                   <span className="absolute left-0 top-2 w-2.5 h-0.5 bg-primary" />
                   <Link
-                    href="#"
+                    href={link.href}
                     className="text-[16px] text-muted-foreground link-gradient"
                   >
-                    {item}
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -52,20 +63,14 @@ export function Footer() {
           <div>
             <h4 className="text-xl font-semibold mt-5 mb-4 text-foreground">Journals</h4>
             <ul className="space-y-3 relative">
-              {[
-                "Engineering",
-                "Management",
-                "Social Science",
-                "Arts & Humanities",
-                "Medicine",
-              ].map((item, i) => (
+              {journalLinks.map((link, i) => (
                 <li key={i} className="pl-6 relative">
                   <span className="absolute left-0 top-2 w-2.5 h-0.5 bg-primary" />
                   <Link
-                    href="#"
+                    href={link.href}
                     className="text-[16px] text-muted-foreground link-gradient"
                   >
-                    {item}
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -75,10 +80,6 @@ export function Footer() {
           {/* Column 4 - Contact */}
           <div>
             <h4 className="text-xl font-semibold mt-5 mb-4 text-foreground">Contact Us</h4>
-            <p className="text-base text-muted-foreground mb-2">
-              Be a part of something bigger. Reach out to us for queries,
-              collaborations.
-            </p>
            
             <p className="text-base text-muted-foreground mb-2">+91 7020892896</p>
             <p className="text-base text-muted-foreground">info@aiinsociety.in</p>
