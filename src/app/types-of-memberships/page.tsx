@@ -381,7 +381,7 @@ export default function TypesOfMembershipsPage() {
                         <Button asChild>
                             <Link href="/registrations">Join as a Professional</Link>
                         </Button>
-                        <Button asChild variant="secondary">
+                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
                             <Link href="/registrations">Join as a Student</Link>
                         </Button>
                         <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
