@@ -175,22 +175,6 @@ export default function TypesOfMembershipsPage() {
                     </p>
                     <div className="max-w-4xl mx-auto text-left space-y-16 py-16">
 
-                          {/* Reduced Dues Section */}
-                          <div className="space-y-4">
-                            <h3 className="text-3xl font-bold">Reduced AIIS Membership Dues for Special Circumstances</h3>
-                            <p className="text-muted-foreground">
-                              AIIS supports its members through all of life's transitions. If you're retired, unemployed, permanently disabled, or experiencing financial hardship, you may qualify for reduced dues under our Special Circumstances program. AIIS also offers discounted electronic memberships for individuals living in eligible countries.
-                            </p>
-                            <div className="space-y-2">
-                              <Link href="#" className="flex items-center text-primary font-semibold hover:underline">
-                                <ArrowRight className="w-4 h-4 mr-2 transform -rotate-45" /> Learn More About Special Circumstances
-                              </Link>
-                              <Link href="#" className="flex items-center text-primary font-semibold hover:underline">
-                                <ArrowRight className="w-4 h-4 mr-2 transform -rotate-45" /> Check Eligibility for Electronic Membership
-                              </Link>
-                            </div>
-                          </div>
-
                           {/* Grades Section */}
                           <div className="space-y-4">
                             <h3 className="text-3xl font-bold">Grades</h3>
