@@ -44,6 +44,8 @@ export function AppHeader() {
     
     setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
     setIsAdmin(!!adminSession?.loggedIn);
+    // Close mobile menu on navigation
+    setIsOpen(false);
   }, [pathname]);
 
 
@@ -101,7 +103,7 @@ export function AppHeader() {
         {/* Navbar wrapper */}
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center relative z-20" title="datatech">
+          <Link href="/" className="flex items-center" title="datatech">
       <Image
         src="/assests/images/logo.png" // replace with your logo path inside public folder
         alt="Datatech Logo"
@@ -113,7 +115,7 @@ export function AppHeader() {
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl relative z-20"
+            className="lg:hidden text-2xl"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}

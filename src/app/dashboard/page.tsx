@@ -1209,16 +1209,13 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("courses");
 
   useEffect(() => {
-    const checkAuth = () => {
-      const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
-      if (adminLoggedIn !== "true") {
-        router.push("/login");
-      } else {
-        setIsAuthenticated(true);
-        fetchData();
-      }
-    };
-    checkAuth();
+    const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
+    if (adminLoggedIn !== "true") {
+      router.push("/login");
+    } else {
+      setIsAuthenticated(true);
+      fetchData();
+    }
   }, [router]);
 
   const fetchData = async () => {
