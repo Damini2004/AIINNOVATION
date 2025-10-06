@@ -378,14 +378,14 @@ export default function TypesOfMembershipsPage() {
                     Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
                     </p>
                     <div className="mt-8 flex flex-col items-start gap-4">
-                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-                            <Link href="/registrations"><ArrowRight className="mr-2 h-4 w-4" />Join as a Professional</Link>
+                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white group">
+                            <Link href="/registrations"><ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />Join as a Professional</Link>
                         </Button>
-                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-                            <Link href="/registrations">Join as a Student</Link>
+                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white group">
+                            <Link href="/registrations"><ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />Join as a Student</Link>
                         </Button>
-                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-                            <Link href="/contact-us">Request More Information</Link>
+                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white group">
+                            <Link href="/contact-us"><ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />Request More Information</Link>
                         </Button>
                     </div>
                 </div>
@@ -404,5 +404,3 @@ export default function TypesOfMembershipsPage() {
     </div>
   );
 }
-
-    
