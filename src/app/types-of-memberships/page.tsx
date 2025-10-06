@@ -272,6 +272,11 @@ export default function TypesOfMembershipsPage() {
                                 <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
                                     Professional. Social. Humanitarian. As a member, you’ll represent these core IEEE qualities and find them in our nearly half million members globally.
                                 </p>
+                                <div className="mt-6">
+                                    <Button asChild size="lg">
+                                        <Link href="/registrations">Join us</Link>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </TabsContent>
