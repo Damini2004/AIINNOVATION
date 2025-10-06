@@ -239,7 +239,7 @@ export function AppHeader() {
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-[110px] w-full h-[calc(100vh-110px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto pb-8">
+          <nav className="lg:hidden fixed left-0 top-[90px] w-full h-[calc(100vh-90px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto pb-8">
             <ul
               style={{
                 listStyle: "none",
