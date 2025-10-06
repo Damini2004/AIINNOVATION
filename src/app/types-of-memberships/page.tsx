@@ -371,21 +371,23 @@ export default function TypesOfMembershipsPage() {
                 className="rounded-lg object-cover mx-auto shadow-lg"
                 data-ai-hint="community working together"
               />
-              <div className="absolute inset-0 bg-black/50 rounded-lg flex flex-col items-center justify-center text-white p-8">
-                 <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
-                 <p className="mt-4 text-white/80 max-w-3xl">
-                  Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
-                </p>
-                <div className="mt-8 flex flex-wrap justify-center gap-4">
-                    <Button asChild>
-                        <Link href="/registrations">Join as a Professional</Link>
-                    </Button>
-                    <Button asChild variant="secondary">
-                        <Link href="/registrations">Join as a Student</Link>
-                    </Button>
-                    <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-                        <Link href="/contact-us">Request More Information</Link>
-                    </Button>
+              <div className="absolute inset-0 bg-black/50 rounded-lg flex flex-col justify-center text-white p-8">
+                 <div className="w-full max-w-5xl mx-auto">
+                    <h2 className="text-3xl font-bold text-left">Ready to take the next step?</h2>
+                    <p className="mt-4 text-white/80 max-w-3xl text-left">
+                    Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
+                    </p>
+                    <div className="mt-8 flex flex-wrap justify-end gap-4">
+                        <Button asChild>
+                            <Link href="/registrations">Join as a Professional</Link>
+                        </Button>
+                        <Button asChild variant="secondary">
+                            <Link href="/registrations">Join as a Student</Link>
+                        </Button>
+                        <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
+                            <Link href="/contact-us">Request More Information</Link>
+                        </Button>
+                    </div>
                 </div>
               </div>
             </div>
