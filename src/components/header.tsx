@@ -44,9 +44,28 @@ export function AppHeader() {
     
     setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
     setIsAdmin(!!adminSession?.loggedIn);
-    // Close mobile menu on navigation
-    setIsOpen(false);
-  }, [pathname]);
+    
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
 
 
   useEffect(() => {
@@ -75,7 +94,7 @@ export function AppHeader() {
       return <li><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return <li><Link href="/registrations"></Link></li>;
+    return <li><Link href="/registrations">Registrations</Link></li>;
   };
 
   const MobileAuthLink = () => {
@@ -115,7 +134,7 @@ export function AppHeader() {
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl"
+            className="lg:hidden text-2xl z-20"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}
@@ -213,7 +232,7 @@ export function AppHeader() {
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-0 w-full h-screen bg-white shadow-lg datatech_menu z-10 pt-24">
+          <nav className="lg:hidden absolute left-0 top-[110px] w-full h-[calc(100vh-110px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto">
             <ul
               style={{
                 listStyle: "none",
