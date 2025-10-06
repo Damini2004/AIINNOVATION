@@ -122,7 +122,7 @@ export function AppHeader() {
         {/* Navbar wrapper */}
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center" title="datatech">
+          <Link href="/" className="flex items-center relative z-20" title="datatech">
       <Image
         src="/assests/images/logo.png" // replace with your logo path inside public folder
         alt="Datatech Logo"
@@ -134,7 +134,7 @@ export function AppHeader() {
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl z-20"
+            className="lg:hidden text-2xl relative z-20"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}
@@ -162,7 +162,6 @@ export function AppHeader() {
                 <ul className="sub-menu">
                   <li><Link href="/aboutus">Overview</Link></li>
                   <li><Link href="/missionvision">Mission & Vision</Link></li>
-                  <li><Link href="/ourteam">Our Members</Link></li>
                   <li><Link href="/partners">Partners</Link></li>
                 </ul>
               </li>
@@ -222,6 +221,7 @@ export function AppHeader() {
                   <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
                   <li><Link href="/types-of-memberships">Types of Memberships</Link></li>
                   <li><Link href="/membership-benefits">Membership Benefits</Link></li>
+                  <li><Link href="/ourteam">Our Members</Link></li>
                 </ul>
               </li>
               <AuthLink />
@@ -259,7 +259,6 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/aboutus">Overview</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/missionvision">Mission & Vision</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ourteam">Our Members</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/partners">Partners</Link></li>
                   </ul>
                 )}
@@ -354,6 +353,7 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/types-of-memberships">Types of Memberships</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/membership-benefits">Membership Benefits</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ourteam">Our Members</Link></li>
                   </ul>
                 )}
               </li>
