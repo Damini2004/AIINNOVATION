@@ -45,11 +45,11 @@ export function AppHeader() {
     setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
     setIsAdmin(!!adminSession?.loggedIn);
 
-    // Close mobile menu on navigation
     if (isOpen) {
       setIsOpen(false);
     }
-  }, [pathname, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
 
   useEffect(() => {
