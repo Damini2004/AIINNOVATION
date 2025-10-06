@@ -55,12 +55,7 @@ export function AppHeader() {
     // Cleanup listener on component unmount
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    // Close mobile menu on navigation
-    setIsOpen(false);
-  }, [pathname]);
-
+  
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -81,6 +76,13 @@ export function AppHeader() {
     handleScroll(); // Check on initial mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Close mobile menu on navigation
+    if(isOpen) {
+        setIsOpen(false);
+    }
+  }, [pathname]);
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
@@ -128,14 +130,14 @@ export function AppHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="datatech">
-      <Image
-        src="/assests/images/logo.png" // replace with your logo path inside public folder
-        alt="Datatech Logo"
-        width={160}
-        height={40}
-        className="h-16 w-auto"
-      />
-    </Link>
+            <Image
+              src="/assests/images/logo.png"
+              alt="Datatech Logo"
+              width={160}
+              height={40}
+              className="h-16 w-auto"
+            />
+          </Link>
 
           {/* Hamburger button */}
           <button
@@ -237,7 +239,7 @@ export function AppHeader() {
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-0 w-full h-screen bg-white shadow-lg datatech_menu z-10 overflow-y-auto pt-[110px] pb-8">
+          <nav className="lg:hidden absolute left-0 top-[110px] w-full h-[calc(100vh-110px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto pb-8">
             <ul
               style={{
                 listStyle: "none",
