@@ -243,20 +243,6 @@ export default function DigitalLibraryPage() {
                 )}
               </div>
             </div>
-
-            {/* Right Sidebar: Image */}
-            <aside className="lg:col-span-3 hidden lg:block">
-                <div className="sticky top-24">
-                    <Image 
-                        src="https://picsum.photos/seed/library-promo/400/600"
-                        alt="Digital Library"
-                        width={400}
-                        height={600}
-                        className="rounded-lg object-cover shadow-lg"
-                        data-ai-hint="library books"
-                    />
-                </div>
-            </aside>
           </div>
         </div>
       </main>
