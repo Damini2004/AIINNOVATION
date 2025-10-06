@@ -203,7 +203,7 @@ export function AppHeader() {
                 <ul className="sub-menu">
                   <li><Link href="/journals">Publications</Link></li>
                   <li><Link href="/hostjournal">Host a journal with AIIS</Link></li>
-                  <li><Link href="/associate-journal">Associate Journal</Link></li>
+                  <li><Link href="/associate-journal">Associated Journal</Link></li>
                 </ul>
               </li>
 
@@ -321,7 +321,7 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/journals">Publications</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostjournal">Host a journal with AIIS</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/associate-journal">Associate Journal</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/associate-journal">Associated Journal</Link></li>
                   </ul>
                 )}
               </li>

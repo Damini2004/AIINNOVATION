@@ -14,13 +14,13 @@ export default function AssociateJournalPage() {
         data-ai-hint="abstract geometric"
       >
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold">Associate Journal</h1>
+          <h1 className="text-4xl font-bold">Associated Journal</h1>
           <div className="text-sm mt-2">
             <Link href="/" className="hover:text-primary">
               HOME
             </Link>
             <span className="mx-2 text-muted-foreground">&gt;</span>
-            <span className="text-primary font-medium">ASSOCIATE JOURNAL</span>
+            <span className="text-primary font-medium">ASSOCIATED JOURNAL</span>
           </div>
         </div>
       </section>
