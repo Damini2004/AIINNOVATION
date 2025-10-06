@@ -116,10 +116,9 @@ export default function TypesOfMembershipsPage() {
       <main className="py-20">
         <div className="container mx-auto px-6">
           <Tabs defaultValue="professionals" className="w-full text-center">
-             <TabsList className="items-center justify-center p-1 text-muted-foreground grid w-full grid-cols-1 sm:grid-cols-3 bg-secondary rounded-lg h-auto">
+             <TabsList className="items-center justify-center p-1 text-muted-foreground grid w-full grid-cols-1 sm:grid-cols-2 bg-secondary rounded-lg h-auto">
               <TabsTrigger value="professionals">Professionals</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
-              <TabsTrigger value="stories">Member Stories</TabsTrigger>
             </TabsList>
 
             <AnimatePresence mode="wait">
@@ -352,12 +351,15 @@ export default function TypesOfMembershipsPage() {
                            </div>
                      </div>
                 </TabsContent>
-                <TabsContent value="stories" className="mt-8">
-                    <MemberStories />
-                </TabsContent>
+                
               </motion.div>
             </AnimatePresence>
           </Tabs>
+
+           <div className="mt-16">
+             <MemberStories />
+           </div>
+
         </div>
       </main>
     </div>
