@@ -43,18 +43,32 @@ export default function UserDashboardPage() {
     resolver: zodResolver(userProfileSchema),
   });
 
+  const getSessionWithExpiry = (key: string) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  };
+
+
   useEffect(() => {
     const fetchProfile = async () => {
-      const email = localStorage.getItem("userEmail");
-      const isLoggedIn = localStorage.getItem("isUserLoggedIn");
+      const session = getSessionWithExpiry("userSession");
       
-      if (!isLoggedIn || !email) {
+      if (!session || !session.loggedIn || !session.user.email) {
         router.push("/registrations");
         return;
       }
       
       setLoading(true);
-      const result = await getUserProfile(email);
+      const result = await getUserProfile(session.user.email);
       if (result.success && result.data) {
         setProfile(result.data);
         form.reset(result.data);
@@ -100,9 +114,7 @@ export default function UserDashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isUserLoggedIn");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userSession");
     toast({ title: "Logged Out", description: "You have been successfully logged out." });
     router.push("/");
   };

@@ -40,30 +40,37 @@ export default function LoginForm() {
     },
   });
 
+  const setSessionWithExpiry = (key: string, value: object, ttl: number) => {
+    const now = new Date();
+    const item = {
+      value: value,
+      expiry: now.getTime() + ttl,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  }
+
+
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     const result = await handleLogin(data);
     setIsLoading(false);
 
     if (result.success) {
+      const sessionTTL = 60 * 1000; // 1 minute
       if (result.isAdmin) {
-        localStorage.setItem("isAdminLoggedIn", "true");
+        setSessionWithExpiry('adminSession', { loggedIn: true }, sessionTTL);
         toast({
           title: "Admin Login Successful",
           description: "Redirecting to admin dashboard...",
         });
         router.push("/admin");
       } else {
-         localStorage.setItem("isUserLoggedIn", "true");
-         if (result.user) {
-            localStorage.setItem("userName", result.user.name);
-            localStorage.setItem("userEmail", result.user.email);
-         }
+         setSessionWithExpiry('userSession', { loggedIn: true, user: result.user }, sessionTTL);
          toast({
           title: "Login Successful",
           description: `Welcome back, ${result.user?.name || 'user'}!`,
         });
-        router.push("/user-dashboard"); // Redirect to user dashboard
+        router.push("/user-dashboard");
       }
     } else {
        toast({

@@ -18,8 +18,23 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  const getSessionWithExpiry = (key: string) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  };
+
   useEffect(() => {
-    if (localStorage.getItem("isAdminLoggedIn") === "true") {
+    const session = getSessionWithExpiry("adminSession");
+    if (session && session.loggedIn) {
       router.replace("/admin");
     } else {
       setIsCheckingAuth(false);
@@ -31,10 +46,16 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock authentication
     setTimeout(() => {
       if (email === "admin@aiis.com" && password === "password") {
-        localStorage.setItem("isAdminLoggedIn", "true");
+        const sessionTTL = 60 * 1000; // 1 minute
+        const now = new Date();
+        const item = {
+          value: { loggedIn: true },
+          expiry: now.getTime() + sessionTTL,
+        };
+        localStorage.setItem("adminSession", JSON.stringify(item));
+
         toast({
           title: "Login Successful",
           description: "Redirecting to dashboard...",

@@ -17,16 +17,34 @@ export function AppHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => {
-    // This effect runs only on the client, after the component has mounted.
-    setIsClient(true);
-    const userLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
-    const adminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
-    setIsLoggedIn(userLoggedIn || adminLoggedIn);
-    setIsAdmin(adminLoggedIn);
-  }, []); // Run only once on mount
+  const getSessionWithExpiry = (key: string) => {
+    if (typeof window === 'undefined') return null;
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    try {
+      const item = JSON.parse(itemStr);
+      const now = new Date();
+      if (now.getTime() > item.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return item.value;
+    } catch (e) {
+      return null;
+    }
+  };
+
 
   useEffect(() => {
+    setIsClient(true);
+    const userSession = getSessionWithExpiry("userSession");
+    const adminSession = getSessionWithExpiry("adminSession");
+    
+    setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
+    setIsAdmin(!!adminSession?.loggedIn);
+
     // Close mobile menu on navigation
     if (isOpen) {
       setIsOpen(false);
@@ -49,7 +67,7 @@ export function AppHeader() {
 
   const AuthLink = () => {
     if (!isClient) {
-      // On the server, and initial client render, render the default link
+      // On the server, and initial client render, render a placeholder
       return <li><Link href="/registrations"></Link></li>;
     }
     

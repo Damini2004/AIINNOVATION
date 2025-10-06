@@ -1207,17 +1207,29 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
 
+  const getSessionWithExpiry = (key: string) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  };
+
+
   useEffect(() => {
-    const checkAuth = () => {
-      const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
-      if (adminLoggedIn !== "true") {
-        router.push("/panel");
-      } else {
-        setIsAuthenticated(true);
-        fetchData();
-      }
-    };
-    checkAuth();
+    const session = getSessionWithExpiry("adminSession");
+    if (!session || !session.loggedIn) {
+      router.replace("/panel");
+    } else {
+      setIsAuthenticated(true);
+      fetchData();
+    }
   }, [router]);
 
   const fetchData = async () => {
@@ -1242,7 +1254,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
+    localStorage.removeItem("adminSession");
     toast({ title: "Logged Out", description: "You have been successfully logged out." });
     router.push("/");
   };
