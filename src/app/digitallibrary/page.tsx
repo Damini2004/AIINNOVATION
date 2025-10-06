@@ -192,7 +192,7 @@ export default function DigitalLibraryPage() {
             </aside>
             
             {/* Center Content: Papers List */}
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-9">
               <div className="space-y-2">
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
@@ -249,5 +249,3 @@ export default function DigitalLibraryPage() {
     </div>
   );
 }
-
-    
