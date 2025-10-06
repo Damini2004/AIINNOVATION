@@ -377,7 +377,7 @@ export default function TypesOfMembershipsPage() {
                     <p className="mt-4 text-white/80 max-w-3xl text-left">
                     Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
                     </p>
-                    <div className="mt-8 gap-4">
+                    <div className="mt-8 flex flex-col items-start gap-4">
                         <Button asChild>
                             <Link href="/registrations">Join as a Professional</Link>
                         </Button>
