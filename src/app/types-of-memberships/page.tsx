@@ -360,6 +360,42 @@ export default function TypesOfMembershipsPage() {
              <MemberStories />
            </div>
 
+          <div className="mt-20 text-center">
+            <div className="h-16 w-px bg-border mx-auto"></div>
+            <div className="mt-8">
+              <Image
+                src="https://picsum.photos/seed/join-us/800/400"
+                alt="Join AIIS Community"
+                width={800}
+                height={400}
+                className="rounded-lg object-cover mx-auto shadow-lg"
+                data-ai-hint="community working together"
+              />
+            </div>
+            <div className="mt-8 max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
+              <p className="mt-4 text-muted-foreground">
+                Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Button asChild>
+                <Link href="/registrations">Join as a Professional</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/registrations">Join as a Student</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link href="/contact-us">Request More Information About Membership</Link>
+              </Button>
+            </div>
+             <div className="mt-6">
+                <Link href="#" className="text-sm text-primary hover:underline">
+                    Renew Your Membership
+                </Link>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
