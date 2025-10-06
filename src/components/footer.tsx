@@ -22,10 +22,6 @@ export function Footer() {
                      height={63}
                    />
             </div>
-            <p className="text-base text-muted-foreground leading-relaxed">
-              AI Innovation Society is a global platform fostering ethical,
-              inclusive, and impactful advancements in Artificial Intelligence.
-            </p>
           </div>
 
           {/* Column 2 - Useful Links */}
