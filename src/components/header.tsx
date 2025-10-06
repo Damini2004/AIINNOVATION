@@ -44,11 +44,6 @@ export function AppHeader() {
     
     setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
     setIsAdmin(!!adminSession?.loggedIn);
-
-    if (isOpen) {
-      setIsOpen(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
 
@@ -106,7 +101,7 @@ export function AppHeader() {
         {/* Navbar wrapper */}
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center" title="datatech">
+          <Link href="/" className="flex items-center relative z-20" title="datatech">
       <Image
         src="/assests/images/logo.png" // replace with your logo path inside public folder
         alt="Datatech Logo"
@@ -118,7 +113,7 @@ export function AppHeader() {
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl"
+            className="lg:hidden text-2xl relative z-20"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}
@@ -216,7 +211,7 @@ export function AppHeader() {
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-[60px] w-full bg-white shadow-lg datatech_menu">
+          <nav className="lg:hidden absolute left-0 top-0 w-full h-screen bg-white shadow-lg datatech_menu z-10 pt-24">
             <ul
               style={{
                 listStyle: "none",
