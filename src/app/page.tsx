@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -59,6 +60,7 @@ function Showcase() {
       <EventsSection />
       <ContactSection />
       <QuickButtonArea />
+      <MembersPage />
       <CodeSnippetView
         snippet={selectedSnippet}
         open={!!selectedSnippet}

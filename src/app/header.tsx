@@ -44,7 +44,7 @@ export function AppHeader() {
      return (
        <li>
          <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
-           Dashboard
+           
          </Link>
        </li>
      )
