@@ -362,6 +362,12 @@ export default function TypesOfMembershipsPage() {
 
           <div className="mt-20 text-center">
             <div className="h-16 w-px bg-border mx-auto"></div>
+             <div className="mt-8 max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
+              <p className="mt-4 text-muted-foreground">
+                Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
+              </p>
+            </div>
             <div className="mt-8">
               <Image
                 src="https://picsum.photos/seed/join-us/800/400"
@@ -371,12 +377,6 @@ export default function TypesOfMembershipsPage() {
                 className="rounded-lg object-cover mx-auto shadow-lg"
                 data-ai-hint="community working together"
               />
-            </div>
-            <div className="mt-8 max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold">Ready to take the next step?</h2>
-              <p className="mt-4 text-muted-foreground">
-                Join IEEE and you’ll be part of a community of engineers and technological experts around the world. Become a member today.
-              </p>
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Button asChild>
