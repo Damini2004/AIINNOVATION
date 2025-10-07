@@ -101,7 +101,7 @@ export function AppHeader() {
       return <li><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return <li><Link href="/registrations">Registrations</Link></li>;
+    return <li><Link href="/registrations"></Link></li>;
   };
 
   const MobileAuthLink = () => {
