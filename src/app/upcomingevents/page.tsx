@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEvents } from "@/app/dashboard/actions";
+import { getEvents } from "@/app/admin/actions";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,7 @@ type EventType = {
   description: string;
   image: string;
   link: string;
+  date: string;
 };
 
 export default function UpcomingEventsPage() {
@@ -28,7 +29,14 @@ export default function UpcomingEventsPage() {
       try {
         setLoading(true);
         const eventsData = await getEvents();
-        setEvents(eventsData);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize today's date
+        const upcomingEvents = eventsData.filter(event => {
+            if(!event.date) return false;
+            const eventDate = new Date(event.date);
+            return eventDate >= today;
+        });
+        setEvents(upcomingEvents as EventType[]);
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -130,5 +138,7 @@ export default function UpcomingEventsPage() {
     </div>
   );
 }
+
+    
 
     

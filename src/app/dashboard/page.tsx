@@ -77,10 +77,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 
 // Zod Schemas
@@ -113,6 +116,7 @@ const eventSchema = z.object({
   category: z.string().min(1, "Category is required"),
   image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL for the event"),
+  date: z.string().min(1, "Date is required"),
 });
 
 const journalSchema = z.object({
@@ -403,15 +407,19 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<Event>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event || { image: '' },
+    defaultValues: event || { image: '', date: '' },
   });
+
+  const dateValue = watch("date");
 
   useEffect(() => {
     if (event) {
         setValue('image', event.image);
-        setPreview(event.image)
+        setPreview(event.image);
+        setValue('date', event.date);
     }
   }, [event, setValue]);
 
@@ -457,6 +465,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
        <Input type="hidden" {...register("id")} />
        <Input type="hidden" {...register("image")} />
+       <Input type="hidden" {...register("date")} />
        <div>
         <Label htmlFor="eventTitle">Title</Label>
         <Input id="eventTitle" {...register("title")} disabled={isSubmitting} />
@@ -471,6 +480,32 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
         <Label htmlFor="eventDescription">Description</Label>
         <Textarea id="eventDescription" {...register("description")} disabled={isSubmitting} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+       <div>
+        <Label>Event Date</Label>
+         <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                variant={"outline"}
+                className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateValue && "text-muted-foreground"
+                )}
+                >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateValue ? format(new Date(dateValue), "PPP") : <span>Pick a date</span>}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+                <Calendar
+                mode="single"
+                selected={dateValue ? new Date(dateValue) : undefined}
+                onSelect={(date) => setValue('date', date ? format(date, 'yyyy-MM-dd') : '', {shouldValidate: true})}
+                initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+        {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
       </div>
       <div>
         <Label htmlFor="eventCategory">Category</Label>
@@ -1194,6 +1229,63 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
     );
 }
 
+function ContactMessageManager({ messages: initialMessages, onUpdate }: { messages: ContactMessage[], onUpdate: () => void }) {
+  const { toast } = useToast();
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteContactMessage(id);
+    if (result.success) {
+      toast({ title: "Success", description: "Message deleted successfully." });
+      onUpdate();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Contact Form Messages</CardTitle>
+        <CardDescription>View messages submitted through the contact form.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {initialMessages.length === 0 && <p className="text-muted-foreground text-center py-4">No messages yet.</p>}
+          {initialMessages.map((msg) => (
+            <div key={msg.id} className="p-4 border rounded-lg bg-muted/20">
+              <div className="flex justify-between items-start">
+                  <div>
+                      <p className="font-semibold">{msg.name} <span className="text-sm text-muted-foreground font-normal">&lt;{msg.email}&gt;</span></p>
+                      <p className="text-sm text-muted-foreground">{msg.phone} {msg.website && `| ${msg.website}`}</p>
+                      <p className="text-sm text-muted-foreground">Received: {new Date(msg.createdAt.seconds * 1000).toLocaleString()}</p>
+                  </div>
+                  <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                      <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                          This action will permanently delete the message from "{msg.name}".
+                          </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(msg.id!)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                      </AlertDialogContent>
+                  </AlertDialog>
+              </div>
+              <p className="mt-4 bg-background p-3 rounded-md">{msg.message}</p>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -1204,14 +1296,30 @@ export default function AdminPage() {
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [resources, setResources] = useState<EducationalResource[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
 
+  const getSessionWithExpiry = (key: string) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  };
+
+
   useEffect(() => {
-    const adminLoggedIn = localStorage.getItem("isAdminLoggedIn");
-    if (adminLoggedIn !== "true") {
-      router.push("/login");
+    const session = getSessionWithExpiry("adminSession");
+    if (!session || !session.loggedIn) {
+      router.replace("/panel");
     } else {
       setIsAuthenticated(true);
       fetchData();
@@ -1220,7 +1328,7 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData, messagesData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
@@ -1228,6 +1336,7 @@ export default function AdminPage() {
       getDigitalLibraryPapers(),
       getEducationalResources(),
       getRegistrations(),
+      getContactMessages(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
@@ -1236,11 +1345,12 @@ export default function AdminPage() {
     setPapers(papersData);
     setResources(resourcesData as EducationalResource[]);
     setRegistrations(registrationsData);
+    setContactMessages(messagesData as ContactMessage[]);
     setLoading(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
+    localStorage.removeItem("adminSession");
     toast({ title: "Logged Out", description: "You have been successfully logged out." });
     router.push("/");
   };
@@ -1282,7 +1392,7 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto py-10">
        <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <Button variant="outline" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Logout
@@ -1290,7 +1400,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto lg:h-10">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
@@ -1299,6 +1409,12 @@ export default function AdminPage() {
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
           <TabsTrigger value="registrations">Registrations</TabsTrigger>
+           <TabsTrigger value="messages" className="relative">
+              Messages
+              {contactMessages.length > 0 && 
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{contactMessages.length}</Badge>
+              }
+           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1648,8 +1764,13 @@ export default function AdminPage() {
         <TabsContent value="registrations">
             <RegistrationManager registrations={registrations} onUpdate={fetchData} />
         </TabsContent>
+        <TabsContent value="messages">
+            <ContactMessageManager messages={contactMessages} onUpdate={fetchData} />
+        </TabsContent>
 
       </Tabs>
     </div>
   );
 }
+
+    

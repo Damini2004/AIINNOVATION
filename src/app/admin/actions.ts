@@ -37,6 +37,7 @@ const eventSchema = z.object({
   category: z.string().min(1, "Category is required"),
   image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL for the event"),
+  date: z.string().min(1, "Date is required"),
 });
 
 const journalSchema = z.object({
@@ -139,7 +140,11 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
     }
     revalidatePath('/admin');
     revalidatePath(`/${collectionName}`);
-    if (collectionName === 'events') revalidatePath('/');
+    if (collectionName === 'events') {
+        revalidatePath('/');
+        revalidatePath('/upcomingevents');
+        revalidatePath('/pastevents');
+    }
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
     if (collectionName === 'educational_resources') {
         revalidatePath('/educationalresources');
@@ -200,7 +205,11 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
 
     revalidatePath('/admin');
     revalidatePath(`/${collectionName}`);
-     if (collectionName === 'events') revalidatePath('/');
+     if (collectionName === 'events') {
+        revalidatePath('/');
+        revalidatePath('/upcomingevents');
+        revalidatePath('/pastevents');
+     }
     if (collectionName === 'digital_library_papers') revalidatePath('/digitallibrary');
     if (collectionName === 'educational_resources') {
       revalidatePath('/educationalresources');
@@ -424,5 +433,7 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
 export async function deleteContactMessage(id: string) {
     return deleteDocFromCollection('contact_messages', id);
 }
+
+    
 
     

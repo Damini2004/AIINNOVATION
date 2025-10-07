@@ -79,10 +79,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail, CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 
 // Zod Schemas
@@ -115,6 +118,7 @@ const eventSchema = z.object({
   category: z.string().min(1, "Category is required"),
   image: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL for the event"),
+  date: z.string().min(1, "Date is required"),
 });
 
 const journalSchema = z.object({
@@ -405,15 +409,19 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<Event>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event || { image: '' },
+    defaultValues: event || { image: '', date: '' },
   });
+
+  const dateValue = watch("date");
 
   useEffect(() => {
     if (event) {
         setValue('image', event.image);
-        setPreview(event.image)
+        setPreview(event.image);
+        setValue('date', event.date);
     }
   }, [event, setValue]);
 
@@ -459,6 +467,7 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
        <Input type="hidden" {...register("id")} />
        <Input type="hidden" {...register("image")} />
+       <Input type="hidden" {...register("date")} />
        <div>
         <Label htmlFor="eventTitle">Title</Label>
         <Input id="eventTitle" {...register("title")} disabled={isSubmitting} />
@@ -473,6 +482,32 @@ function EventForm({ event, onSave }: { event?: Event; onSave: () => void }) {
         <Label htmlFor="eventDescription">Description</Label>
         <Textarea id="eventDescription" {...register("description")} disabled={isSubmitting} />
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+      </div>
+       <div>
+        <Label>Event Date</Label>
+         <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                variant={"outline"}
+                className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateValue && "text-muted-foreground"
+                )}
+                >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateValue ? format(new Date(dateValue), "PPP") : <span>Pick a date</span>}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+                <Calendar
+                mode="single"
+                selected={dateValue ? new Date(dateValue) : undefined}
+                onSelect={(date) => setValue('date', date ? format(date, 'yyyy-MM-dd') : '', {shouldValidate: true})}
+                initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+        {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
       </div>
       <div>
         <Label htmlFor="eventCategory">Category</Label>
@@ -1739,3 +1774,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
