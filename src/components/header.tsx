@@ -140,7 +140,7 @@ export function AppHeader() {
               />
             ) : (
               <Image
-                src="/assests/images/logo3.png"
+                src="/assests/images/logo.png"
                 alt="Datatech Logo"
                 width={160}
                 height={40}
