@@ -53,8 +53,10 @@ import {
   approveRegistration,
   rejectRegistration,
   updateRegistrationStatus,
+  getContactMessages,
+  deleteContactMessage,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource, Counter, Registration } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -77,7 +79,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -1194,6 +1196,63 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
     );
 }
 
+function ContactMessageManager({ messages: initialMessages, onUpdate }: { messages: ContactMessage[], onUpdate: () => void }) {
+  const { toast } = useToast();
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteContactMessage(id);
+    if (result.success) {
+      toast({ title: "Success", description: "Message deleted successfully." });
+      onUpdate();
+    } else {
+      toast({ variant: "destructive", title: "Error", description: result.error });
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Contact Form Messages</CardTitle>
+        <CardDescription>View messages submitted through the contact form.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {initialMessages.length === 0 && <p className="text-muted-foreground text-center py-4">No messages yet.</p>}
+          {initialMessages.map((msg) => (
+            <div key={msg.id} className="p-4 border rounded-lg bg-muted/20">
+              <div className="flex justify-between items-start">
+                  <div>
+                      <p className="font-semibold">{msg.name} <span className="text-sm text-muted-foreground font-normal">&lt;{msg.email}&gt;</span></p>
+                      <p className="text-sm text-muted-foreground">{msg.phone} {msg.website && `| ${msg.website}`}</p>
+                      <p className="text-sm text-muted-foreground">Received: {new Date(msg.createdAt.seconds * 1000).toLocaleString()}</p>
+                  </div>
+                  <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                      <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                          This action will permanently delete the message from "{msg.name}".
+                          </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(msg.id!)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                      </AlertDialogContent>
+                  </AlertDialog>
+              </div>
+              <p className="mt-4 bg-background p-3 rounded-md">{msg.message}</p>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -1204,6 +1263,7 @@ export default function AdminPage() {
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [resources, setResources] = useState<EducationalResource[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
@@ -1235,7 +1295,7 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData] = await Promise.all([
+    const [coursesData, partnersData, eventsData, journalsData, papersData, resourcesData, registrationsData, messagesData] = await Promise.all([
       getCourses(),
       getPartners(),
       getEvents(),
@@ -1243,6 +1303,7 @@ export default function AdminPage() {
       getDigitalLibraryPapers(),
       getEducationalResources(),
       getRegistrations(),
+      getContactMessages(),
     ]);
     setCourses(coursesData);
     setPartners(partnersData);
@@ -1251,6 +1312,7 @@ export default function AdminPage() {
     setPapers(papersData);
     setResources(resourcesData as EducationalResource[]);
     setRegistrations(registrationsData);
+    setContactMessages(messagesData as ContactMessage[]);
     setLoading(false);
   };
 
@@ -1305,7 +1367,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto lg:h-10">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
@@ -1314,6 +1376,7 @@ export default function AdminPage() {
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
           <TabsTrigger value="registrations">Registrations</TabsTrigger>
+           <TabsTrigger value="messages">Messages</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
@@ -1662,6 +1725,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="registrations">
             <RegistrationManager registrations={registrations} onUpdate={fetchData} />
+        </TabsContent>
+        <TabsContent value="messages">
+            <ContactMessageManager messages={contactMessages} onUpdate={fetchData} />
         </TabsContent>
 
       </Tabs>

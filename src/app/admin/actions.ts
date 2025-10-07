@@ -3,7 +3,7 @@
 "use server";
 
 import { z } from "zod";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query, Timestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc, where, query, Timestamp, orderBy } from "firebase/firestore";
 import { ref, getStorage, deleteObject } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
@@ -102,6 +102,17 @@ const memberSchema = z.object({
     facebookUrl: z.string().url().optional().or(z.literal('')),
 });
 
+const contactMessageSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  website: z.string().url("Invalid URL").optional().or(z.literal('')),
+  message: z.string().min(1, "Message is required"),
+  createdAt: z.union([z.instanceof(Timestamp), z.string()]).optional(),
+});
+
+
 type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
@@ -111,6 +122,7 @@ export type EducationalResource = z.infer<typeof educationalResourceSchema>;
 export type Counter = z.infer<typeof counterSchema>;
 export type Registration = z.infer<typeof registrationSchema>;
 export type Member = z.infer<typeof memberSchema>;
+export type ContactMessage = z.infer<typeof contactMessageSchema>;
 
 
 // Generic function to add or update a document
@@ -147,9 +159,16 @@ async function addOrUpdateDoc<T extends { id?: string }>(collectionName: string,
 }
 
 // Generic function to fetch documents
-async function getDocsFromCollection<T>(collectionName: string): Promise<T[]> {
+async function getDocsFromCollection<T>(collectionName: string, options: { orderByField?: string, orderDirection?: 'asc' | 'desc' } = {}): Promise<T[]> {
   try {
-    const querySnapshot = await getDocs(collection(db, collectionName));
+    const collRef = collection(db, collectionName);
+    let q;
+    if (options.orderByField && options.orderDirection) {
+        q = query(collRef, orderBy(options.orderByField, options.orderDirection));
+    } else {
+        q = query(collRef);
+    }
+    const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as T[];
   } catch (error) {
     console.error(`Error fetching ${collectionName}:`, error);
@@ -187,6 +206,7 @@ async function deleteDocFromCollection(collectionName: string, id: string, fileP
       revalidatePath('/educationalresources');
       revalidatePath('/freecourses');
     }
+    if(collectionName === 'contact_messages') revalidatePath('/contact-us');
 
     return { success: true };
   } catch (error: any) {
@@ -374,6 +394,35 @@ export async function updateRegistrationStatus(registrationId: string, status: '
 // Member Actions
 export async function getMembers(): Promise<Member[]> {
     return getDocsFromCollection<Member>('members');
+}
+
+// Contact Message Actions
+export async function submitContactForm(data: Omit<ContactMessage, 'id' | 'createdAt'>) {
+    try {
+        const validatedData = contactMessageSchema.omit({id: true, createdAt: true}).parse(data);
+        const docData = { ...validatedData, createdAt: Timestamp.now() };
+        await addDoc(collection(db, 'contact_messages'), docData);
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error submitting contact form:", error);
+        if (error instanceof z.ZodError) {
+            return { success: false, error: "Validation failed: " + error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ') };
+        }
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getContactMessages(): Promise<ContactMessage[]> {
+    const messages = await getDocsFromCollection<ContactMessage>('contact_messages', { orderByField: 'createdAt', orderDirection: 'desc' });
+    return messages.map(msg => ({
+        ...msg,
+        createdAt: JSON.parse(JSON.stringify(msg.createdAt)),
+    }));
+}
+
+export async function deleteContactMessage(id: string) {
+    return deleteDocFromCollection('contact_messages', id);
 }
 
     

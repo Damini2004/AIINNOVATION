@@ -7,12 +7,17 @@ import {
   Phone,
   Mail,
   Globe,
+  Loader2,
 } from "lucide-react";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { submitContactForm } from "@/app/admin/actions";
 
 export default function ContactSection() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -27,10 +32,25 @@ export default function ContactSection() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", form);
-    // Here you would typically handle form submission, e.g., send to an API
+    setIsLoading(true);
+    const result = await submitContactForm(form);
+    setIsLoading(false);
+
+    if (result.success) {
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for contacting us. We'll be in touch shortly.",
+      });
+      setForm({ name: "", email: "", phone: "", website: "", message: "" });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: result.error || "An unexpected error occurred.",
+      });
+    }
   };
 
   return (
@@ -110,6 +130,8 @@ export default function ContactSection() {
                 onChange={handleChange}
                 placeholder="Name"
                 className="bg-white/10 text-white placeholder:text-gray-400"
+                required
+                disabled={isLoading}
               />
               <Input
                 type="email"
@@ -118,6 +140,8 @@ export default function ContactSection() {
                 onChange={handleChange}
                 placeholder="Email"
                  className="bg-white/10 text-white placeholder:text-gray-400"
+                 required
+                 disabled={isLoading}
               />
               <Input
                 type="text"
@@ -126,6 +150,7 @@ export default function ContactSection() {
                 onChange={handleChange}
                 placeholder="Phone"
                  className="bg-white/10 text-white placeholder:text-gray-400"
+                 disabled={isLoading}
               />
               <Input
                 type="text"
@@ -134,6 +159,7 @@ export default function ContactSection() {
                 onChange={handleChange}
                 placeholder="Website"
                  className="bg-white/10 text-white placeholder:text-gray-400"
+                 disabled={isLoading}
               />
             </div>
             <Textarea
@@ -142,10 +168,11 @@ export default function ContactSection() {
               onChange={handleChange}
               placeholder="Message"
               className="h-44 bg-white/10 text-white placeholder:text-gray-400"
+              required
+              disabled={isLoading}
             />
-            <Button
-              type="submit"
-            >
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Send Message
             </Button>
           </form>
