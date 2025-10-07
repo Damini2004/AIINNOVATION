@@ -41,7 +41,7 @@ export default function VolunteerPage() {
           {/* Left Image */}
           <div className="flex justify-center">
             <Image
-              src="https://picsum.photos/seed/volunteer/600/500"
+              src="/assests/images/Volunteer.jpg"
               alt="Volunteer illustration"
               width={600}
               height={500}

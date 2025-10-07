@@ -348,9 +348,9 @@ export default function TypesOfMembershipsPage() {
             <div className="h-16 w-px bg-border mx-auto"></div>
             <div className="relative mt-8">
               <Image
-                src="https://picsum.photos/seed/join-us/1200/400"
+                src="/assests/images/contact.jpg"
                 alt="Join AIIS Community"
-                width={1200}
+                width={1000}
                 height={400}
                 className="rounded-lg object-cover mx-auto shadow-lg"
                 data-ai-hint="community working together"
