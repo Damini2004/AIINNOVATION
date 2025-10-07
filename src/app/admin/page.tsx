@@ -1376,7 +1376,12 @@ export default function AdminPage() {
           <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
           <TabsTrigger value="registrations">Registrations</TabsTrigger>
-           <TabsTrigger value="messages">Messages</TabsTrigger>
+           <TabsTrigger value="messages" className="relative">
+              Messages
+              {contactMessages.length > 0 && 
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{contactMessages.length}</Badge>
+              }
+           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses">
