@@ -248,7 +248,7 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
       </div>
       <div>
         <Label htmlFor="courseCategory">Category</Label>
-        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd" {...register("category")} disabled={isSubmitting} />
+        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd, free" {...register("category")} disabled={isSubmitting} />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
       <div>
@@ -1402,13 +1402,12 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 h-auto lg:h-10">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto lg:h-10">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="library">Digital Library</TabsTrigger>
-          <TabsTrigger value="resources">Educational Resources</TabsTrigger>
           <TabsTrigger value="counters">Counters</TabsTrigger>
           <TabsTrigger value="registrations">Registrations</TabsTrigger>
            <TabsTrigger value="messages" className="relative">
@@ -1424,7 +1423,7 @@ export default function AdminPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Courses</CardTitle>
-                <CardDescription>Add, edit, or delete courses.</CardDescription>
+                <CardDescription>Add, edit, or delete courses. Use the category 'free' for free courses.</CardDescription>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
@@ -1688,78 +1687,6 @@ export default function AdminPage() {
         <TabsContent value="library">
           <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
         </TabsContent>
-        <TabsContent value="resources">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Educational Resources</CardTitle>
-                <CardDescription>Add, edit, or delete educational resources.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Resource</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Resource</DialogTitle>
-                  </DialogHeader>
-                  <EducationalResourceForm onSave={fetchData} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {resources.map((resource) => (
-                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-4">
-                      {resource.image ? (
-                        <Image src={resource.image} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
-                      ) : (
-                        <div className="w-[60px] h-[45px] flex items-center justify-center bg-secondary rounded-md">
-                          {getFileIcon(resource.fileType)}
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-semibold">{resource.title}</p>
-                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Resource</DialogTitle>
-                          </DialogHeader>
-                          <EducationalResourceForm onSave={fetchData} resource={resource}/>
-                        </DialogContent>
-                       </Dialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete the resource "{resource.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
         <TabsContent value="counters">
           <CounterForm onSave={fetchData} />
         </TabsContent>
@@ -1774,5 +1701,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
