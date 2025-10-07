@@ -12,43 +12,112 @@ export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
+  const getSessionWithExpiry = (key: string) => {
+    if (typeof window === 'undefined') return null;
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    try {
+      const item = JSON.parse(itemStr);
+      const now = new Date();
+      if (now.getTime() > item.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return item.value;
+    } catch (e) {
+      return null;
+    }
+  };
+
+
   useEffect(() => {
     setIsClient(true);
-    setIsLoggedIn(localStorage.getItem("isAdminLoggedIn") === "true" || localStorage.getItem("isUserLoggedIn") === "true");
-     // Close mobile menu on navigation
-    setIsOpen(false);
-  }, [pathname]);
+    const userSession = getSessionWithExpiry("userSession");
+    const adminSession = getSessionWithExpiry("adminSession");
+    
+    setIsLoggedIn(!!userSession?.loggedIn || !!adminSession?.loggedIn);
+    setIsAdmin(!!adminSession?.loggedIn);
+    
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check on initial mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Close mobile menu on navigation
+    if(isOpen) {
+        setIsOpen(false);
+    }
+  }, [pathname]);
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
 
-  const DashboardLink = () => {
-     if (!isClient) return <li><a style={{ display: 'none' }} /></li>;
-     if (!isLoggedIn) return null;
+  const AuthLink = () => {
+    if (!isClient) {
+      // On the server, and initial client render, render a placeholder
+      return <li><Link href="/registrations"></Link></li>;
+    }
+    
+    if (isAdmin) {
+      return <li><Link href="/admin">Dashboard</Link></li>;
+    }
+    if (isLoggedIn) {
+      return <li><Link href="/user-dashboard">Profile</Link></li>;
+    }
+    
+    return <li><Link href="/registrations"></Link></li>;
+  };
 
-     const isAdmin = localStorage.getItem("isAdminLoggedIn") === "true";
-     return (
-       <li>
-         <Link href={isAdmin ? "/admin" : "/user-dashboard"}>
-           
-         </Link>
-       </li>
-     )
-   };
+  const MobileAuthLink = () => {
+     if (!isClient) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+    }
+    
+    if (isAdmin) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/admin">Dashboard</Link></li>;
+    }
+    if (isLoggedIn) {
+      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/user-dashboard">Profile</Link></li>;
+    }
+    
+    return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+  }
 
 
   return (
@@ -60,19 +129,19 @@ export function AppHeader() {
         {/* Navbar wrapper */}
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center" title="datatech">
-      <Image
-        src="/assests/images/logo.png" // replace with your logo path inside public folder
-        alt="Datatech Logo"
-        width={160}
-        height={40}
-        className="h-16 w-auto"
-      />
-    </Link>
+          <Link href="/" className="flex items-center relative z-20" title="datatech">
+            <Image
+              src="/assests/images/logo.png"
+              alt="Datatech Logo"
+              width={160}
+              height={40}
+              className="h-16 w-auto"
+            />
+          </Link>
 
           {/* Hamburger button */}
           <button
-            className="lg:hidden text-2xl"
+            className="lg:hidden text-2xl relative z-20"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X /> : <Menu />}
@@ -100,7 +169,6 @@ export function AppHeader() {
                 <ul className="sub-menu">
                   <li><Link href="/aboutus">Overview</Link></li>
                   <li><Link href="/missionvision">Mission & Vision</Link></li>
-                  <li><Link href="/ourteam">Our Members</Link></li>
                   <li><Link href="/partners">Partners</Link></li>
                 </ul>
               </li>
@@ -124,7 +192,7 @@ export function AppHeader() {
                   <li><Link href="/upcomingevents">Upcoming Events</Link></li>
                   <li><Link href="/pastevents">Past Events</Link></li>
                   <li><Link href="/hostevent">Host an Event</Link></li>
-                  <li><Link href="/submitproposal">Submit Proposal</Link></li>
+                  
                 </ul>
               </li>
 
@@ -135,7 +203,7 @@ export function AppHeader() {
                 <ul className="sub-menu">
                   <li><Link href="/journals">Publications</Link></li>
                   <li><Link href="/hostjournal">Host a journal with AIIS</Link></li>
-                  <li><Link href="/associate-journal">Associate Journal</Link></li>
+                  <li><Link href="/associate-journal">Associated Journal</Link></li>
                 </ul>
               </li>
 
@@ -160,28 +228,18 @@ export function AppHeader() {
                   <li><Link href="/volunteer">Volunteer Opportunities</Link></li>
                   <li><Link href="/types-of-memberships">Types of Memberships</Link></li>
                   <li><Link href="/membership-benefits">Membership Benefits</Link></li>
+                  <li><Link href="/ourteam">Our Members</Link></li>
                 </ul>
               </li>
-              <li
-  style={{ display: "none" }}
->
-  <Link
-    href="/registrations"
-    target={isClient && !isLoggedIn ? "_blank" : undefined}
-    rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}
-  >
-    {isClient && isLoggedIn ? "Profile" : ""}
-  </Link>
-</li>
+              <AuthLink />
               <li><Link href="/contact-us">Contact</Link></li>
-               <DashboardLink />
             </ul>
           </nav>
         </div>
 
         {/* Mobile Menu with dropdowns */}
         {isOpen && (
-          <nav className="lg:hidden absolute left-0 top-[60px] w-full bg-white shadow-lg datatech_menu">
+          <nav className="lg:hidden fixed left-0 top-[90px] w-full h-[calc(100vh-90px)] bg-white shadow-lg datatech_menu z-10 overflow-y-auto pb-8">
             <ul
               style={{
                 listStyle: "none",
@@ -208,7 +266,6 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/aboutus">Overview</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/missionvision">Mission & Vision</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ourteam">Our Members</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/partners">Partners</Link></li>
                   </ul>
                 )}
@@ -246,7 +303,7 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/upcomingevents">Upcoming Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/pastevents">Past Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostevent">Host an Event</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/submitproposal">Submit Proposal</Link></li>
+                    
                   </ul>
                 )}
               </li>
@@ -264,7 +321,7 @@ export function AppHeader() {
                   <ul className="pl-4 mt-2 space-y-2">
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/journals">Publications</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostjournal">Host a journal with AIIS</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/associate-journal">Associate Journal</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/associate-journal">Associated Journal</Link></li>
                   </ul>
                 )}
               </li>
@@ -303,12 +360,12 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/volunteer">Volunteer Opportunities</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/types-of-memberships">Types of Memberships</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/membership-benefits">Membership Benefits</Link></li>
+                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/ourteam">Our Members</Link></li>
                   </ul>
                 )}
               </li>
-               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations" target={isClient && !isLoggedIn ? "_blank" : undefined} rel={isClient && !isLoggedIn ? "noopener noreferrer" : undefined}>{isClient && isLoggedIn ? "Profile" : ""}</Link></li>
+              <MobileAuthLink />
               <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
-              <DashboardLink />
             </ul>
           </nav>
         )}

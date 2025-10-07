@@ -169,7 +169,7 @@ export default function HostEventPage() {
               <h2 className="text-3xl font-semibold">Host an Event with AI Innovation Society</h2>
               <p>Partner with Us to Shape the Future of Responsible AI</p>
                <Button asChild className="mt-6">
-                  <Link href="/submitproposal">Submit Proposal</Link>
+                  <Link href="/contact-us">Contact Us</Link>
                </Button>
             </div>
              <div className="relative flex justify-center items-center">
@@ -286,5 +286,3 @@ export default function HostEventPage() {
     </div>
   );
 }
-
-    
