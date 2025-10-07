@@ -1,11 +1,10 @@
 
-
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getCourses } from "@/app/courses/page";
-import type { Course } from "@/app/courses/page";
+import { getCourses } from "@/app/admin/actions";
+import type { Course } from "@/app/admin/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -188,5 +187,3 @@ export default function FreeCoursesPage() {
     </div>
   );
 }
-
-    

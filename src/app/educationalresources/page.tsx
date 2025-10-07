@@ -1,11 +1,10 @@
 
-
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getCourses } from "@/app/courses/page";
-import type { Course } from "@/app/courses/page";
+import { getEducationalResources } from "@/app/admin/actions";
+import type { EducationalResource } from "@/app/admin/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,33 +12,50 @@ import {
   Search,
   BookOpen,
   Eye,
+  File as FileIcon,
+  Presentation,
+  FileCode,
+  Link as LinkIcon,
 } from "lucide-react";
 import "./resources.css";
 
 import Image from "next/image";
 
-function ResourceCard({ resource }: { resource: Course }) {
+function ResourceCard({ resource }: { resource: EducationalResource }) {
   const getIcon = (fileType: string) => {
+    if (fileType.includes("pdf")) return <FileCode className="h-5 w-5 mr-2 text-red-500" />;
+    if (fileType.includes("presentation") || fileType.includes("powerpoint")) return <Presentation className="h-5 w-5 mr-2 text-orange-500" />;
+    if (fileType.includes("document") || fileType.includes("word")) return <FileIcon className="h-5 w-5 mr-2 text-blue-500" />;
+    if (fileType === 'link') return <LinkIcon className="h-5 w-5 mr-2 text-gray-500" />;
     return <BookOpen className="h-5 w-5 mr-2" />;
   };
 
+  const fileLabel = resource.fileType === 'link' ? 'Link' : resource.fileType.split('/')[1]?.toUpperCase() || 'File';
+
   return (
     <div className="resource-card group">
+      <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="no-underline">
         <div className="resource-card-image">
-            <Image 
-                src={resource.img || 'https://picsum.photos/seed/resource/400/225'}
-                alt={resource.title}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint="resource cover"
-            />
+            {resource.image ? (
+                <Image 
+                    src={resource.image}
+                    alt={resource.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    data-ai-hint="resource cover"
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center bg-secondary">
+                    {getIcon(resource.fileType)}
+                </div>
+            )}
         </div>
-        <a href={resource.link} target="_blank" rel="noopener noreferrer" className="resource-card-content no-underline">
+        <div className="resource-card-content">
             <h3 className="resource-title group-hover:text-primary">{resource.title}</h3>
             <p className="resource-description">{resource.description}</p>
             <div className="resource-meta">
             <span className="file-type-badge flex items-center">
-                {getIcon(resource.category as any)}{resource.category}
+                {getIcon(resource.fileType)}{fileLabel}
             </span>
             <Button asChild size="sm" variant="outline">
                 <span className="flex items-center">
@@ -48,15 +64,16 @@ function ResourceCard({ resource }: { resource: Course }) {
                 </span>
             </Button>
             </div>
-        </a>
+        </div>
+      </a>
     </div>
   );
 }
 
-const PAPERS_PER_PAGE = 12;
+const RESOURCES_PER_PAGE = 12;
 
 export default function EducationalResourcesPage() {
-  const [resources, setResources] = useState<Course[]>([]);
+  const [resources, setResources] = useState<EducationalResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,10 +81,8 @@ export default function EducationalResourcesPage() {
   useEffect(() => {
     const fetchResources = async () => {
       setLoading(true);
-      const resourcesData = await getCourses();
-      // Filter out free courses
-      const paidResources = resourcesData.filter(r => !(r.category as any).includes('free'));
-      setResources(paidResources);
+      const resourcesData = await getEducationalResources();
+      setResources(resourcesData);
       setLoading(false);
     };
     fetchResources();
@@ -83,10 +98,10 @@ export default function EducationalResourcesPage() {
       );
     });
 
-  const totalPages = Math.ceil(filteredResources.length / PAPERS_PER_PAGE);
+  const totalPages = Math.ceil(filteredResources.length / RESOURCES_PER_PAGE);
   const paginatedResources = filteredResources.slice(
-    (currentPage - 1) * PAPERS_PER_PAGE,
-    currentPage * PAPERS_PER_PAGE
+    (currentPage - 1) * RESOURCES_PER_PAGE,
+    currentPage * RESOURCES_PER_PAGE
   );
 
   const handlePageChange = (newPage: number) => {
@@ -181,9 +196,9 @@ export default function EducationalResourcesPage() {
             ) : (
               <div className="text-center py-16 border-2 border-dashed rounded-lg">
                 <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">No Courses Found</h3>
+                <h3 className="mt-4 text-lg font-semibold">No Resources Found</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  No courses matched your search or filter criteria.
+                  No resources matched your search or filter criteria.
                 </p>
               </div>
             )}
@@ -193,5 +208,3 @@ export default function EducationalResourcesPage() {
     </div>
   );
 }
-
-    
