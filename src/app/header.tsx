@@ -131,7 +131,7 @@ export function AppHeader() {
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="datatech">
             <Image
-              src="/assests/images/logo.png"
+              src="/assests/images/logo3.png"
               alt="Datatech Logo"
               width={160}
               height={40}
