@@ -130,13 +130,23 @@ export function AppHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="datatech">
-            <Image
-              src="/assests/images/logo.png"
-              alt="Datatech Logo"
-              width={160}
-              height={40}
-              className="h-16 w-auto"
-            />
+             {isScrolled ? (
+              <Image
+                src="/assests/images/logo2.png"
+                alt="Datatech Logo Scrolled"
+                width={160}
+                height={40}
+                className="h-16 w-auto"
+              />
+            ) : (
+              <Image
+                src="/assests/images/logo.png"
+                alt="Datatech Logo"
+                width={160}
+                height={40}
+                className="h-16 w-auto"
+              />
+            )}
           </Link>
 
           {/* Hamburger button */}
@@ -192,7 +202,6 @@ export function AppHeader() {
                   <li><Link href="/upcomingevents">Upcoming Events</Link></li>
                   <li><Link href="/pastevents">Past Events</Link></li>
                   <li><Link href="/hostevent">Host an Event</Link></li>
-                  <li><Link href="/submitproposal">Submit Proposal</Link></li>
                 </ul>
               </li>
 
@@ -303,7 +312,6 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/upcomingevents">Upcoming Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/pastevents">Past Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostevent">Host an Event</Link></li>
-                    <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/submitproposal">Submit Proposal</Link></li>
                   </ul>
                 )}
               </li>
@@ -373,3 +381,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
