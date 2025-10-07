@@ -144,7 +144,7 @@ export default function FreeCoursesPage() {
             <div className="relative w-full max-w-2xl">
               <Input
                 type="text"
-                placeholder="Search resources by title or description..."
+                placeholder="Search courses by title or description..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -248,9 +248,9 @@ export default function FreeCoursesPage() {
               ) : (
                 <div className="text-center py-16 border-2 border-dashed rounded-lg">
                   <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-semibold">No Resources Found</h3>
+                  <h3 className="mt-4 text-lg font-semibold">No Courses Found</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    No resources matched your search or filter criteria.
+                    No courses matched your search or filter criteria.
                   </p>
                 </div>
               )}

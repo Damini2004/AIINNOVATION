@@ -248,9 +248,9 @@ export default function EducationalResourcesPage() {
             ) : (
               <div className="text-center py-16 border-2 border-dashed rounded-lg">
                 <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">No Resources Found</h3>
+                <h3 className="mt-4 text-lg font-semibold">No Courses Found</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  No resources matched your search or filter criteria.
+                  No courses matched your search or filter criteria.
                 </p>
               </div>
             )}
