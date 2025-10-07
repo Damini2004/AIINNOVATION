@@ -114,7 +114,7 @@ const contactMessageSchema = z.object({
 });
 
 
-type Course = z.infer<typeof courseSchema>;
+export type Course = z.infer<typeof courseSchema>;
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;

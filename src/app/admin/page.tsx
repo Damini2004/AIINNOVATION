@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 // Zod Schemas
@@ -94,7 +95,9 @@ const courseSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   duration: z.string().min(1, "Duration is required"),
-  category: z.string().min(1, "Category is required"),
+  category: z.array(z.string()).refine(value => value.some(item => item), {
+    message: "You have to select at least one category.",
+  }),
   img: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal('')),
 });
@@ -159,12 +162,21 @@ const counterSchema = z.object({
 });
 
 
-type Course = z.infer<typeof courseSchema>;
+type CourseFormValues = z.infer<typeof courseSchema>;
+type Course = Omit<CourseFormValues, 'category'> & { category: string, id?: string };
 type Partner = z.infer<typeof partnerSchema>;
 type Event = z.infer<typeof eventSchema>;
 type Journal = z.infer<typeof journalSchema>;
 type EducationalResourceFormType = z.infer<typeof educationalResourceSchema>;
 type CounterFormType = z.infer<typeof counterSchema>;
+
+const courseCategories = [
+    { id: 'school', label: 'School' },
+    { id: 'ug', label: 'Undergraduate' },
+    { id: 'pgphd', label: 'PG / PhD' },
+    { id: 'rm', label: 'Research Methodology' },
+    { id: 'free', label: 'Free Course' },
+];
 
 function CourseForm({ course, onSave }: { course?: Course; onSave: () => void }) {
   const { toast } = useToast();
@@ -174,12 +186,21 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
     setValue,
-  } = useForm<Course>({
+  } = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
-    defaultValues: course || { category: 'ug', img: '' },
+    defaultValues: {
+        id: course?.id,
+        title: course?.title || "",
+        description: course?.description || "",
+        duration: course?.duration || "",
+        img: course?.img || "",
+        link: course?.link || "",
+        category: typeof course?.category === 'string' ? course.category.split(',').map(s => s.trim()) : [],
+    },
   });
 
   useEffect(() => {
@@ -208,14 +229,20 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
     }
   };
 
-  const onSubmit: SubmitHandler<Course> = async (data) => {
+  const onSubmit: SubmitHandler<CourseFormValues> = async (data) => {
     setIsSubmitting(true);
     if (!data.img) {
         toast({ variant: "destructive", title: "Validation Error", description: "Please upload an image." });
         setIsSubmitting(false);
         return;
     }
-    const result = await addOrUpdateCourse(data);
+
+    const courseData: Course = {
+        ...data,
+        category: data.category.join(','),
+    }
+
+    const result = await addOrUpdateCourse(courseData);
     if (result.success) {
       toast({ title: "Success", description: `Course ${course ? 'updated' : 'added'}.` });
       onSave();
@@ -246,9 +273,30 @@ function CourseForm({ course, onSave }: { course?: Course; onSave: () => void })
         <Input id="courseDuration" {...register("duration")} disabled={isSubmitting} />
         {errors.duration && <p className="text-red-500 text-sm">{errors.duration.message}</p>}
       </div>
-      <div>
-        <Label htmlFor="courseCategory">Category</Label>
-        <Input id="courseCategory" placeholder="e.g. school, ug, pgphd, free" {...register("category")} disabled={isSubmitting} />
+       <div>
+        <Label>Category</Label>
+        <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+                <div className="grid grid-cols-2 gap-2 p-2 border rounded-md">
+                    {courseCategories.map((item) => (
+                        <div key={item.id} className="flex items-center gap-2">
+                           <Checkbox
+                                id={item.id}
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                    return checked
+                                    ? field.onChange([...(field.value || []), item.id])
+                                    : field.onChange(field.value?.filter((value) => value !== item.id));
+                                }}
+                            />
+                            <Label htmlFor={item.id} className="font-normal">{item.label}</Label>
+                        </div>
+                    ))}
+                </div>
+            )}
+        />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
       <div>
