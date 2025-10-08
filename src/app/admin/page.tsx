@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -1849,8 +1850,8 @@ export default function AdminPage() {
     <SidebarProvider>
       <div className="flex min-h-screen">
         <Sidebar className="bg-black text-white" collapsible="icon">
-            <SidebarContent className="p-2 pt-8">
-                <SidebarGroup>
+            <SidebarContent className="p-2 pt-8 flex flex-col">
+                <SidebarGroup className="flex-1">
                     <SidebarMenu>
                     {sidebarItems.map(item => (
                         <SidebarMenuItem key={item.id}>
@@ -1867,17 +1868,14 @@ export default function AdminPage() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            onClick={handleLogout}
-                            className="text-white hover:bg-gray-700 data-[active=true]:bg-primary"
-                        >
-                            <LogOut />
-                            Logout
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroup>
+                 <SidebarFooter className="p-2 mt-auto">
+                    <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-gray-700 w-full justify-start">
+                      <LogOut />
+                      <span>Logout</span>
+                    </Button>
+                </SidebarFooter>
             </SidebarContent>
         </Sidebar>
 
