@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
-import "./header.css";
+import "../components/header.css";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -110,13 +110,13 @@ export function AppHeader() {
     }
     
     if (isAdmin) {
-      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/admin">Dashboard</Link></li>;
+      return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/admin">Dashboard</Link></li>;
     }
     if (isLoggedIn) {
-      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/user-dashboard">Profile</Link></li>;
+      return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+    return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/registrations">Registrations</Link></li>;
   }
 
 
@@ -130,13 +130,23 @@ export function AppHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="datatech">
-            <Image
-              src="/assests/images/logo3.png"
-              alt="Datatech Logo"
-              width={160}
-              height={40}
-              className="h-16 w-auto"
-            />
+             {isScrolled ? (
+              <Image
+                src="/assests/images/logo3.png"
+                alt="Datatech Logo Scrolled"
+                width={160}
+                height={40}
+                className="h-16 w-auto"
+              />
+            ) : (
+              <Image
+                src="/assests/images/logo.png"
+                alt="Datatech Logo"
+                width={160}
+                height={40}
+                className="h-16 w-auto"
+              />
+            )}
           </Link>
 
           {/* Hamburger button */}
@@ -192,7 +202,6 @@ export function AppHeader() {
                   <li><Link href="/upcomingevents">Upcoming Events</Link></li>
                   <li><Link href="/pastevents">Past Events</Link></li>
                   <li><Link href="/hostevent">Host an Event</Link></li>
-                  
                 </ul>
               </li>
 
@@ -249,12 +258,12 @@ export function AppHeader() {
                 gap: "10px",
               }}
             >
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <Link href="/">Home</Link>
               </li>
 
               {/* About */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -272,7 +281,7 @@ export function AppHeader() {
               </li>
 
               {/* Programs */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -290,7 +299,7 @@ export function AppHeader() {
               </li>
 
               {/* Events */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -303,13 +312,12 @@ export function AppHeader() {
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/upcomingevents">Upcoming Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/pastevents">Past Events</Link></li>
                     <li className="hover:bg-gray-200 rounded px-2 py-1"><Link href="/hostevent">Host an Event</Link></li>
-                    
                   </ul>
                 )}
               </li>
 
               {/* Research */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -327,7 +335,7 @@ export function AppHeader() {
               </li>
 
               {/* Resources */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -365,7 +373,7 @@ export function AppHeader() {
                 )}
               </li>
               <MobileAuthLink />
-              <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/contact-us">Contact</Link></li>
             </ul>
           </nav>
         )}

@@ -4,11 +4,12 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './animations.css';
 import './members.css';
-import { AppHeader } from '@/components/header';
+import { AppHeader } from '@/app/header';
+import { Footer } from '@/components/footer';
 import './footer.css';
 import { Suspense } from 'react';
 import Loading from './loading';
-import { Footer } from '@/components/footer';
+
 
 export const metadata: Metadata = {
   title: 'Code Showcase',
