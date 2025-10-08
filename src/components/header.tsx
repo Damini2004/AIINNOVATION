@@ -110,13 +110,13 @@ export function AppHeader() {
     }
     
     if (isAdmin) {
-      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/admin">Dashboard</Link></li>;
+      return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/admin">Dashboard</Link></li>;
     }
     if (isLoggedIn) {
-      return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/user-dashboard">Profile</Link></li>;
+      return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/user-dashboard">Profile</Link></li>;
     }
     
-    return <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/registrations">Registrations</Link></li>;
+    return <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/registrations">Registrations</Link></li>;
   }
 
 
@@ -258,12 +258,12 @@ export function AppHeader() {
                 gap: "10px",
               }}
             >
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <Link href="/">Home</Link>
               </li>
 
               {/* About */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -281,7 +281,7 @@ export function AppHeader() {
               </li>
 
               {/* Programs */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -299,7 +299,7 @@ export function AppHeader() {
               </li>
 
               {/* Events */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -317,7 +317,7 @@ export function AppHeader() {
               </li>
 
               {/* Research */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -335,7 +335,7 @@ export function AppHeader() {
               </li>
 
               {/* Resources */}
-              <li className="hover:bg-gray-100 rounded px-3 py-2">
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black">
                 <button
                   type="button"
                   className="flex justify-between w-full font-medium"
@@ -373,7 +373,7 @@ export function AppHeader() {
                 )}
               </li>
               <MobileAuthLink />
-              <li className="hover:bg-gray-100 rounded px-3 py-2"><Link href="/contact-us">Contact</Link></li>
+              <li className="hover:bg-gray-100 rounded px-3 py-2 text-black"><Link href="/contact-us">Contact</Link></li>
             </ul>
           </nav>
         )}
@@ -381,5 +381,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
