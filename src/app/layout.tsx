@@ -7,6 +7,8 @@ import './members.css';
 import { Footer } from '@/components/footer';
 import { AppHeader } from '@/components/header';
 import './footer.css';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
   title: 'Code Showcase',
@@ -34,7 +36,9 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background light')}>
         <AppHeader />
-        {children}
+        <Suspense fallback={<Loading />}>
+          {children}
+        </Suspense>
         <Footer />
         <Toaster />
       </body>
