@@ -1883,29 +1883,32 @@ export default function AdminPage() {
             </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-10">
-            <div className="flex items-center gap-4 mb-6">
+        <main className="flex-1">
+            <div className="flex items-center gap-4 mb-6 p-4 md:p-6 lg:p-10">
                 <SidebarTrigger className="md:hidden" />
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             </div>
 
-            <AdminPageContent
-                courses={courses}
-                partners={partners}
-                events={events}
-                journals={journals}
-                papers={papers}
-                resources={resources}
-                registrations={registrations}
-                contactMessages={contactMessages}
-                fetchData={fetchData}
-                handleDelete={handleDelete}
-                getFileIcon={getFileIcon}
-                activeView={activeView}
-            />
+            <div className="p-4 md:p-6 lg:p-10 pt-0">
+              <AdminPageContent
+                  courses={courses}
+                  partners={partners}
+                  events={events}
+                  journals={journals}
+                  papers={papers}
+                  resources={resources}
+                  registrations={registrations}
+                  contactMessages={contactMessages}
+                  fetchData={fetchData}
+                  handleDelete={handleDelete}
+                  getFileIcon={getFileIcon}
+                  activeView={activeView}
+              />
+            </div>
         </main>
       </div>
     </SidebarProvider>
   );
 }
 
+    
