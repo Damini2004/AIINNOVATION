@@ -1852,7 +1852,7 @@ export default function AdminPage() {
   
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen">
         <Sidebar className="bg-black text-white" collapsible="icon">
             <SidebarContent className="p-2 pt-8 flex flex-col">
                 <SidebarGroup className="flex-1">
@@ -1883,13 +1883,13 @@ export default function AdminPage() {
             </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1">
-            <div className="flex items-center gap-4 mb-6 p-4">
+        <main className="flex-1 overflow-y-auto">
+            <div className="flex items-center gap-4 mb-6 p-4 border-b">
                 <SidebarTrigger className="md:hidden" />
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             </div>
 
-            <div className="px-10">
+            <div className="p-4 md:p-6 lg:p-8">
               <AdminPageContent
                   courses={courses}
                   partners={partners}
