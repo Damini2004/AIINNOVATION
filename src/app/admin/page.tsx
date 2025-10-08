@@ -1783,6 +1783,7 @@ export default function AdminPage() {
       getJournals(),
       getDigitalLibraryPapers(),
       getEducationalResources(),
+      getRegistrations(),
       getContactMessages(),
     ]);
     setCourses(coursesData as CourseType[]);
@@ -1828,6 +1829,10 @@ export default function AdminPage() {
     return <FileIcon className="h-5 w-5 text-gray-500" />;
   };
 
+  if (!isAuthenticated || loading) {
+     return <div className="flex justify-center items-center min-h-screen bg-background"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
+  
   const sidebarItems = [
     { id: 'courses', label: 'Courses', icon: Book },
     { id: 'partners', label: 'Partners', icon: Handshake },
@@ -1840,10 +1845,6 @@ export default function AdminPage() {
     { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.length },
   ];
 
-  if (!isAuthenticated) {
-     return <div className="flex justify-center items-center min-h-screen bg-background"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-  }
-  
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
@@ -1886,26 +1887,20 @@ export default function AdminPage() {
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             </div>
 
-            {loading ? (
-                <div className="flex justify-center items-center h-full">
-                    <Loader2 className="h-16 w-16 animate-spin" />
-                </div>
-            ) : (
-                <AdminPageContent
-                    courses={courses}
-                    partners={partners}
-                    events={events}
-                    journals={journals}
-                    papers={papers}
-                    resources={resources}
-                    registrations={registrations}
-                    contactMessages={contactMessages}
-                    fetchData={fetchData}
-                    handleDelete={handleDelete}
-                    getFileIcon={getFileIcon}
-                    activeView={activeView}
-                />
-            )}
+            <AdminPageContent
+                courses={courses}
+                partners={partners}
+                events={events}
+                journals={journals}
+                papers={papers}
+                resources={resources}
+                registrations={registrations}
+                contactMessages={contactMessages}
+                fetchData={fetchData}
+                handleDelete={handleDelete}
+                getFileIcon={getFileIcon}
+                activeView={activeView}
+            />
         </main>
       </div>
     </SidebarProvider>
