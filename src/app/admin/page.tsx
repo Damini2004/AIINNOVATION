@@ -980,7 +980,7 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
 
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Digital Library</CardTitle>
         <CardDescription>Upload a CSV file to bulk-add papers or manage existing ones.</CardDescription>
