@@ -1783,7 +1783,6 @@ export default function AdminPage() {
       getJournals(),
       getDigitalLibraryPapers(),
       getEducationalResources(),
-      getRegistrations(),
       getContactMessages(),
     ]);
     setCourses(coursesData as CourseType[]);
@@ -1867,15 +1866,18 @@ export default function AdminPage() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            onClick={handleLogout}
+                            className="text-white hover:bg-gray-700 data-[active=true]:bg-primary"
+                        >
+                            <LogOut />
+                            Logout
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="p-2">
-                <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-gray-700 w-full justify-start">
-                  <LogOut />
-                  <span>Logout</span>
-                </Button>
-            </SidebarFooter>
         </Sidebar>
 
         <main className="flex-1 p-4 md:p-6 lg:p-10">
@@ -1909,5 +1911,3 @@ export default function AdminPage() {
     </SidebarProvider>
   );
 }
-
-    
