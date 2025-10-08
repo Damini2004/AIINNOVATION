@@ -1849,7 +1849,7 @@ export default function AdminPage() {
     <SidebarProvider>
       <div className="flex min-h-screen">
         <Sidebar className="bg-black text-white" collapsible="icon">
-            <SidebarContent className="p-2">
+            <SidebarContent className="p-2 pt-8">
                 <SidebarGroup>
                     <SidebarMenu>
                     {sidebarItems.map(item => (
