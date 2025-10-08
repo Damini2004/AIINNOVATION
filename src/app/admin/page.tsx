@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -18,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -56,7 +54,7 @@ import {
   getContactMessages,
   deleteContactMessage,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage, Course as CourseType } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -79,7 +77,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail, CalendarIcon } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail, CalendarIcon, LayoutDashboard, Book, Handshake, Calendar as CalendarLucide, Library, GraduationCap, CircleUserRound, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -87,6 +85,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarItem, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 
 // Zod Schemas
@@ -1336,10 +1335,408 @@ function ContactMessageManager({ messages: initialMessages, onUpdate }: { messag
   )
 }
 
+type AdminPageContentProps = {
+  courses: CourseType[];
+  partners: Partner[];
+  events: Event[];
+  journals: Journal[];
+  papers: DigitalLibraryPaper[];
+  resources: EducationalResource[];
+  registrations: Registration[];
+  contactMessages: ContactMessage[];
+  fetchData: () => void;
+  handleDelete: (collection: 'courses' | 'partners' | 'events' | 'journals' | 'digital_library_papers' | 'educational_resources', id: string, filePath?: string) => void;
+  getFileIcon: (fileType: string) => JSX.Element;
+  activeView: string;
+}
+
+function AdminPageContent({
+  courses,
+  partners,
+  events,
+  journals,
+  papers,
+  resources,
+  registrations,
+  contactMessages,
+  fetchData,
+  handleDelete,
+  getFileIcon,
+  activeView
+}: AdminPageContentProps) {
+  if (activeView === 'courses') {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Courses</CardTitle>
+            <CardDescription>Add, edit, or delete courses. Use the category 'free' for free courses.</CardDescription>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add New Course</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Course</DialogTitle>
+              </DialogHeader>
+              <CourseForm onSave={() => {fetchData();}} />
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {courses.map((course) => (
+              <div key={course.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
+                 <div className="flex items-center gap-4">
+                    <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md object-cover" />
+                    <div>
+                      <p className="font-semibold">{course.title}</p>
+                      <p className="text-sm text-muted-foreground">{course.category} - {course.duration}</p>
+                    </div>
+                 </div>
+                <div className="flex items-center gap-2">
+                   <Dialog>
+                    <DialogTrigger asChild>
+                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Course</DialogTitle>
+                      </DialogHeader>
+                      <CourseForm course={course} onSave={() => fetchData()} />
+                    </DialogContent>
+                  </Dialog>
+                   <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action will permanently delete the course "{course.title}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete('courses', course.id!, course.img)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+  if (activeView === 'partners') {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+           <div>
+            <CardTitle>Partners</CardTitle>
+            <CardDescription>Add, edit, or delete partners.</CardDescription>
+          </div>
+           <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add New Partner</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Partner</DialogTitle>
+              </DialogHeader>
+              <PartnerForm onSave={() => fetchData()} />
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {partners.map((partner) => (
+              <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
+                 <div className="flex items-center gap-4">
+                    <Image src={partner.logo || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
+                    <div>
+                      <p className="font-semibold">{partner.name}</p>
+                      <p className="text-sm text-muted-foreground">{partner.designation}</p>
+                    </div>
+                 </div>
+                <div className="flex items-center gap-2">
+                   <Dialog>
+                    <DialogTrigger asChild>
+                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Partner</DialogTitle>
+                      </DialogHeader>
+                      <PartnerForm partner={partner} onSave={() => fetchData()} />
+                    </DialogContent>
+                  </Dialog>
+                   <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action will permanently delete the partner "{partner.name}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete('partners', partner.id!, partner.logo)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+   if (activeView === 'events') {
+    return (
+       <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Events</CardTitle>
+            <CardDescription>Add, edit, or delete events.</CardDescription>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add New Event</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Event</DialogTitle>
+              </DialogHeader>
+              <EventForm onSave={() => fetchData()} />
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {events.map((event) => (
+              <div key={event.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
+                <div className="flex items-center gap-4">
+                    <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md object-cover" />
+                    <div>
+                      <p className="font-semibold">{event.title}</p>
+                       <p className="text-sm text-muted-foreground">{event.category} - {event.subtitle}</p>
+                    </div>
+                 </div>
+                <div className="flex items-center gap-2">
+                   <Dialog>
+                    <DialogTrigger asChild>
+                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Event</DialogTitle>
+                      </DialogHeader>
+                      <EventForm event={event} onSave={() => fetchData()} />
+                    </DialogContent>
+                  </Dialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                           This action will permanently delete the event "{event.title}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete('events', event.id!, event.image)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+  if (activeView === 'journals') {
+    return (
+       <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Journals</CardTitle>
+            <CardDescription>Add, edit, or delete journals.</CardDescription>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add New Journal</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Journal</DialogTitle>
+              </DialogHeader>
+              <JournalForm onSave={() => fetchData()} />
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {journals.map((journal) => (
+              <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
+                <div className="flex items-center gap-4">
+                    <Image src={journal.image} alt={journal.title} width={60} height={45} className="rounded-md object-cover" />
+                    <div>
+                      <p className="font-semibold">{journal.title}</p>
+                    </div>
+                 </div>
+                <div className="flex items-center gap-2">
+                   <Dialog>
+                    <DialogTrigger asChild>
+                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Journal</DialogTitle>
+                      </DialogHeader>
+                      <JournalForm journal={journal} onSave={() => fetchData()} />
+                    </DialogContent>
+                  </Dialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action will permanently delete the journal "{journal.title}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete('journals', journal.id!, journal.image)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+   if (activeView === 'library') {
+    return (
+      <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
+    )
+  }
+  if (activeView === 'resources') {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Educational Resources</CardTitle>
+            <CardDescription>Add, edit, or delete educational resources.</CardDescription>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add New Resource</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Resource</DialogTitle>
+              </DialogHeader>
+              <EducationalResourceForm onSave={fetchData} />
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {resources.map((resource) => (
+              <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
+                <div className="flex items-center gap-4">
+                  {resource.image ? (
+                    <Image src={resource.image} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
+                  ) : (
+                    <div className="w-[60px] h-[45px] flex items-center justify-center bg-secondary rounded-md">
+                      {getFileIcon(resource.fileType)}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold">{resource.title}</p>
+                    <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                   <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Resource</DialogTitle>
+                      </DialogHeader>
+                      <EducationalResourceForm onSave={fetchData} resource={resource}/>
+                    </DialogContent>
+                   </Dialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete the resource "{resource.title}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+   if (activeView === 'counters') {
+    return (
+      <CounterForm onSave={fetchData} />
+    )
+  }
+  if (activeView === 'registrations') {
+    return (
+      <RegistrationManager registrations={registrations} onUpdate={fetchData} />
+    )
+  }
+  if (activeView === 'messages') {
+    return (
+      <ContactMessageManager messages={contactMessages} onUpdate={fetchData} />
+    )
+  }
+
+  return null;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<CourseType[]>([]);
   const [partners, setPartners] =useState<Partner[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [journals, setJournals] = useState<Journal[]>([]);
@@ -1349,9 +1746,10 @@ export default function AdminPage() {
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState("courses");
+  const [activeView, setActiveView] = useState("courses");
 
   const getSessionWithExpiry = (key: string) => {
+    if (typeof window === 'undefined') return null;
     const itemStr = localStorage.getItem(key);
     if (!itemStr) {
       return null;
@@ -1388,7 +1786,7 @@ export default function AdminPage() {
       getRegistrations(),
       getContactMessages(),
     ]);
-    setCourses(coursesData);
+    setCourses(coursesData as CourseType[]);
     setPartners(partnersData);
     setEvents(eventsData);
     setJournals(journalsData);
@@ -1431,394 +1829,85 @@ export default function AdminPage() {
     return <FileIcon className="h-5 w-5 text-gray-500" />;
   };
 
+  const sidebarItems = [
+    { id: 'courses', label: 'Courses', icon: Book },
+    { id: 'partners', label: 'Partners', icon: Handshake },
+    { id: 'events', label: 'Events', icon: CalendarLucide },
+    { id: 'journals', label: 'Journals', icon: Library },
+    { id: 'library', label: 'Digital Library', icon: Book },
+    { id: 'resources', label: 'Ed Resources', icon: GraduationCap },
+    { id: 'counters', label: 'Counters', icon: LayoutDashboard },
+    { id: 'registrations', label: 'Registrations', icon: CircleUserRound },
+    { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.length },
+  ];
+
   if (!isAuthenticated) {
-     return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+     return <div className="flex justify-center items-center min-h-screen bg-background"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
   
-  if (loading) {
-    return <div className="container mx-auto py-10 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-  }
-
   return (
-    <div className="container mx-auto py-10">
-       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <Button variant="outline" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+    <SidebarProvider>
+      <div className="flex min-h-screen">
+        <Sidebar className="bg-black text-white" collapsible="icon">
+            <SidebarContent className="p-2">
+                <SidebarGroup>
+                    <SidebarMenu>
+                    {sidebarItems.map(item => (
+                        <SidebarMenuItem key={item.id}>
+                            <SidebarMenuButton
+                                onClick={() => setActiveView(item.id)}
+                                isActive={activeView === item.id}
+                                className="text-white hover:bg-gray-700 data-[active=true]:bg-primary"
+                            >
+                                <item.icon />
+                                {item.label}
+                                {item.badge && item.badge > 0 && 
+                                <Badge className="ml-auto bg-red-500 text-white">{item.badge}</Badge>
+                                }
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                    </SidebarMenu>
+                </SidebarGroup>
+            </SidebarContent>
+            <SidebarFooter className="p-2">
+                <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-gray-700 w-full justify-start">
+                  <LogOut />
+                  <span>Logout</span>
+                </Button>
+            </SidebarFooter>
+        </Sidebar>
+
+        <main className="flex-1 p-4 md:p-6 lg:p-10">
+            <div className="flex items-center gap-4 mb-6">
+                <SidebarTrigger className="md:hidden" />
+                <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center items-center h-full">
+                    <Loader2 className="h-16 w-16 animate-spin" />
+                </div>
+            ) : (
+                <AdminPageContent
+                    courses={courses}
+                    partners={partners}
+                    events={events}
+                    journals={journals}
+                    papers={papers}
+                    resources={resources}
+                    registrations={registrations}
+                    contactMessages={contactMessages}
+                    fetchData={fetchData}
+                    handleDelete={handleDelete}
+                    getFileIcon={getFileIcon}
+                    activeView={activeView}
+                />
+            )}
+        </main>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 h-auto lg:h-10">
-          <TabsTrigger value="courses">Courses</TabsTrigger>
-          <TabsTrigger value="partners">Partners</TabsTrigger>
-          <TabsTrigger value="events">Events</TabsTrigger>
-          <TabsTrigger value="journals">Journals</TabsTrigger>
-          <TabsTrigger value="library">Digital Library</TabsTrigger>
-          <TabsTrigger value="resources">Ed Resources</TabsTrigger>
-          <TabsTrigger value="counters">Counters</TabsTrigger>
-          <TabsTrigger value="registrations">Registrations</TabsTrigger>
-           <TabsTrigger value="messages" className="relative">
-              Messages
-              {contactMessages.length > 0 && 
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{contactMessages.length}</Badge>
-              }
-           </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="courses">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Courses</CardTitle>
-                <CardDescription>Add, edit, or delete courses. Use the category 'free' for free courses.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Course</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Course</DialogTitle>
-                  </DialogHeader>
-                  <CourseForm onSave={() => {fetchData();}} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {courses.map((course) => (
-                  <div key={course.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                     <div className="flex items-center gap-4">
-                        <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md object-cover" />
-                        <div>
-                          <p className="font-semibold">{course.title}</p>
-                          <p className="text-sm text-muted-foreground">{course.category} - {course.duration}</p>
-                        </div>
-                     </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Course</DialogTitle>
-                          </DialogHeader>
-                          <CourseForm course={course} onSave={() => fetchData()} />
-                        </DialogContent>
-                      </Dialog>
-                       <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will permanently delete the course "{course.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('courses', course.id!, course.img)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="partners">
-           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-               <div>
-                <CardTitle>Partners</CardTitle>
-                <CardDescription>Add, edit, or delete partners.</CardDescription>
-              </div>
-               <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Partner</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Partner</DialogTitle>
-                  </DialogHeader>
-                  <PartnerForm onSave={() => fetchData()} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {partners.map((partner) => (
-                  <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                     <div className="flex items-center gap-4">
-                        <Image src={partner.logo || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
-                        <div>
-                          <p className="font-semibold">{partner.name}</p>
-                          <p className="text-sm text-muted-foreground">{partner.designation}</p>
-                        </div>
-                     </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Partner</DialogTitle>
-                          </DialogHeader>
-                          <PartnerForm partner={partner} onSave={() => fetchData()} />
-                        </DialogContent>
-                      </Dialog>
-                       <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will permanently delete the partner "{partner.name}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('partners', partner.id!, partner.logo)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="events">
-           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Events</CardTitle>
-                <CardDescription>Add, edit, or delete events.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Event</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Event</DialogTitle>
-                  </DialogHeader>
-                  <EventForm onSave={() => fetchData()} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-4">
-                        <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md object-cover" />
-                        <div>
-                          <p className="font-semibold">{event.title}</p>
-                           <p className="text-sm text-muted-foreground">{event.category} - {event.subtitle}</p>
-                        </div>
-                     </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Event</DialogTitle>
-                          </DialogHeader>
-                          <EventForm event={event} onSave={() => fetchData()} />
-                        </DialogContent>
-                      </Dialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                               This action will permanently delete the event "{event.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('events', event.id!, event.image)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="journals">
-           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Journals</CardTitle>
-                <CardDescription>Add, edit, or delete journals.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Journal</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Journal</DialogTitle>
-                  </DialogHeader>
-                  <JournalForm onSave={() => fetchData()} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {journals.map((journal) => (
-                  <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-4">
-                        <Image src={journal.image} alt={journal.title} width={60} height={45} className="rounded-md object-cover" />
-                        <div>
-                          <p className="font-semibold">{journal.title}</p>
-                        </div>
-                     </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                           <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Journal</DialogTitle>
-                          </DialogHeader>
-                          <JournalForm journal={journal} onSave={() => fetchData()} />
-                        </DialogContent>
-                      </Dialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will permanently delete the journal "{journal.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('journals', journal.id!, journal.image)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="library">
-          <DigitalLibraryManager papers={papers} onUpdate={fetchData} />
-        </TabsContent>
-        <TabsContent value="resources">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Educational Resources</CardTitle>
-                <CardDescription>Add, edit, or delete educational resources.</CardDescription>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add New Resource</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Resource</DialogTitle>
-                  </DialogHeader>
-                  <EducationalResourceForm onSave={fetchData} />
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {resources.map((resource) => (
-                  <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-4">
-                      {resource.image ? (
-                        <Image src={resource.image} alt={resource.title} width={60} height={45} className="rounded-md object-cover" />
-                      ) : (
-                        <div className="w-[60px] h-[45px] flex items-center justify-center bg-secondary rounded-md">
-                          {getFileIcon(resource.fileType)}
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-semibold">{resource.title}</p>
-                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:underline truncate max-w-xs block">{resource.fileName === 'link' ? resource.fileUrl : resource.fileName}</a>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                       <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Resource</DialogTitle>
-                          </DialogHeader>
-                          <EducationalResourceForm onSave={fetchData} resource={resource}/>
-                        </DialogContent>
-                       </Dialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete the resource "{resource.title}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete('educational_resources', resource.id!, resource.fileName)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="counters">
-          <CounterForm onSave={fetchData} />
-        </TabsContent>
-        <TabsContent value="registrations">
-            <RegistrationManager registrations={registrations} onUpdate={fetchData} />
-        </TabsContent>
-        <TabsContent value="messages">
-            <ContactMessageManager messages={contactMessages} onUpdate={fetchData} />
-        </TabsContent>
-
-      </Tabs>
-    </div>
+    </SidebarProvider>
   );
 }
+
+    
