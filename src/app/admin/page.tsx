@@ -1889,7 +1889,7 @@ export default function AdminPage() {
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             </div>
 
-            <div className="p-4 md:p-6 lg:p-10 pt-0">
+            <div className="px-4 md:px-6 lg:px-10">
               <AdminPageContent
                   courses={courses}
                   partners={partners}
