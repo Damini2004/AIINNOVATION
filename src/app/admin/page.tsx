@@ -1884,12 +1884,12 @@ export default function AdminPage() {
         </Sidebar>
 
         <main className="flex-1">
-            <div className="flex items-center gap-4 mb-6 p-4 md:p-6 lg:p-10">
+            <div className="flex items-center gap-4 mb-6 p-4">
                 <SidebarTrigger className="md:hidden" />
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             </div>
 
-            <div className="px-4 md:px-6 lg:px-10">
+            <div className="px-10">
               <AdminPageContent
                   courses={courses}
                   partners={partners}
