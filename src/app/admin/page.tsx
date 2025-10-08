@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -1748,6 +1747,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeView, setActiveView] = useState("courses");
+  const [sidebarItems, setSidebarItems] = useState<any[]>([]);
 
   const getSessionWithExpiry = (key: string) => {
     if (typeof window === 'undefined') return null;
@@ -1774,6 +1774,22 @@ export default function AdminPage() {
       fetchData();
     }
   }, [router]);
+
+  useEffect(() => {
+    if(!loading) {
+       setSidebarItems([
+        { id: 'courses', label: 'Courses', icon: Book },
+        { id: 'partners', label: 'Partners', icon: Handshake },
+        { id: 'events', label: 'Events', icon: CalendarLucide },
+        { id: 'journals', label: 'Journals', icon: Library },
+        { id: 'library', label: 'Digital Library', icon: Book },
+        { id: 'resources', label: 'Ed Resources', icon: GraduationCap },
+        { id: 'counters', label: 'Counters', icon: LayoutDashboard },
+        { id: 'registrations', label: 'Registrations', icon: CircleUserRound },
+        { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.length },
+      ]);
+    }
+  }, [loading, contactMessages])
 
   const fetchData = async () => {
     setLoading(true);
@@ -1834,18 +1850,6 @@ export default function AdminPage() {
      return <div className="flex justify-center items-center min-h-screen bg-background"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
   
-  const sidebarItems = [
-    { id: 'courses', label: 'Courses', icon: Book },
-    { id: 'partners', label: 'Partners', icon: Handshake },
-    { id: 'events', label: 'Events', icon: CalendarLucide },
-    { id: 'journals', label: 'Journals', icon: Library },
-    { id: 'library', label: 'Digital Library', icon: Book },
-    { id: 'resources', label: 'Ed Resources', icon: GraduationCap },
-    { id: 'counters', label: 'Counters', icon: LayoutDashboard },
-    { id: 'registrations', label: 'Registrations', icon: CircleUserRound },
-    { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.length },
-  ];
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
@@ -1904,3 +1908,4 @@ export default function AdminPage() {
     </SidebarProvider>
   );
 }
+
