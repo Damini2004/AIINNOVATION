@@ -4,7 +4,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './animations.css';
 import './members.css';
-import { Footer } from '@/components/footer';
 import { AppHeader } from '@/components/header';
 import './footer.css';
 import { Suspense } from 'react';
@@ -39,7 +38,6 @@ export default function RootLayout({
         <Suspense fallback={<Loading />}>
           {children}
         </Suspense>
-        <Footer />
         <Toaster />
       </body>
     </html>
