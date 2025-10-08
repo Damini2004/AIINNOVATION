@@ -25,7 +25,7 @@ export function Footer() {
 
   return (
     <footer
-      className="pt-20 pb-3 bg-cover bg-center bg-secondary  z-[999]"
+      className="pt-20 pb-3 bg-cover bg-center bg-secondary"
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
