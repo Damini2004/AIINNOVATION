@@ -84,16 +84,15 @@ export async function handleLogin(data: unknown) {
 
   try {
     const { email, password } = validatedData.data;
-    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-
-    // 1. Check for Super Admin
-    if (email === superAdminEmail) {
-      // The password has already been verified by Firebase Auth on the client side.
-      // We just need to confirm the email is the designated admin email.
-      return { success: true, isAdmin: true };
+    
+    // 1. Check if the user is the designated super admin.
+    if (email === process.env.SUPER_ADMIN_EMAIL) {
+        // The password has already been verified by Firebase Auth on the client.
+        // We just need to confirm the email is the designated admin email.
+        return { success: true, isAdmin: true };
     }
 
-    // 2. If not super admin, check for a regular user
+    // 2. If not super admin, check for a regular user.
     const q = query(collection(db, "registrations"), where("email", "==", email));
     const querySnapshot = await getDocs(q);
 
@@ -104,19 +103,16 @@ export async function handleLogin(data: unknown) {
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
 
-    // Note: This password check is for legacy/non-Firebase-auth users.
-    // A more secure system would migrate all users to Firebase Auth.
+    // This password check is for non-Firebase Auth users.
     if (userData.password === password) {
       return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
     } else {
-      // This path is hit if the user exists but the password (from a direct DB check) is wrong.
-      // For a Firebase Auth user, this check will likely fail unless passwords are in sync, which is bad practice.
-      // The primary login path for regular users should also use Firebase Auth on the client.
-      return { success: false, error: "Incorrect password for regular user." };
+      return { success: false, error: "Incorrect password." };
     }
 
   } catch (error: any) {
-    return { success: false, error: error.message || "An unexpected server error occurred." };
+    console.error("Server Action Error in handleLogin:", error);
+    return { success: false, error: "An unexpected server error occurred." };
   }
 }
 
