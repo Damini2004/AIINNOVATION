@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
         });
       }
     } catch (error: any) {
-      // This catches Firebase Auth errors (wrong password, user not found)
+      // This catches Firebase Auth errors (wrong password, user not found, etc.)
       let errorMessage = "An unknown error occurred.";
       if (error.code) {
         switch (error.code) {

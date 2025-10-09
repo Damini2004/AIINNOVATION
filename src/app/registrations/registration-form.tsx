@@ -29,8 +29,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UploadCloud, ArrowLeft, ArrowRight } from "lucide-react";
 import { handleRegistration } from "./actions";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
 
-const registrationSchema = z.object({
+
+const formSchema = z.object({
   registrationType: z.enum(["student", "professional", "member"], {
     required_error: "Please select a registration type.",
   }),
@@ -56,7 +59,7 @@ const registrationSchema = z.object({
     path: ["confirmPassword"],
 });
 
-type RegistrationFormValues = z.infer<typeof registrationSchema>;
+type RegistrationFormValues = z.infer<typeof formSchema>;
 
 export default function RegistrationForm() {
   const { toast } = useToast();
@@ -65,7 +68,7 @@ export default function RegistrationForm() {
   const [step, setStep] = useState(1);
 
   const form = useForm<RegistrationFormValues>({
-    resolver: zodResolver(registrationSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -129,23 +132,50 @@ export default function RegistrationForm() {
   const onSubmit: SubmitHandler<RegistrationFormValues> = async (data) => {
     setIsSubmitting(true);
     try {
-      const result = await handleRegistration(data);
-       if (result.success) {
+      // Step 1: Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      // Step 2: Save user profile data to Firestore
+      const { password, confirmPassword, ...profileData } = data;
+      const result = await handleRegistration({
+        ...profileData,
+        uid: user.uid, // Add Firebase UID to the document
+      });
+
+      if (result.success) {
         toast({
           title: "Registration Successful!",
-          description: "Thank you for joining AIIS. We will be in touch shortly.",
+          description: "Thank you for joining AIIS. Your application is pending approval.",
         });
         form.reset();
         setPhotoPreview(null);
         setStep(1);
       } else {
-        throw new Error(result.error);
+        throw new Error(result.error || "Failed to save profile.");
       }
     } catch (error: any) {
+      let errorMessage = "An unexpected error occurred.";
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = "This email address is already in use.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "The email address is not valid.";
+            break;
+          case 'auth/weak-password':
+            errorMessage = "The password is not strong enough.";
+            break;
+          default:
+            errorMessage = error.message;
+            break;
+        }
+      }
        toast({
         variant: "destructive",
         title: "Registration Failed",
-        description: error.message || "An unexpected error occurred.",
+        description: errorMessage,
       });
     } finally {
         setIsSubmitting(false);
