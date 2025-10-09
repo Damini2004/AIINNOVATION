@@ -18,9 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { handleLogin } from "./actions";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getIdTokenResult } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
+import { getUserProfile } from "./actions";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -57,21 +57,24 @@ export default function LoginForm() {
 
     try {
       // 1. Authenticate with Firebase
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
 
-      // 2. Authorize with server action (checks if user is 'approved' in Firestore)
-      const result = await handleLogin({ email: data.email });
+      // 2. Check if the user's registration is approved
+      const result = await getUserProfile(data.email);
 
-      if (result.success && result.user) {
+      if (result.success && result.data && result.data.status === 'approved') {
         const sessionTTL = 60 * 60 * 1000; // 1 hour
-        setSessionWithExpiry('userSession', { loggedIn: true, user: result.user }, sessionTTL);
+        setSessionWithExpiry('userSession', { loggedIn: true, user: result.data }, sessionTTL);
         toast({
           title: "Login Successful",
-          description: `Welcome back, ${result.user.name}!`,
+          description: `Welcome back, ${result.data.name}!`,
         });
         router.push("/user-dashboard");
-      } else {
-        // This will catch errors from the server action, like "User not found" or "Registration pending"
+      } else if (result.success && result.data && result.data.status === 'pending') {
+        throw new Error("Your registration is still pending approval.");
+      }
+       else {
+        // This will catch errors from the server action, like "User not found"
         throw new Error(result.error || "Authorization failed.");
       }
     } catch (error: any) {
@@ -158,4 +161,3 @@ export default function LoginForm() {
     </>
   );
 }
-
