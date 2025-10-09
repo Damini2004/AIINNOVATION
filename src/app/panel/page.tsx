@@ -23,6 +23,7 @@ export default function AdminLoginPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const getSessionWithExpiry = (key: string) => {
+    if (typeof window === 'undefined') return null;
     const itemStr = localStorage.getItem(key);
     if (!itemStr) {
       return null;
