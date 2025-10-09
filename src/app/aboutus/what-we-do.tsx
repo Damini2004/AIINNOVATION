@@ -1,3 +1,4 @@
+
 "use client";
 
 import { BarChart, Globe, Lock, Briefcase, Users, GitBranch } from 'lucide-react';
@@ -45,7 +46,7 @@ export default function WhatWeDo() {
 
 
   return (
-    <div className="service-area style-six py-20">
+    <div className="py-20 bg-secondary">
       <div className="container mx-auto">
         <div className="text-center pb-12">
           <h5 className="text-primary font-semibold">WHAT WE DO</h5>
@@ -56,25 +57,32 @@ export default function WhatWeDo() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
-                 <div key={index} className={service.variant === 'gradient' ? "dreamit-service-box-1 white" : "dreamit-service-box"}>
-                    {service.variant === 'default' && 
-                        <div className="service-icon">
-                            {service.icon}
-                        </div>
-                    }
-                    <div className="service-box-inner">
-                         {service.variant === 'gradient' && 
-                            <div className="service-icon">
-                                {service.icon}
-                            </div>
-                        }
-                        <div className="em-service-title">
-                            <h2>{service.title}</h2>
-                        </div>
-                        <div className="em-service-text">
-                            <p>{service.description}</p>
-                        </div>
+                 <div
+                  key={index}
+                  className={`
+                    relative group text-center p-12 bg-card shadow-lg rounded-lg transition-all duration-500 z-10
+                    ${service.variant === 'gradient' ? 'text-primary-foreground' : ''}
+                  `}
+                >
+                  <div
+                    className={`
+                      absolute top-0 left-0 w-full h-full rounded-lg transition-all duration-500 -z-10
+                      ${service.variant === 'gradient'
+                          ? 'bg-gradient-to-r from-primary to-accent'
+                          : 'bg-card group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent'
+                      }
+                    `}
+                  />
+                    <div className="text-primary group-hover:text-primary-foreground transition-colors duration-500 inline-block mb-6">
+                        {React.cloneElement(service.icon, { className: "w-16 h-16"})}
                     </div>
+
+                    <h3 className="text-xl font-bold mb-4 group-hover:text-primary-foreground transition-colors duration-500">
+                        {service.title}
+                    </h3>
+                    <p className="text-muted-foreground group-hover:text-primary-foreground/80 transition-colors duration-500">
+                        {service.description}
+                    </p>
                 </div>
             ))}
         </div>

@@ -7,6 +7,7 @@ import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import "./header.css";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,23 +131,13 @@ export function AppHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="datatech">
-             {isScrolled ? (
-              <Image
-                src="/assests/images/logo3.png"
-                alt="Datatech Logo Scrolled"
-                width={160}
-                height={40}
-                className="h-16 w-auto"
-              />
-            ) : (
-              <Image
+            <Image
                 src="/assests/images/logo.png"
                 alt="Datatech Logo"
                 width={160}
                 height={40}
-                className="h-16 w-auto"
+                className={cn("h-16 w-auto transition-all", { "brightness-[10] contrast-[10]": isScrolled })}
               />
-            )}
           </Link>
 
           {/* Hamburger button */}

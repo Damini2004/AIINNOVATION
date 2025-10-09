@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import WhatWeDo from "./what-we-do";
-import "./what-we-do.css";
 import { motion } from "framer-motion";
 
 export default function AboutUsContent() {

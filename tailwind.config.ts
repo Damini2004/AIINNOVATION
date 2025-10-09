@@ -17,9 +17,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Space Grotesk', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
-        code: ['Source Code Pro', 'monospace'],
+        body: ['var(--font-space-grotesk)', 'sans-serif'],
+        headline: ['var(--font-inter)', 'sans-serif'],
+        code: ['var(--font-source-code-pro)', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
