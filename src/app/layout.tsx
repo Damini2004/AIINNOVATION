@@ -51,7 +51,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="canonical" href="https://aiinnovation-zmoi.vercel.app/" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/assests/images/apple-touch-icon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
