@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { handleLogin } from "../registrations/actions";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -42,13 +43,16 @@ export default function AdminLoginPage() {
   }, [router]);
 
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (email === "admin@aiis.com" && password === "password") {
-        const sessionTTL = 60 * 1000; // 1 minute
+    const result = await handleLogin({ email, password });
+    
+    setIsLoading(false);
+
+    if (result.success && result.isAdmin) {
+        const sessionTTL = 60 * 60 * 1000; // 1 hour
         const now = new Date();
         const item = {
           value: { loggedIn: true },
@@ -61,15 +65,13 @@ export default function AdminLoginPage() {
           description: "Redirecting to dashboard...",
         });
         router.push("/admin");
-      } else {
+    } else {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid email or password.",
+          description: result.error || "Invalid email or password.",
         });
-        setIsLoading(false);
-      }
-    }, 1000);
+    }
   };
 
   if (isCheckingAuth) {
@@ -84,19 +86,19 @@ export default function AdminLoginPage() {
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)] bg-background">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <CardTitle className="text-2xl">Super Admin Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your credentials below to login to the admin dashboard.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLoginSubmit}>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@aiis.com"
+                placeholder="superadmin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

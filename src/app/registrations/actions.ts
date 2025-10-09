@@ -85,8 +85,11 @@ export async function handleLogin(data: unknown) {
     try {
         const { email, password } = validatedData.data;
 
-        // Check for special admin case first
-        if (email === "admin@aiis.com" && password === "password") {
+        // Check for special super admin case first, using environment variables
+        const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
+        const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
+
+        if (email === superAdminEmail && password === superAdminPassword) {
             return { success: true, isAdmin: true };
         }
 
