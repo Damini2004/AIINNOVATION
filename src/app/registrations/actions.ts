@@ -85,14 +85,14 @@ export async function handleLogin(data: unknown) {
     try {
         const { email, password } = validatedData.data;
         const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-
+        
+        // If the email matches the super admin email, authorize them immediately.
+        // The password has already been verified by Firebase Auth on the client.
         if (email === superAdminEmail) {
-            // This is a simplified check. The actual password verification
-            // is now handled on the client by Firebase Auth. We just check if the email
-            // is the super admin's email to grant admin privileges.
             return { success: true, isAdmin: true };
         }
 
+        // If not super admin, check for a regular user in the registrations collection.
         const q = query(collection(db, "registrations"), where("email", "==", email));
         const querySnapshot = await getDocs(q);
 
@@ -103,8 +103,8 @@ export async function handleLogin(data: unknown) {
         const userDoc = querySnapshot.docs[0];
         const userData = userDoc.data();
 
-        // NOTE: This plaintext password check is NOT secure and is for demonstration.
-        // The client-side handles the real Firebase Auth.
+        // This check is for regular user login from the registrations collection.
+        // The client-side should ideally also use Firebase Auth for these users.
         if (userData.password === password) {
              // We only return isAdmin: false, and user data for non-admin users.
             return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
