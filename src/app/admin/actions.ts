@@ -427,7 +427,8 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
     const messages = await getDocsFromCollection<ContactMessage>('contact_messages', { orderByField: 'createdAt', orderDirection: 'desc' });
     return messages.map(msg => ({
         ...msg,
-        createdAt: JSON.parse(JSON.stringify(msg.createdAt)),
+        // Manually convert Timestamp to a serializable format (ISO string)
+        createdAt: msg.createdAt instanceof Timestamp ? msg.createdAt.toDate().toISOString() : msg.createdAt,
         status: msg.status || 'unread', // Default old messages to unread
     }));
 }
@@ -449,4 +450,5 @@ export async function updateContactMessageStatus(id: string, status: 'read' | 'u
     
 
     
+
 
