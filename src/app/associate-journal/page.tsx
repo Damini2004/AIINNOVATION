@@ -1,8 +1,6 @@
 
-"use client";
-
 import Link from "next/link";
-import JournalList from "@/components/journal-list";
+import AssociateJournalContent from "./associate-journal-content";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -34,7 +32,7 @@ export default function AssociateJournalPage() {
       {/* Main Content */}
       <main className="py-24">
         <div className="container mx-auto px-6">
-           <JournalList />
+           <AssociateJournalContent />
         </div>
       </main>
     </div>
