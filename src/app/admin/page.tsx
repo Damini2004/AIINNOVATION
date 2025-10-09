@@ -56,7 +56,7 @@ import {
   deleteContactMessage,
   updateContactMessageStatus,
 } from "./actions";
-import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage, Course as CourseType } from "./actions";
+import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage, Course as CourseType, Partner as PartnerType, Event as EventType, Journal as JournalType } from "./actions";
 import {
   Dialog,
   DialogContent,
@@ -905,6 +905,22 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
   const [isUploading, setIsUploading] = useState(false);
   const [parsedData, setParsedData] = useState<Omit<DigitalLibraryPaper, 'id'>[] | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAPERS_PER_PAGE = 5;
+
+  const filteredPapers = useMemo(() => {
+    return initialPapers.filter(paper =>
+      paper.paperTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      paper.authorName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [initialPapers, searchTerm]);
+
+  const totalPages = Math.ceil(filteredPapers.length / PAPERS_PER_PAGE);
+  const paginatedPapers = filteredPapers.slice(
+    (currentPage - 1) * PAPERS_PER_PAGE,
+    currentPage * PAPERS_PER_PAGE
+  );
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1011,10 +1027,22 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
           </div>
         )}
         
-        <div className="space-y-2 pt-4">
+        <div className="space-y-4 pt-4">
              <h4 className="font-semibold">Existing Papers ({initialPapers.length})</h4>
-             <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-                {initialPapers.map((paper) => (
+              <div className="relative w-full sm:max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                      placeholder="Search papers..."
+                      className="pl-9"
+                      value={searchTerm}
+                      onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setCurrentPage(1);
+                      }}
+                  />
+              </div>
+             <div className="space-y-2">
+                {paginatedPapers.map((paper) => (
                     <div key={paper.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                         <div className="truncate">
                           <p className="font-medium text-sm truncate">{paper.paperTitle}</p>
@@ -1040,8 +1068,14 @@ function DigitalLibraryManager({ papers: initialPapers, onUpdate }: { papers: Di
                     </div>
                 ))}
             </div>
+            {totalPages > 1 && (
+                <div className="flex justify-between items-center pt-4">
+                    <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                    <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
+                    <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</Button>
+                </div>
+            )}
         </div>
-
       </CardContent>
     </Card>
   )
@@ -1111,10 +1145,14 @@ function CounterForm({ onSave }: { onSave: () => void }) {
   );
 }
 
+const ITEMS_PER_PAGE = 5;
+
 function RegistrationManager({ registrations, onUpdate }: { registrations: Registration[], onUpdate: () => void }) {
     const { toast } = useToast();
     const [isProcessing, setIsProcessing] = useState<string | null>(null);
     const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const handleApprove = async (registration: Registration) => {
         setIsProcessing(registration.id!);
@@ -1154,8 +1192,17 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
     }
 
     const filteredRegistrations = useMemo(() => {
-        return registrations.filter(reg => reg.status === filter);
-    }, [registrations, filter]);
+        return registrations.filter(reg => 
+          reg.status === filter &&
+          (reg.name.toLowerCase().includes(searchTerm.toLowerCase()) || reg.email.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    }, [registrations, filter, searchTerm]);
+
+    const totalPages = Math.ceil(filteredRegistrations.length / ITEMS_PER_PAGE);
+    const paginatedRegistrations = filteredRegistrations.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
 
     const ActionButtons = ({reg}: {reg: Registration}) => {
         if (reg.status === 'pending') {
@@ -1180,14 +1227,28 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                 <CardDescription>Review and manage new member registrations.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex gap-2 mb-4">
-                    <Button variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>Pending</Button>
-                    <Button variant={filter === 'approved' ? 'default' : 'outline'} onClick={() => setFilter('approved')}>Approved</Button>
-                    <Button variant={filter === 'rejected' ? 'default' : 'outline'} onClick={() => setFilter('rejected')}>Rejected</Button>
+                 <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                    <div className="relative w-full sm:max-w-xs">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                            placeholder="Search by name or email..."
+                            className="pl-9"
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>Pending</Button>
+                        <Button variant={filter === 'approved' ? 'default' : 'outline'} onClick={() => setFilter('approved')}>Approved</Button>
+                        <Button variant={filter === 'rejected' ? 'default' : 'outline'} onClick={() => setFilter('rejected')}>Rejected</Button>
+                    </div>
                 </div>
                 <div className="space-y-4">
-                    {filteredRegistrations.length === 0 && <p className="text-muted-foreground text-center py-4">No {filter} registrations.</p>}
-                    {filteredRegistrations.map((reg) => (
+                    {paginatedRegistrations.length === 0 && <p className="text-muted-foreground text-center py-4">No {filter} registrations match your criteria.</p>}
+                    {paginatedRegistrations.map((reg) => (
                         <div key={reg.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                             <div className="flex items-center gap-4">
                                 <Image src={reg.photo} alt={reg.name} width={48} height={48} className="rounded-full object-cover" />
@@ -1274,6 +1335,13 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                         </div>
                     ))}
                 </div>
+                {totalPages > 1 && (
+                    <div className="flex justify-between items-center pt-6">
+                        <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                        <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
+                        <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</Button>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
@@ -1419,9 +1487,9 @@ function ContactMessageManager({ messages: initialMessages, onUpdate }: { messag
 
 type AdminPageContentProps = {
   courses: CourseType[];
-  partners: Partner[];
-  events: Event[];
-  journals: Journal[];
+  partners: PartnerType[];
+  events: EventType[];
+  journals: JournalType[];
   papers: DigitalLibraryPaper[];
   resources: EducationalResource[];
   registrations: Registration[];
@@ -1446,6 +1514,36 @@ function AdminPageContent({
   getFileIcon,
   activeView
 }: AdminPageContentProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
+  useEffect(() => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  }, [activeView]);
+
+  const filteredCourses = useMemo(() => courses.filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase())), [courses, searchTerm]);
+  const paginatedCourses = filteredCourses.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalCoursePages = Math.ceil(filteredCourses.length / ITEMS_PER_PAGE);
+
+  const filteredPartners = useMemo(() => partners.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())), [partners, searchTerm]);
+  const paginatedPartners = filteredPartners.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPartnerPages = Math.ceil(filteredPartners.length / ITEMS_PER_PAGE);
+
+  const filteredEvents = useMemo(() => events.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase())), [events, searchTerm]);
+  const paginatedEvents = filteredEvents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalEventPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  
+  const filteredJournals = useMemo(() => journals.filter(j => j.title.toLowerCase().includes(searchTerm.toLowerCase())), [journals, searchTerm]);
+  const paginatedJournals = filteredJournals.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalJournalPages = Math.ceil(filteredJournals.length / ITEMS_PER_PAGE);
+  
+  const filteredResources = useMemo(() => resources.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase())), [resources, searchTerm]);
+  const paginatedResources = filteredResources.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalResourcePages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+
+
   if (activeView === 'courses') {
     return (
       <Card>
@@ -1467,8 +1565,12 @@ function AdminPageContent({
           </Dialog>
         </CardHeader>
         <CardContent>
+          <div className="relative w-full sm:max-w-xs mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search courses..." className="pl-9" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}/>
+          </div>
           <div className="space-y-4">
-            {courses.map((course) => (
+            {paginatedCourses.map((course) => (
               <div key={course.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                  <div className="flex items-center gap-4">
                     <Image src={course.img || "https://picsum.photos/seed/placeholder/60/45"} alt={course.title} width={60} height={45} className="rounded-md object-cover" />
@@ -1510,6 +1612,13 @@ function AdminPageContent({
               </div>
             ))}
           </div>
+          {totalCoursePages > 1 && (
+              <div className="flex justify-between items-center pt-6">
+                  <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {currentPage} of {totalCoursePages}</span>
+                  <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalCoursePages}>Next</Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1535,8 +1644,12 @@ function AdminPageContent({
           </Dialog>
         </CardHeader>
         <CardContent>
+          <div className="relative w-full sm:max-w-xs mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search partners..." className="pl-9" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}/>
+          </div>
           <div className="space-y-4">
-            {partners.map((partner) => (
+            {paginatedPartners.map((partner) => (
               <div key={partner.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                  <div className="flex items-center gap-4">
                     <Image src={partner.logo || `https://picsum.photos/seed/placeholder/40/40`} alt={partner.name} width={40} height={40} className="rounded-md object-contain" />
@@ -1578,6 +1691,13 @@ function AdminPageContent({
               </div>
             ))}
           </div>
+          {totalPartnerPages > 1 && (
+              <div className="flex justify-between items-center pt-6">
+                  <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPartnerPages}</span>
+                  <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPartnerPages}>Next</Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1603,8 +1723,12 @@ function AdminPageContent({
           </Dialog>
         </CardHeader>
         <CardContent>
+          <div className="relative w-full sm:max-w-xs mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search events..." className="pl-9" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}/>
+          </div>
           <div className="space-y-4">
-            {events.map((event) => (
+            {paginatedEvents.map((event) => (
               <div key={event.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                 <div className="flex items-center gap-4">
                     <Image src={event.image} alt={event.title} width={60} height={45} className="rounded-md object-cover" />
@@ -1646,6 +1770,13 @@ function AdminPageContent({
               </div>
             ))}
           </div>
+          {totalEventPages > 1 && (
+              <div className="flex justify-between items-center pt-6">
+                  <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {currentPage} of {totalEventPages}</span>
+                  <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalEventPages}>Next</Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1671,8 +1802,12 @@ function AdminPageContent({
           </Dialog>
         </CardHeader>
         <CardContent>
+          <div className="relative w-full sm:max-w-xs mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search journals..." className="pl-9" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}/>
+          </div>
           <div className="space-y-4">
-            {journals.map((journal) => (
+            {paginatedJournals.map((journal) => (
               <div key={journal.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                 <div className="flex items-center gap-4">
                     <Image src={journal.image} alt={journal.title} width={60} height={45} className="rounded-md object-cover" />
@@ -1713,6 +1848,13 @@ function AdminPageContent({
               </div>
             ))}
           </div>
+          {totalJournalPages > 1 && (
+              <div className="flex justify-between items-center pt-6">
+                  <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {currentPage} of {totalJournalPages}</span>
+                  <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalJournalPages}>Next</Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1743,8 +1885,12 @@ function AdminPageContent({
           </Dialog>
         </CardHeader>
         <CardContent>
+          <div className="relative w-full sm:max-w-xs mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search resources..." className="pl-9" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}/>
+          </div>
           <div className="space-y-4">
-            {resources.map((resource) => (
+            {paginatedResources.map((resource) => (
               <div key={resource.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/20">
                 <div className="flex items-center gap-4">
                   {resource.image ? (
@@ -1792,6 +1938,13 @@ function AdminPageContent({
               </div>
             ))}
           </div>
+          {totalResourcePages > 1 && (
+              <div className="flex justify-between items-center pt-6">
+                  <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {currentPage} of {totalResourcePages}</span>
+                  <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalResourcePages}>Next</Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1819,9 +1972,9 @@ export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [courses, setCourses] = useState<CourseType[]>([]);
-  const [partners, setPartners] =useState<Partner[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [journals, setJournals] = useState<Journal[]>([]);
+  const [partners, setPartners] =useState<PartnerType[]>([]);
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [journals, setJournals] = useState<JournalType[]>([]);
   const [papers, setPapers] = useState<DigitalLibraryPaper[]>([]);
   const [resources, setResources] = useState<EducationalResource[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -1888,8 +2041,8 @@ export default function AdminPage() {
     ]);
     setCourses(coursesData as CourseType[]);
     setPartners(partnersData);
-    setEvents(eventsData);
-    setJournals(journalsData);
+    setEvents(eventsData as EventType[]);
+    setJournals(journalsData as JournalType[]);
     setPapers(papersData);
     setResources(resourcesData as EducationalResource[]);
     setRegistrations(registrationsData);
@@ -1965,7 +2118,7 @@ export default function AdminPage() {
                 </SidebarFooter>
             </SidebarContent>
         </Sidebar>
-         <div className="flex flex-col flex-1">
+         <div className="flex flex-col flex-1 overflow-hidden">
             <header className="flex items-center gap-4 h-14 border-b bg-background px-4">
                 <SidebarTrigger className="md:hidden" />
                 <h1 className="text-xl font-bold whitespace-nowrap">Admin Dashboard</h1>
