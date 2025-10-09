@@ -7,13 +7,13 @@ import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
 
 // Schema for creating the user data document in Firestore.
-// Note: Password fields are removed as they are handled by Firebase Auth.
+// WARNING: Storing passwords directly in the database is insecure.
 const registrationSchema = z.object({
-  uid: z.string(), // Firebase Auth UID
   registrationType: z.enum(["student", "professional", "member"]),
   name: z.string().min(2),
   email: z.string().email(),
   contact: z.string().min(10),
+  password: z.string().min(8, "Password must be at least 8 characters."),
   biography: z.string().max(2000).min(10),
   photo: z.string().min(1, "Photo is required"),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
@@ -21,7 +21,6 @@ const registrationSchema = z.object({
   otherSocialUrl: z.string().url().optional().or(z.literal('')),
   scholarLink: z.string().url().optional().or(z.literal('')),
 });
-
 
 const userProfileUpdateSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -34,7 +33,6 @@ const userProfileUpdateSchema = z.object({
   scholarLink: z.string().url().optional().or(z.literal('')),
 });
 
-
 export async function handleRegistration(data: unknown) {
   const validatedData = registrationSchema.safeParse(data);
 
@@ -46,7 +44,6 @@ export async function handleRegistration(data: unknown) {
   }
 
   try {
-    // Check if a registration with this email already exists
     const q = query(collection(db, "registrations"), where("email", "==", validatedData.data.email));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
@@ -70,6 +67,40 @@ export async function handleRegistration(data: unknown) {
   }
 }
 
+// WARNING: This is an insecure login method.
+export async function handleUnsafeLogin(email: string, password: string):Promise<{success: boolean; data?: any; error?: string}> {
+  if (!email || !password) {
+    return { success: false, error: "Email and password are required." };
+  }
+
+  try {
+    const q = query(collection(db, "registrations"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return { success: false, error: "Invalid credentials. Please check your email and password." };
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    // Direct password comparison - INSECURE
+    if (userData.password !== password) {
+      return { success: false, error: "Invalid credentials. Please check your email and password." };
+    }
+
+    if (userData.status === 'approved') {
+       return { success: true, data: { id: userDoc.id, ...userData } };
+    } else if (userData.status === 'pending') {
+       return { success: false, error: "Your registration is still pending approval." };
+    } else {
+       return { success: false, error: "Your registration was not approved. Please contact support."};
+    }
+
+  } catch (error: any) {
+    return { success: false, error: "An unexpected server error occurred." };
+  }
+}
 
 export async function getUserProfile(email: string) {
     if (!email) return { success: false, error: "Email not provided" };

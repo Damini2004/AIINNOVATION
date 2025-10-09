@@ -18,9 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { getUserProfile } from "./actions";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { handleUnsafeLogin } from "./actions";
+
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -52,62 +51,34 @@ export default function LoginForm() {
     localStorage.setItem(key, JSON.stringify(item));
   }
 
-
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
 
     try {
-      // 1. Authenticate with Firebase
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-
-      // 2. Check if the user's registration is approved in Firestore
-      const result = await getUserProfile(data.email);
+      const result = await handleUnsafeLogin(data.email, data.password);
 
       if (result.success && result.data) {
-        if (result.data.status === 'approved') {
-          const sessionTTL = 60 * 60 * 1000; // 1 hour
-          setSessionWithExpiry('userSession', { loggedIn: true, user: result.data }, sessionTTL);
-          toast({
-            title: "Login Successful",
-            description: `Welcome back, ${result.data.name}!`,
-          });
-          router.push("/user-dashboard");
-        } else if (result.data.status === 'pending') {
-          await auth.signOut();
-          throw new Error("Your registration is still pending approval.");
-        } else {
-           await auth.signOut();
-           throw new Error("Your registration was not approved. Please contact support.");
-        }
+        const sessionTTL = 60 * 60 * 1000; // 1 hour
+        // Remove password from session data
+        const { password, ...userSessionData } = result.data;
+        setSessionWithExpiry('userSession', { loggedIn: true, user: userSessionData }, sessionTTL);
+        
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${result.data.name}!`,
+        });
+        router.push("/user-dashboard");
       } else {
-        // This will catch errors from the server action, like "User not found"
-        await auth.signOut();
         throw new Error(result.error || "Could not find user profile.");
       }
     } catch (error: any) {
-      // This catches both Firebase Auth errors and custom errors from our logic
-      let errorMessage = "An unknown error occurred.";
-       if (error.code) { // Firebase Auth errors
-        switch (error.code) {
-          case 'auth/user-not-found':
-          case 'auth/invalid-credential':
-          case 'auth/wrong-password':
-            errorMessage = "Invalid credentials. Please check your email and password.";
-            break;
-          default:
-            errorMessage = "Failed to login. Please try again.";
-            break;
-        }
-      } else { // Custom errors from our logic
-          errorMessage = error.message;
-      }
-       toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: errorMessage,
-        });
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message,
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 

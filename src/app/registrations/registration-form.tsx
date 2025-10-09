@@ -29,9 +29,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UploadCloud, ArrowLeft, ArrowRight } from "lucide-react";
 import { handleRegistration } from "./actions";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
-
 
 const formSchema = z.object({
   registrationType: z.enum(["student", "professional", "member"], {
@@ -132,16 +129,8 @@ export default function RegistrationForm() {
   const onSubmit: SubmitHandler<RegistrationFormValues> = async (data) => {
     setIsSubmitting(true);
     try {
-      // Step 1: Create user in Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      const user = userCredential.user;
-
-      // Step 2: Save user profile data to Firestore
-      const { password, confirmPassword, privacyPolicy, ...profileData } = data;
-      const result = await handleRegistration({
-        ...profileData,
-        uid: user.uid, // Add Firebase UID to the document
-      });
+      const { confirmPassword, privacyPolicy, ...profileData } = data;
+      const result = await handleRegistration(profileData);
 
       if (result.success) {
         toast({
@@ -152,30 +141,13 @@ export default function RegistrationForm() {
         setPhotoPreview(null);
         setStep(1);
       } else {
-        // If Firestore save fails, we should ideally delete the auth user to allow re-registration
-        // For now, we'll just show the error.
         throw new Error(result.error || "Failed to save your profile information.");
       }
     } catch (error: any) {
       let errorMessage = "An unexpected error occurred.";
-      if (error.code) { // Handle Firebase Auth errors
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            errorMessage = "This email address is already in use. Please try logging in.";
-            break;
-          case 'auth/invalid-email':
-            errorMessage = "The email address is not valid.";
-            break;
-          case 'auth/weak-password':
-            errorMessage = "The password is not strong enough. It must be at least 6 characters.";
-            break;
-          default:
-            errorMessage = "An authentication error occurred. Please try again.";
-            break;
-        }
-      } else { // Handle custom errors from our server action
-        errorMessage = error.message;
-      }
+       if (error.message) {
+         errorMessage = error.message;
+       }
        toast({
         variant: "destructive",
         title: "Registration Failed",
