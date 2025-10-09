@@ -72,12 +72,15 @@ export default function LoginForm() {
           });
           router.push("/user-dashboard");
         } else if (result.data.status === 'pending') {
+          await auth.signOut();
           throw new Error("Your registration is still pending approval.");
         } else {
+           await auth.signOut();
            throw new Error("Your registration was not approved. Please contact support.");
         }
       } else {
         // This will catch errors from the server action, like "User not found"
+        await auth.signOut();
         throw new Error(result.error || "Could not find user profile.");
       }
     } catch (error: any) {

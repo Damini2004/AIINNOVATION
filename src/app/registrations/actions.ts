@@ -2,11 +2,12 @@
 "use server";
 
 import { z } from "zod";
-import { addDoc, collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where, doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
 
-// Schema for creating the user data document in Firestore
+// Schema for creating the user data document in Firestore.
+// Note: Password fields are removed as they are handled by Firebase Auth.
 const registrationSchema = z.object({
   uid: z.string(), // Firebase Auth UID
   registrationType: z.enum(["student", "professional", "member"]),
@@ -55,7 +56,7 @@ export async function handleRegistration(data: unknown) {
     const docData = {
       ...validatedData.data,
       status: "pending", // Add a status for admin approval
-      createdAt: new Date(),
+      createdAt: Timestamp.now(),
     };
 
     await addDoc(collection(db, "registrations"), docData);

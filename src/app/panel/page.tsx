@@ -73,6 +73,7 @@ export default function AdminLoginPage() {
         });
         router.push("/admin");
       } else {
+         await auth.signOut(); // Sign out non-admin users
          toast({
           variant: "destructive",
           title: "Authorization Failed",
