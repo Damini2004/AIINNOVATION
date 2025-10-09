@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://aiinnovation-zmoi.vercel.app'),
   title: {
     template: '%s | AI Innovation',
-    default: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+    default: 'AI Innovation | AI Solutions for Education & Research',
   },
-  description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
+  description: 'AI Innovation Society: Your partner for AI-driven growth. We offer smart solutions in automation, analytics, education, and research to boost efficiency and success.',
   keywords: ['AI', 'Artificial Intelligence', 'Machine Learning', 'AI Education', 'AI Research', 'Ethical AI', 'AI for Good', 'AIIS'],
   openGraph: {
-    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
-    description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
+    title: 'AI Innovation | AI Solutions for Education & Research',
+    description: 'AI Innovation Society: Your partner for AI-driven growth. We offer smart solutions in automation, analytics, education, and research to boost efficiency and success.',
     url: 'https://aiinnovation-zmoi.vercel.app',
     siteName: 'AI Innovation',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
    twitter: {
     card: 'summary_large_image',
-    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
-    description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
+    title: 'AI Innovation | AI Solutions for Education & Research',
+    description: 'AI Innovation Society: Your partner for AI-driven growth. We offer smart solutions in automation, analytics, education, and research to boost efficiency and success.',
     images: ['https://aiinsociety.in/assests/images/logo.png'], // Update with a real OG image URL
   },
 };
@@ -51,6 +51,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="canonical" href="https://aiinnovation-zmoi.vercel.app/" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
