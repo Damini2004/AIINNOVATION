@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
@@ -53,6 +54,7 @@ import {
   updateRegistrationStatus,
   getContactMessages,
   deleteContactMessage,
+  updateContactMessageStatus,
 } from "./actions";
 import type { DigitalLibraryPaper, EducationalResource, Counter, Registration, ContactMessage, Course as CourseType } from "./actions";
 import {
@@ -77,7 +79,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail, CalendarIcon, LayoutDashboard, Book, Handshake, Calendar as CalendarLucide, Library, GraduationCap, CircleUserRound, MessageSquare } from "lucide-react";
+import { Loader2, Trash2, Edit, LogOut, Upload, FileText, CheckCircle, XCircle, File as FileIcon, Presentation, Link as LinkIcon, FileCode, Check, X, Linkedin, Twitter, RefreshCw, Mail, CalendarIcon, LayoutDashboard, Book, Handshake, Calendar as CalendarLucide, Library, GraduationCap, CircleUserRound, MessageSquare, Search, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -1201,8 +1203,7 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-2xl">
                                         <DialogHeader>
-                                            <DialogTitle>Registration Details</DialogTitle>
-                                            <DialogDescription>Reviewing application for {reg.name}</DialogDescription>
+                                            <DialogTitle>Registration Details for {reg.name}</DialogTitle>
                                         </DialogHeader>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
                                             <div className="md:col-span-1 flex flex-col items-center space-y-4">
@@ -1278,58 +1279,139 @@ function RegistrationManager({ registrations, onUpdate }: { registrations: Regis
     );
 }
 
-function ContactMessageManager({ messages: initialMessages, onUpdate }: { messages: ContactMessage[], onUpdate: () => void }) {
-  const { toast } = useToast();
+const MESSAGES_PER_PAGE = 5;
 
-  const handleDelete = async (id: string) => {
-    const result = await deleteContactMessage(id);
-    if (result.success) {
-      toast({ title: "Success", description: "Message deleted successfully." });
-      onUpdate();
-    } else {
-      toast({ variant: "destructive", title: "Error", description: result.error });
-    }
-  }
+function ContactMessageManager({ messages: initialMessages, onUpdate }: { messages: ContactMessage[], onUpdate: () => void }) {
+    const { toast } = useToast();
+    const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('unread');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+    const filteredMessages = useMemo(() => {
+        return initialMessages
+            .filter(msg => {
+                if (filter === 'all') return true;
+                return msg.status === filter;
+            })
+            .filter(msg => {
+                const term = searchTerm.toLowerCase();
+                if (!term) return true;
+                return (
+                    msg.name.toLowerCase().includes(term) ||
+                    msg.email.toLowerCase().includes(term) ||
+                    msg.message.toLowerCase().includes(term)
+                );
+            });
+    }, [initialMessages, filter, searchTerm]);
+
+    const totalPages = Math.ceil(filteredMessages.length / MESSAGES_PER_PAGE);
+    const paginatedMessages = filteredMessages.slice(
+        (currentPage - 1) * MESSAGES_PER_PAGE,
+        currentPage * MESSAGES_PER_PAGE
+    );
+
+    const handleDelete = async (id: string) => {
+        const result = await deleteContactMessage(id);
+        if (result.success) {
+            toast({ title: "Success", description: "Message deleted successfully." });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+    };
+
+    const handleStatusToggle = async (id: string, currentStatus: 'read' | 'unread') => {
+        setIsProcessing(id);
+        const newStatus = currentStatus === 'read' ? 'unread' : 'read';
+        const result = await updateContactMessageStatus(id, newStatus);
+        if (result.success) {
+            toast({ title: "Success", description: `Message marked as ${newStatus}.` });
+            onUpdate();
+        } else {
+            toast({ variant: "destructive", title: "Error", description: result.error });
+        }
+        setIsProcessing(null);
+    };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Contact Form Messages</CardTitle>
-        <CardDescription>View messages submitted through the contact form.</CardDescription>
+        <CardDescription>View and manage messages submitted through the contact form.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {initialMessages.length === 0 && <p className="text-muted-foreground text-center py-4">No messages yet.</p>}
-          {initialMessages.map((msg) => (
-            <div key={msg.id} className="p-4 border rounded-lg bg-muted/20">
-              <div className="flex justify-between items-start">
-                  <div>
-                      <p className="font-semibold">{msg.name} <span className="text-sm text-muted-foreground font-normal">&lt;{msg.email}&gt;</span></p>
-                      <p className="text-sm text-muted-foreground">{msg.phone} {msg.website && `| ${msg.website}`}</p>
-                      <p className="text-sm text-muted-foreground">Received: {new Date(msg.createdAt.seconds * 1000).toLocaleString()}</p>
-                  </div>
-                  <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                      <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                          This action will permanently delete the message from "{msg.name}".
-                          </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(msg.id!)}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                      </AlertDialogContent>
-                  </AlertDialog>
-              </div>
-              <p className="mt-4 bg-background p-3 rounded-md">{msg.message}</p>
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <div className="relative w-full sm:max-w-xs">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                    placeholder="Search messages..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                />
             </div>
-          ))}
+            <div className="flex items-center gap-2">
+                <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => { setFilter('all'); setCurrentPage(1); }}>All</Button>
+                <Button variant={filter === 'unread' ? 'default' : 'outline'} size="sm" onClick={() => { setFilter('unread'); setCurrentPage(1); }}>Unread</Button>
+                <Button variant={filter === 'read' ? 'default' : 'outline'} size="sm" onClick={() => { setFilter('read'); setCurrentPage(1); }}>Read</Button>
+            </div>
         </div>
+
+        <div className="space-y-4">
+          {paginatedMessages.length === 0 ? (
+             <p className="text-muted-foreground text-center py-8">No messages match your criteria.</p>
+          ) : (
+            paginatedMessages.map((msg) => (
+                <div key={msg.id} className={cn("p-4 border rounded-lg", msg.status === 'unread' ? 'bg-primary/5 border-primary/20' : 'bg-muted/20')}>
+                    <div className="flex justify-between items-start gap-4">
+                        <div>
+                            <p className="font-semibold flex items-center gap-2">
+                                {msg.name} 
+                                <span className="text-sm text-muted-foreground font-normal">&lt;{msg.email}&gt;</span>
+                                {msg.status === 'unread' && <Badge variant="default" className="h-5">Unread</Badge>}
+                            </p>
+                            <p className="text-sm text-muted-foreground">{msg.phone} {msg.website && `| ${msg.website}`}</p>
+                            <p className="text-xs text-muted-foreground">Received: {new Date(msg.createdAt.seconds * 1000).toLocaleString()}</p>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button variant="ghost" size="icon" onClick={() => handleStatusToggle(msg.id!, msg.status)} disabled={isProcessing === msg.id}>
+                                {isProcessing === msg.id ? <Loader2 className="h-4 w-4 animate-spin"/> : (msg.status === 'unread' ? <Eye className="h-4 w-4" title="Mark as read"/> : <EyeOff className="h-4 w-4" title="Mark as unread"/>)}
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                    This action will permanently delete the message from "{msg.name}".
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(msg.id!)}>Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </div>
+                    <p className="mt-4 bg-background p-3 rounded-md text-sm">{msg.message}</p>
+                </div>
+            ))
+          )}
+        </div>
+        {totalPages > 1 && (
+            <div className="flex justify-between items-center pt-6">
+                <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
+                <Button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</Button>
+            </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -1786,7 +1868,7 @@ export default function AdminPage() {
         { id: 'resources', label: 'Ed Resources', icon: GraduationCap },
         { id: 'counters', label: 'Counters', icon: LayoutDashboard },
         { id: 'registrations', label: 'Registrations', icon: CircleUserRound },
-        { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.length },
+        { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.filter(m => m.status === 'unread').length },
       ]);
     }
   }, [loading, contactMessages])
@@ -1852,9 +1934,9 @@ export default function AdminPage() {
   
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
-        <Sidebar className="bg-black text-white" collapsible="icon">
-            <SidebarContent className="p-2 pt-8 flex flex-col">
+      <div className="flex h-screen bg-muted/40">
+        <Sidebar className="bg-background border-r" collapsible="icon">
+            <SidebarContent className="p-2 pt-5 flex flex-col">
                 <SidebarGroup className="flex-1">
                     <SidebarMenu>
                     {sidebarItems.map(item => (
@@ -1862,12 +1944,12 @@ export default function AdminPage() {
                             <SidebarMenuButton
                                 onClick={() => setActiveView(item.id)}
                                 isActive={activeView === item.id}
-                                className="text-white hover:bg-gray-700 data-[active=true]:bg-primary"
+                                className="text-foreground hover:bg-muted data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                             >
                                 <item.icon />
-                                {item.label}
-                                {item.badge && item.badge > 0 && 
-                                <Badge className="ml-auto bg-red-500 text-white">{item.badge}</Badge>
+                                <span>{item.label}</span>
+                                {item.badge > 0 && 
+                                <Badge className="ml-auto bg-red-500 text-white hover:bg-red-600">{item.badge}</Badge>
                                 }
                             </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -1875,22 +1957,20 @@ export default function AdminPage() {
                     </SidebarMenu>
                 </SidebarGroup>
                  <SidebarFooter className="p-2 mt-auto">
-                    <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-gray-700 w-full justify-start">
+                    <Button variant="ghost" onClick={handleLogout} className="text-foreground hover:bg-muted w-full justify-start">
                       <LogOut />
                       <span>Logout</span>
                     </Button>
                 </SidebarFooter>
             </SidebarContent>
         </Sidebar>
-
-        <main className="flex-1 overflow-y-auto">
-            <div className="flex items-center gap-4 mb-6 p-4 border-b">
+         <div className="flex flex-col flex-1">
+            <header className="flex items-center gap-4 h-14 border-b bg-background px-4">
                 <SidebarTrigger className="md:hidden" />
-                <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            </div>
-
-            <div className="p-4 md:p-6 lg:p-8">
-              <AdminPageContent
+                <h1 className="text-xl font-bold whitespace-nowrap">Admin Dashboard</h1>
+            </header>
+            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+               <AdminPageContent
                   courses={courses}
                   partners={partners}
                   events={events}
@@ -1904,11 +1984,10 @@ export default function AdminPage() {
                   getFileIcon={getFileIcon}
                   activeView={activeView}
               />
-            </div>
-        </main>
+            </main>
+        </div>
       </div>
     </SidebarProvider>
   );
 }
-
     

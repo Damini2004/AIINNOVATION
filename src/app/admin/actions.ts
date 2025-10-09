@@ -111,6 +111,7 @@ const contactMessageSchema = z.object({
   website: z.string().url("Invalid URL").optional().or(z.literal('')),
   message: z.string().min(1, "Message is required"),
   createdAt: z.union([z.instanceof(Timestamp), z.string()]).optional(),
+  status: z.enum(['unread', 'read']).default('unread'),
 });
 
 
@@ -406,11 +407,11 @@ export async function getMembers(): Promise<Member[]> {
 }
 
 // Contact Message Actions
-export async function submitContactForm(data: Omit<ContactMessage, 'id' | 'createdAt'>) {
+export async function submitContactForm(data: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>) {
     try {
-        const validatedData = contactMessageSchema.omit({id: true, createdAt: true}).parse(data);
-        const docData = { ...validatedData, createdAt: Timestamp.now() };
-        await addDoc(collection(db, 'contact_messages'), docData);
+        const validatedData = contactMessageSchema.omit({id: true, createdAt: true, status: true}).parse(data);
+        const docData = { ...validatedData, createdAt: Timestamp.now(), status: 'unread' };
+        await addDoc(collection(db, 'contact_messages'), docData as any);
         revalidatePath('/admin');
         return { success: true };
     } catch (error: any) {
@@ -427,6 +428,7 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
     return messages.map(msg => ({
         ...msg,
         createdAt: JSON.parse(JSON.stringify(msg.createdAt)),
+        status: msg.status || 'unread', // Default old messages to unread
     }));
 }
 
@@ -434,6 +436,17 @@ export async function deleteContactMessage(id: string) {
     return deleteDocFromCollection('contact_messages', id);
 }
 
+export async function updateContactMessageStatus(id: string, status: 'read' | 'unread') {
+    try {
+        const docRef = doc(db, 'contact_messages', id);
+        await updateDoc(docRef, { status });
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
     
 
     
+
