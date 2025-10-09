@@ -1,4 +1,3 @@
-.
 import Link from "next/link";
 import "./host-journal-services.css";
 import type { Metadata } from 'next';
