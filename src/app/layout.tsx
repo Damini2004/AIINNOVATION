@@ -12,17 +12,18 @@ import Loading from './loading';
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://aiinnovation-zmoi.vercel.app'),
   title: {
-    template: '%s | AI Innovation Society',
-    default: 'AI Innovation Society - Fostering Responsible AI Innovation',
+    template: '%s | AI Innovation',
+    default: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
   },
-  description: 'The AI Innovation Society (AIIS) is a global platform fostering responsible AI innovation through education, research, social impact, and academic publishing.',
+  description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
   keywords: ['AI', 'Artificial Intelligence', 'Machine Learning', 'AI Education', 'AI Research', 'Ethical AI', 'AI for Good', 'AIIS'],
   openGraph: {
-    title: 'AI Innovation Society - Fostering Responsible AI Innovation',
-    description: 'A global platform for responsible AI innovation, education, and research.',
-    url: 'https://aiinsociety.in',
-    siteName: 'AI Innovation Society',
+    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+    description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
+    url: 'https://aiinnovation-zmoi.vercel.app',
+    siteName: 'AI Innovation',
     images: [
       {
         url: 'https://aiinsociety.in/assests/images/logo.png', // Update with a real OG image URL
@@ -35,8 +36,8 @@ export const metadata: Metadata = {
   },
    twitter: {
     card: 'summary_large_image',
-    title: 'AI Innovation Society - Fostering Responsible AI Innovation',
-    description: 'A global platform for responsible AI innovation, education, and research.',
+    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+    description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
     images: ['https://aiinsociety.in/assests/images/logo.png'], // Update with a real OG image URL
   },
 };
@@ -49,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="canonical" href="https://aiinnovation-zmoi.vercel.app/" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
