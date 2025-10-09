@@ -112,8 +112,12 @@ export async function getUserProfile(email: string) {
             return { success: false, error: "User profile not found in the database." };
         }
         const userDoc = querySnapshot.docs[0];
-        const userData = { id: userDoc.id, ...userDoc.data() };
-        return { success: true, data: JSON.parse(JSON.stringify(userData)) };
+        const userData = userDoc.data();
+        
+        // Serialize the data to convert Timestamp to a plain object
+        const plainData = JSON.parse(JSON.stringify(userData));
+
+        return { success: true, data: { id: userDoc.id, ...plainData } };
     } catch(error: any) {
         return { success: false, error: error.message };
     }
