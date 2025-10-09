@@ -4,6 +4,12 @@ import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import MemberServices from "./member-services";
 import "./member-services.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Become a Member',
+  description: 'Join the AI Innovation Society and unlock your potential with access to a global network, exclusive content, and collaborative opportunities.',
+};
 
 export default function BecomeAMemberPage() {
 

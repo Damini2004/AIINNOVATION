@@ -4,6 +4,12 @@ import MemberServices from "../become-a-member/member-services";
 import "../become-a-member/member-services.css";
 import ApprovedMembers from "@/components/approved-members";
 import "@/app/members.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Membership Benefits',
+  description: 'Discover the exclusive benefits of becoming a member of the AI Innovation Society, from networking to career resources.',
+};
 
 export default function MembershipBenefitsPage() {
   return (

@@ -7,6 +7,12 @@ import { CheckCircle, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import JournalList from "@/components/journal-list";
 import "./journals.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'AIIS Publications & Journals',
+  description: 'Discover the benefits of hosting your institutional journal with the AI Innovation Society, and explore our portfolio of publications.',
+};
 
 export default function JournalsPage() {
   const pros = [

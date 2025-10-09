@@ -18,8 +18,13 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import "./resources.css";
-
 import Image from "next/image";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Educational Resources',
+  description: 'Browse and download educational resources including papers, presentations, and course materials from the AI Innovation Society.',
+};
 
 function ResourceCard({ resource }: { resource: EducationalResource }) {
   const getIcon = (fileType: string) => {

@@ -4,10 +4,16 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getPartners } from "../dashboard/actions";
+import { getPartners } from "../admin/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Facebook, Linkedin, Twitter, Link as LinkIcon } from "lucide-react";
 import "../members.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Our Partners',
+  description: 'We collaborate with leading organizations and institutions to advance the field of AI. View our valued partners.',
+};
 
 type Partner = {
   id?: string;
@@ -115,5 +121,3 @@ export default function PartnersPage() {
     </div>
   );
 }
-
-    

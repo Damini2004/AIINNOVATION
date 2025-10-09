@@ -3,6 +3,12 @@
 
 import Link from "next/link";
 import JournalList from "@/components/journal-list";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Associated Journals',
+  description: 'Explore journals associated with the AI Innovation Society, covering a wide range of topics in AI, machine learning, and data science.',
+};
 
 export default function AssociateJournalPage() {
   return (

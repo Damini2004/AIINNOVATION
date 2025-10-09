@@ -5,6 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import "./internships.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Student Internship Program',
+  description: 'Join the AI Innovation Society\'s internship program to gain hands-on experience in AI, ML, and Data Science under expert mentorship.',
+};
+
 
 export default function StudentInternshipsPage() {
   const programHighlights = [

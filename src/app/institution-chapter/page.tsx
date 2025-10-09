@@ -4,6 +4,12 @@ import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import InstitutionChapterServices from "./institution-chapter-services";
 import "./institution-chapter.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Establish an Institution Chapter',
+  description: 'Empower your institution by establishing an official AI Innovation Society (AIIS) chapter and bring global AI innovation to your campus.',
+};
 
 export default function InstitutionChapterPage() {
   const benefits = [

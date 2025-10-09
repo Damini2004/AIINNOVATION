@@ -14,6 +14,12 @@ import {
   Users,
 } from "lucide-react";
 import "./curriculum.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'AI Curriculum Design Support',
+  description: 'Collaborate with AI Innovation Society to co-develop cutting-edge Artificial Intelligence curriculum for your institution, tailored for future-ready learners.',
+};
 
 export default function CurriculumSupportPage() {
   const scopeItems = [

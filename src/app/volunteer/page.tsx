@@ -4,6 +4,13 @@ import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import VolunteerServices from "./volunteer-services";
 import "./volunteer.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Volunteer Opportunities',
+  description: 'Make an impact by joining the AI Innovation Society\'s volunteer program. Contribute your skills to meaningful AI projects and help shape the future.',
+};
+
 
 export default function VolunteerPage() {
   const benefits = [

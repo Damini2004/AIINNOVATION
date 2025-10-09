@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getDigitalLibraryPapers } from "@/app/dashboard/actions";
-import type { DigitalLibraryPaper } from "@/app/dashboard/actions";
+import { getDigitalLibraryPapers } from "@/app/admin/actions";
+import type { DigitalLibraryPaper } from "@/app/admin/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +27,12 @@ import "./library.css";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Digital Library',
+  description: 'Access a vast repository of AI research papers, articles, and publications from the AI Innovation Society digital library.',
+};
 
 function PaperCard({ paper }: { paper: DigitalLibraryPaper }) {
   return (

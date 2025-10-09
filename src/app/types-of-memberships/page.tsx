@@ -10,6 +10,12 @@ import { CheckCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import "./member-stories.css";
 import MemberStories from "./member-stories";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Types of Memberships',
+  description: 'Explore the different membership types available at the AI Innovation Society for students and professionals, and find the one that fits you best.',
+};
 
 export default function TypesOfMembershipsPage() {
   const [activeBenefit, setActiveBenefit] = useState("Find Community");

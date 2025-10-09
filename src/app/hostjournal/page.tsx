@@ -5,6 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle, Database, Search, Globe, Award, ShieldCheck, Users } from "lucide-react";
 import "./host-journal-services.css";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Host a Journal',
+  description: 'Host your academic journal with the AI Innovation Society and leverage our global network, publication expertise, and commitment to open-access research.',
+};
 
 export default function HostJournalPage() {
   const keyPoints = [

@@ -12,8 +12,33 @@ import Loading from './loading';
 
 
 export const metadata: Metadata = {
-  title: 'Code Showcase',
-  description: 'A showcase of code snippets with AI-powered features.',
+  title: {
+    template: '%s | AI Innovation Society',
+    default: 'AI Innovation Society - Fostering Responsible AI Innovation',
+  },
+  description: 'The AI Innovation Society (AIIS) is a global platform fostering responsible AI innovation through education, research, social impact, and academic publishing.',
+  keywords: ['AI', 'Artificial Intelligence', 'Machine Learning', 'AI Education', 'AI Research', 'Ethical AI', 'AI for Good', 'AIIS'],
+  openGraph: {
+    title: 'AI Innovation Society - Fostering Responsible AI Innovation',
+    description: 'A global platform for responsible AI innovation, education, and research.',
+    url: 'https://aiinsociety.in',
+    siteName: 'AI Innovation Society',
+    images: [
+      {
+        url: 'https://aiinsociety.in/assests/images/logo.png', // Update with a real OG image URL
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+   twitter: {
+    card: 'summary_large_image',
+    title: 'AI Innovation Society - Fostering Responsible AI Innovation',
+    description: 'A global platform for responsible AI innovation, education, and research.',
+    images: ['https://aiinsociety.in/assests/images/logo.png'], // Update with a real OG image URL
+  },
 };
 
 export default function RootLayout({

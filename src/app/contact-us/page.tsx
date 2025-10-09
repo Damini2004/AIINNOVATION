@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import ContactSection from "@/components/contact-section";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description: 'Get in touch with the AI Innovation Society. We welcome queries, collaboration proposals, and feedback from the community.',
+};
 
 export default function ContactUsPage() {
   return (
