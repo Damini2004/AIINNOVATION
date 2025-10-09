@@ -6,7 +6,7 @@ import "./curriculum.css";
 
 export const metadata: Metadata = {
   title: 'AI Curriculum Design Support',
-  description: 'Collaborate with AI Innovation Society to co-develop cutting-edge Artificial Intelligence curriculum for your institution, tailored for future-ready learners.',
+  description: 'Get expert guidance and AI-based support to design an effective curriculum for AI, ML, and Data Science programs.',
 };
 
 export default function CurriculumSupportPage() {
