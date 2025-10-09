@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { handleLogin } from "../registrations/actions";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getIdTokenResult } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 
 
@@ -53,12 +53,13 @@ export default function AdminLoginPage() {
 
     try {
       // Step 1: Authenticate with Firebase Auth
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idTokenResult = await getIdTokenResult(userCredential.user);
 
-      // Step 2: Authorize on the server
-      const result = await handleLogin({ email, password });
-
-      if (result.success && result.isAdmin) {
+      // Step 2: Check for admin custom claim
+      const isAdmin = idTokenResult.claims.admin === true;
+      
+      if (isAdmin) {
         const sessionTTL = 60 * 60 * 1000; // 1 hour
         const now = new Date();
         const item = {
@@ -73,11 +74,10 @@ export default function AdminLoginPage() {
         });
         router.push("/admin");
       } else {
-        // This case handles if the user is a valid Firebase user but not the admin
-        toast({
+         toast({
           variant: "destructive",
           title: "Authorization Failed",
-          description: result.error || "You are not authorized to access this panel.",
+          description: "You are not authorized to access this panel.",
         });
       }
     } catch (error: any) {
@@ -134,7 +134,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder={process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || "superadmin@example.com"}
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
