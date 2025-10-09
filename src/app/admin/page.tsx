@@ -2124,7 +2124,7 @@ export default function AdminPage() {
                 <h1 className="text-xl font-bold whitespace-nowrap">Admin Dashboard</h1>
             </header>
             <main className="flex-1 overflow-y-auto">
-              <div className="h-full p-4">
+              <div className="h-full">
                 <AdminPageContent
                     courses={courses}
                     partners={partners}
@@ -2147,4 +2147,6 @@ export default function AdminPage() {
   );
 }
     
+
+
 
