@@ -5,7 +5,6 @@ import { z } from "zod";
 import { addDoc, collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { revalidatePath } from "next/cache";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // Schema for creating the user data document in Firestore
 const registrationSchema = z.object({
@@ -23,7 +22,7 @@ const registrationSchema = z.object({
 });
 
 
-const userProfileSchema = z.object({
+const userProfileUpdateSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   contact: z.string().min(10, "Please enter a valid contact number."),
   biography: z.string().max(2000, "Biography must not exceed 400 words.").min(10, "Biography is required."),
@@ -46,6 +45,13 @@ export async function handleRegistration(data: unknown) {
   }
 
   try {
+    // Check if a registration with this email already exists
+    const q = query(collection(db, "registrations"), where("email", "==", validatedData.data.email));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return { success: false, error: "A registration with this email already exists." };
+    }
+
     const docData = {
       ...validatedData.data,
       status: "pending", // Add a status for admin approval
@@ -71,7 +77,7 @@ export async function getUserProfile(email: string) {
         const q = query(collection(db, "registrations"), where("email", "==", email));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
-            return { success: false, error: "User not found" };
+            return { success: false, error: "User profile not found in the database." };
         }
         const userDoc = querySnapshot.docs[0];
         const userData = { id: userDoc.id, ...userDoc.data() };
@@ -82,7 +88,7 @@ export async function getUserProfile(email: string) {
 }
 
 export async function updateUserProfile(docId: string, data: unknown) {
-    const validatedData = userProfileSchema.safeParse(data);
+    const validatedData = userProfileUpdateSchema.safeParse(data);
     if (!validatedData.success) {
         return {
           success: false,

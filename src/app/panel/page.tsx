@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
     try {
       // Step 1: Authenticate with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idTokenResult = await getIdTokenResult(userCredential.user);
+      const idTokenResult = await getIdTokenResult(userCredential.user, true); // Force refresh token
 
       // Step 2: Check for admin custom claim
       const isAdmin = idTokenResult.claims.admin === true;
@@ -86,16 +86,14 @@ export default function AdminLoginPage() {
         switch (error.code) {
           case 'auth/user-not-found':
           case 'auth/invalid-credential':
-            errorMessage = "Invalid credentials. Please check your email and password.";
-            break;
           case 'auth/wrong-password':
-            errorMessage = "Incorrect password. Please try again.";
+            errorMessage = "Invalid credentials. Please check your email and password.";
             break;
           case 'auth/invalid-email':
             errorMessage = "The email address is not valid.";
             break;
           default:
-            errorMessage = "Failed to login. Please check your credentials.";
+            errorMessage = "Failed to login. Please try again.";
             break;
         }
       }

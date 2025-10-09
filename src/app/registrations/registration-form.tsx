@@ -137,7 +137,7 @@ export default function RegistrationForm() {
       const user = userCredential.user;
 
       // Step 2: Save user profile data to Firestore
-      const { password, confirmPassword, ...profileData } = data;
+      const { password, confirmPassword, privacyPolicy, ...profileData } = data;
       const result = await handleRegistration({
         ...profileData,
         uid: user.uid, // Add Firebase UID to the document
@@ -145,32 +145,36 @@ export default function RegistrationForm() {
 
       if (result.success) {
         toast({
-          title: "Registration Successful!",
-          description: "Thank you for joining AIIS. Your application is pending approval.",
+          title: "Registration Submitted!",
+          description: "Thank you for joining AIIS. Your application is now pending approval.",
         });
         form.reset();
         setPhotoPreview(null);
         setStep(1);
       } else {
-        throw new Error(result.error || "Failed to save profile.");
+        // If Firestore save fails, we should ideally delete the auth user to allow re-registration
+        // For now, we'll just show the error.
+        throw new Error(result.error || "Failed to save your profile information.");
       }
     } catch (error: any) {
       let errorMessage = "An unexpected error occurred.";
-      if (error.code) {
+      if (error.code) { // Handle Firebase Auth errors
         switch (error.code) {
           case 'auth/email-already-in-use':
-            errorMessage = "This email address is already in use.";
+            errorMessage = "This email address is already in use. Please try logging in.";
             break;
           case 'auth/invalid-email':
             errorMessage = "The email address is not valid.";
             break;
           case 'auth/weak-password':
-            errorMessage = "The password is not strong enough.";
+            errorMessage = "The password is not strong enough. It must be at least 6 characters.";
             break;
           default:
-            errorMessage = error.message;
+            errorMessage = "An authentication error occurred. Please try again.";
             break;
         }
+      } else { // Handle custom errors from our server action
+        errorMessage = error.message;
       }
        toast({
         variant: "destructive",
@@ -316,19 +320,19 @@ export default function RegistrationForm() {
                               disabled={isSubmitting}
                           />
                           <label htmlFor="photo-upload" className="photo-upload-label">
+                            {photoPreview ? (
+                                <Image src={photoPreview} alt="Preview" fill className="object-cover rounded-full" />
+                            ) : (
                               <div className="photo-upload-placeholder">
                                   <UploadCloud className="h-12 w-12 text-muted-foreground" />
-                                  <p className="mt-2 text-sm text-muted-foreground">
-                                  {photoPreview ? 'File selected' : 'Click to upload'}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                  PNG, JPG, GIF up to 2MB
-                                  </p>
+                                  <p className="mt-2 text-sm text-muted-foreground">Click to upload</p>
+                                  <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 2MB</p>
                               </div>
+                            )}
                           </label>
                           </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-center"/>
                       </FormItem>
                   )}
               />
