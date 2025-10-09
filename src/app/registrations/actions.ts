@@ -76,45 +76,48 @@ export async function handleRegistration(data: unknown) {
 }
 
 export async function handleLogin(data: unknown) {
-    const validatedData = loginSchema.safeParse(data);
+  const validatedData = loginSchema.safeParse(data);
 
-    if (!validatedData.success) {
-        return { success: false, error: "Invalid email or password." };
+  if (!validatedData.success) {
+    return { success: false, error: "Invalid email or password format." };
+  }
+
+  try {
+    const { email, password } = validatedData.data;
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
+
+    // 1. Check for Super Admin
+    if (email === superAdminEmail) {
+      // The password has already been verified by Firebase Auth on the client side.
+      // We just need to confirm the email is the designated admin email.
+      return { success: true, isAdmin: true };
     }
 
-    try {
-        const { email, password } = validatedData.data;
-        const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-        
-        // If the email matches the super admin email, authorize them immediately.
-        // The password has already been verified by Firebase Auth on the client.
-        if (email === superAdminEmail) {
-            return { success: true, isAdmin: true };
-        }
+    // 2. If not super admin, check for a regular user
+    const q = query(collection(db, "registrations"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
 
-        // If not super admin, check for a regular user in the registrations collection.
-        const q = query(collection(db, "registrations"), where("email", "==", email));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            return { success: false, error: "No user found with this email." };
-        }
-
-        const userDoc = querySnapshot.docs[0];
-        const userData = userDoc.data();
-
-        // This check is for regular user login from the registrations collection.
-        // The client-side should ideally also use Firebase Auth for these users.
-        if (userData.password === password) {
-             // We only return isAdmin: false, and user data for non-admin users.
-            return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
-        } else {
-            return { success: false, error: "Invalid email or password." };
-        }
-
-    } catch (error: any) {
-        return { success: false, error: error.message || "An unexpected error occurred." };
+    if (querySnapshot.empty) {
+      return { success: false, error: "User not found. Please check your email or register." };
     }
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+
+    // Note: This password check is for legacy/non-Firebase-auth users.
+    // A more secure system would migrate all users to Firebase Auth.
+    if (userData.password === password) {
+      return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
+    } else {
+      // This path is hit if the user exists but the password (from a direct DB check) is wrong.
+      // For a Firebase Auth user, this check will likely fail unless passwords are in sync, which is bad practice.
+      // The primary login path for regular users should also use Firebase Auth on the client.
+      return { success: false, error: "Incorrect password for regular user." };
+    }
+
+  } catch (error: any) {
+    return { success: false, error: error.message || "An unexpected server error occurred." };
+  }
 }
 
 export async function getUserProfile(email: string) {

@@ -51,59 +51,61 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+      // Step 1: Authenticate with Firebase Auth
+      await signInWithEmailAndPassword(auth, email, password);
 
-        if (user) {
-             const result = await handleLogin({ email, password });
-    
-            if (result.success && result.isAdmin) {
-                const sessionTTL = 60 * 60 * 1000; // 1 hour
-                const now = new Date();
-                const item = {
-                value: { loggedIn: true },
-                expiry: now.getTime() + sessionTTL,
-                };
-                localStorage.setItem("adminSession", JSON.stringify(item));
+      // Step 2: Authorize on the server
+      const result = await handleLogin({ email, password });
 
-                toast({
-                title: "Login Successful",
-                description: "Redirecting to dashboard...",
-                });
-                router.push("/admin");
-            } else {
-                 toast({
-                    variant: "destructive",
-                    title: "Login Failed",
-                    description: "You are not authorized to access this panel.",
-                });
-            }
-        }
-    } catch (error: any) {
-        let errorMessage = "An unknown error occurred.";
-        if (error.code) {
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    errorMessage = "No user found with this email.";
-                    break;
-                case 'auth/wrong-password':
-                    errorMessage = "Incorrect password. Please try again.";
-                    break;
-                case 'auth/invalid-email':
-                    errorMessage = "The email address is not valid.";
-                    break;
-                default:
-                    errorMessage = "Failed to login. Please check your credentials.";
-                    break;
-            }
-        }
+      if (result.success && result.isAdmin) {
+        const sessionTTL = 60 * 60 * 1000; // 1 hour
+        const now = new Date();
+        const item = {
+          value: { loggedIn: true },
+          expiry: now.getTime() + sessionTTL,
+        };
+        localStorage.setItem("adminSession", JSON.stringify(item));
+
         toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: errorMessage,
+          title: "Login Successful",
+          description: "Redirecting to dashboard...",
         });
+        router.push("/admin");
+      } else {
+        // This case handles if the user is a valid Firebase user but not the admin
+        toast({
+          variant: "destructive",
+          title: "Authorization Failed",
+          description: result.error || "You are not authorized to access this panel.",
+        });
+      }
+    } catch (error: any) {
+      // This catches Firebase Auth errors (wrong password, user not found)
+      let errorMessage = "An unknown error occurred.";
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+          case 'auth/invalid-credential':
+            errorMessage = "Invalid credentials. Please check your email and password.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Incorrect password. Please try again.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "The email address is not valid.";
+            break;
+          default:
+            errorMessage = "Failed to login. Please check your credentials.";
+            break;
+        }
+      }
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: errorMessage,
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -131,7 +133,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="superadmin@example.com"
+                placeholder={process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || "superadmin@example.com"}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
