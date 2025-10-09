@@ -1369,11 +1369,11 @@ function ContactMessageManager({ messages: initialMessages, onUpdate }: { messag
                 <div key={msg.id} className={cn("p-4 border rounded-lg", msg.status === 'unread' ? 'bg-primary/5 border-primary/20' : 'bg-muted/20')}>
                     <div className="flex justify-between items-start gap-4">
                         <div>
-                            <p className="font-semibold flex items-center gap-2">
+                            <div className="font-semibold flex items-center gap-2">
                                 {msg.name} 
                                 <span className="text-sm text-muted-foreground font-normal">&lt;{msg.email}&gt;</span>
                                 {msg.status === 'unread' && <Badge variant="default" className="h-5">Unread</Badge>}
-                            </p>
+                            </div>
                             <p className="text-sm text-muted-foreground">{msg.phone} {msg.website && `| ${msg.website}`}</p>
                             <p className="text-xs text-muted-foreground">Received: {new Date(msg.createdAt.seconds * 1000).toLocaleString()}</p>
                         </div>
@@ -1859,6 +1859,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if(!loading) {
+       const unreadMessages = contactMessages.filter(m => m.status === 'unread').length;
        setSidebarItems([
         { id: 'courses', label: 'Courses', icon: Book },
         { id: 'partners', label: 'Partners', icon: Handshake },
@@ -1868,7 +1869,7 @@ export default function AdminPage() {
         { id: 'resources', label: 'Ed Resources', icon: GraduationCap },
         { id: 'counters', label: 'Counters', icon: LayoutDashboard },
         { id: 'registrations', label: 'Registrations', icon: CircleUserRound },
-        { id: 'messages', label: 'Messages', icon: MessageSquare, badge: contactMessages.filter(m => m.status === 'unread').length },
+        { id: 'messages', label: 'Messages', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
       ]);
     }
   }, [loading, contactMessages])
@@ -1948,7 +1949,7 @@ export default function AdminPage() {
                             >
                                 <item.icon />
                                 <span>{item.label}</span>
-                                {item.badge > 0 && 
+                                {item.badge && 
                                 <Badge className="ml-auto bg-red-500 text-white hover:bg-red-600">{item.badge}</Badge>
                                 }
                             </SidebarMenuButton>
@@ -1969,21 +1970,23 @@ export default function AdminPage() {
                 <SidebarTrigger className="md:hidden" />
                 <h1 className="text-xl font-bold whitespace-nowrap">Admin Dashboard</h1>
             </header>
-            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-               <AdminPageContent
-                  courses={courses}
-                  partners={partners}
-                  events={events}
-                  journals={journals}
-                  papers={papers}
-                  resources={resources}
-                  registrations={registrations}
-                  contactMessages={contactMessages}
-                  fetchData={fetchData}
-                  handleDelete={handleDelete}
-                  getFileIcon={getFileIcon}
-                  activeView={activeView}
-              />
+            <main className="flex-1 overflow-y-auto">
+               <div className="p-4 md:p-6 lg:p-8">
+                <AdminPageContent
+                    courses={courses}
+                    partners={partners}
+                    events={events}
+                    journals={journals}
+                    papers={papers}
+                    resources={resources}
+                    registrations={registrations}
+                    contactMessages={contactMessages}
+                    fetchData={fetchData}
+                    handleDelete={handleDelete}
+                    getFileIcon={getFileIcon}
+                    activeView={activeView}
+                />
+               </div>
             </main>
         </div>
       </div>
