@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { signInWithEmailAndPassword, getIdTokenResult } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
+
+const SUPER_ADMIN_EMAIL = "superadmin@example.com";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -53,33 +55,30 @@ export default function AdminLoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Step 2: Check for admin custom claim.
-      if (user) {
-        const idTokenResult = await getIdTokenResult(user);
-        if (idTokenResult.claims.admin) {
-          // This is a verified admin. Create session and redirect.
-          const sessionTTL = 60 * 60 * 1000; // 1 hour
-          const now = new Date();
-          const item = {
-            value: { loggedIn: true },
-            expiry: now.getTime() + sessionTTL,
-          };
-          localStorage.setItem("adminSession", JSON.stringify(item));
+      // Step 2: Check if the email matches the super admin email.
+      if (user.email === SUPER_ADMIN_EMAIL) {
+        // This is the verified admin. Create session and redirect.
+        const sessionTTL = 60 * 60 * 1000; // 1 hour
+        const now = new Date();
+        const item = {
+          value: { loggedIn: true },
+          expiry: now.getTime() + sessionTTL,
+        };
+        localStorage.setItem("adminSession", JSON.stringify(item));
 
-          toast({
-            title: "Login Successful",
-            description: "Redirecting to admin dashboard...",
-          });
-          router.push("/admin");
-        } else {
-          // Not an admin. Deny access.
-          await auth.signOut();
-          toast({
-            variant: "destructive",
-            title: "Authorization Failed",
-            description: "You are not authorized to access this panel.",
-          });
-        }
+        toast({
+          title: "Login Successful",
+          description: "Redirecting to admin dashboard...",
+        });
+        router.push("/admin");
+      } else {
+        // Not the admin. Deny access.
+        await auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Authorization Failed",
+          description: "You are not authorized to access this panel.",
+        });
       }
     } catch (error: any) {
       let errorMessage = "An unknown error occurred.";
