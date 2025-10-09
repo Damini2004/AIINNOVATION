@@ -38,7 +38,7 @@ const userProfileSchema = z.object({
 
 
 const loginSchema = z.object({
-  idToken: z.string(),
+  email: z.string().email(),
 });
 
 
@@ -53,10 +53,10 @@ export async function handleRegistration(data: unknown) {
   }
 
   try {
-    const { confirmPassword, ...docDataToSave } = validatedData.data;
+    // In a real app, you would create the user in Firebase Auth here first.
+    // For now, we are just creating the registration document.
+    const { password, confirmPassword, ...docDataToSave } = validatedData.data;
     
-    // In a real application, the password should be hashed before saving.
-    // Storing plaintext passwords is a major security risk.
     const docData = {
       ...docDataToSave,
       status: "pending", // Add a status for admin approval
@@ -81,49 +81,31 @@ export async function handleLogin(data: unknown) {
     return { success: false, error: "Invalid data format." };
   }
   
-  const { idToken } = validatedData.data;
+  const { email } = validatedData.data;
 
   try {
-    // Note: In a real production app, you would verify the ID token here
-    // using the Firebase Admin SDK to get the user's claims.
-    // For this environment, we are simulating the check based on a passed flag.
-    // The client will get this flag from the ID token.
-
-    // A real implementation would look something like this:
-    /*
-    const admin = require('firebase-admin');
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    if (decodedToken.admin) {
-        return { success: true, isAdmin: true };
-    }
-    */
-    
-    // The client will pass whether the token has the admin claim.
-    // This is a temporary solution for this environment.
-    // @ts-ignore
-    if(data.isAdmin) {
-       return { success: true, isAdmin: true };
-    }
-
-
-    // Fallback to check regular user if not admin.
-    // In a full custom claims system, you might not even need this if all roles are handled by claims.
-    // @ts-ignore
-    const email = data.email;
     const q = query(collection(db, "registrations"), where("email", "==", email));
     const querySnapshot = await getDocs(q);
+
     if (querySnapshot.empty) {
-      return { success: false, error: "User not found." };
+      return { success: false, error: "User not found. Please check your email or register." };
     }
+
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
-    return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
+
+    if (userData.status !== 'approved') {
+        return { success: false, error: `Your registration status is: ${userData.status}. Please wait for approval.` };
+    }
+
+    return { success: true, user: { name: userData.name, email: userData.email } };
 
   } catch (error: any) {
     console.error("Server Action Error in handleLogin:", error);
     return { success: false, error: "An unexpected server error occurred." };
   }
 }
+
 
 export async function getUserProfile(email: string) {
     if (!email) return { success: false, error: "Email not provided" };

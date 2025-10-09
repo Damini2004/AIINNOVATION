@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { handleLogin } from "./actions";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -52,32 +54,52 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    const result = await handleLogin(data);
-    setIsLoading(false);
 
-    if (result.success) {
-      const sessionTTL = 60 * 1000; // 1 minute
-      if (result.isAdmin) {
-        setSessionWithExpiry('adminSession', { loggedIn: true }, sessionTTL);
+    try {
+      // 1. Authenticate with Firebase
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+
+      // 2. Authorize with server action (checks if user is 'approved' in Firestore)
+      const result = await handleLogin({ email: data.email });
+
+      if (result.success && result.user) {
+        const sessionTTL = 60 * 60 * 1000; // 1 hour
+        setSessionWithExpiry('userSession', { loggedIn: true, user: result.user }, sessionTTL);
         toast({
-          title: "Admin Login Successful",
-          description: "Redirecting to admin dashboard...",
-        });
-        router.push("/admin");
-      } else {
-         setSessionWithExpiry('userSession', { loggedIn: true, user: result.user }, sessionTTL);
-         toast({
           title: "Login Successful",
-          description: `Welcome back, ${result.user?.name || 'user'}!`,
+          description: `Welcome back, ${result.user.name}!`,
         });
         router.push("/user-dashboard");
+      } else {
+        // This will catch errors from the server action, like "User not found" or "Registration pending"
+        throw new Error(result.error || "Authorization failed.");
       }
-    } else {
+    } catch (error: any) {
+      // This catches both Firebase Auth errors and server action errors
+      let errorMessage = "An unknown error occurred.";
+       if (error.code) { // Firebase Auth errors
+        switch (error.code) {
+          case 'auth/user-not-found':
+          case 'auth/invalid-credential':
+            errorMessage = "Invalid credentials. Please check your email and password.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Incorrect password. Please try again.";
+            break;
+          default:
+            errorMessage = "Failed to login. Please try again.";
+            break;
+        }
+      } else { // Custom errors from our logic
+          errorMessage = error.message;
+      }
        toast({
           variant: "destructive",
           title: "Login Failed",
-          description: result.error || "An unknown error occurred.",
+          description: errorMessage,
         });
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -136,3 +158,4 @@ export default function LoginForm() {
     </>
   );
 }
+
