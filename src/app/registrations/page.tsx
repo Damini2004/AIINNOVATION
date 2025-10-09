@@ -7,12 +7,6 @@ import RegistrationForm from "./registration-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import LoginForm from "./login-form";
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Registration & Login',
-  description: 'Create an account to join the AI Innovation Society or log in to access your member benefits.',
-};
 
 export default function RegistrationsPage() {
   const [isLogin, setIsLogin] = useState(false);
