@@ -12,8 +12,6 @@ import { Loader2 } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 
-const SUPER_ADMIN_EMAIL = "superadmin@example.com";
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -51,13 +49,12 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      // Step 1: Authenticate with Firebase Auth.
+      // Authenticate with Firebase Auth.
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Step 2: Check if the email matches the super admin email.
-      if (user.email === SUPER_ADMIN_EMAIL) {
-        // This is the verified admin. Create session and redirect.
+      // If login is successful, grant admin access.
+      if (user) {
         const sessionTTL = 60 * 60 * 1000; // 1 hour
         const now = new Date();
         const item = {
@@ -72,13 +69,8 @@ export default function AdminLoginPage() {
         });
         router.push("/admin");
       } else {
-        // Not the admin. Deny access.
-        await auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Authorization Failed",
-          description: "You are not authorized to access this panel.",
-        });
+         // This case should ideally not be hit if signInWithEmailAndPassword succeeds.
+         throw new Error("Authentication succeeded but no user object was returned.");
       }
     } catch (error: any) {
       let errorMessage = "An unknown error occurred.";
