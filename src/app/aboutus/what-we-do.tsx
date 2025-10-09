@@ -1,6 +1,7 @@
 
 "use client";
 
+import React from 'react';
 import { BarChart, Globe, Lock, Briefcase, Users, GitBranch } from 'lucide-react';
 
 export default function WhatWeDo() {
