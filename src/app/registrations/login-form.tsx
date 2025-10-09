@@ -43,6 +43,7 @@ export default function LoginForm() {
   });
 
   const setSessionWithExpiry = (key: string, value: object, ttl: number) => {
+    if (typeof window === 'undefined') return;
     const now = new Date();
     const item = {
       value: value,
