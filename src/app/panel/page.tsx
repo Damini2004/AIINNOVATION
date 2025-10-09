@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { signInWithEmailAndPassword, getIdTokenResult } from "firebase/auth";
+import { signInWithEmailAndPassword, getIdTokenResult, User } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 
+// Define the Super Admin email directly in the component.
+const SUPER_ADMIN_EMAIL = "superadmin@example.com";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -45,20 +47,18 @@ export default function AdminLoginPage() {
     }
   }, [router]);
 
-
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Step 1: Authenticate with Firebase Auth
+      // Step 1: Authenticate with Firebase Auth using the provided email and password.
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idTokenResult = await getIdTokenResult(userCredential.user, true); // Force refresh token
+      const user = userCredential.user;
 
-      // Step 2: Check for admin custom claim
-      const isAdmin = idTokenResult.claims.admin === true;
-      
-      if (isAdmin) {
+      // Step 2: Check if the authenticated user's email matches the super admin email.
+      if (user && user.email === SUPER_ADMIN_EMAIL) {
+        // This is the designated super admin.
         const sessionTTL = 60 * 60 * 1000; // 1 hour
         const now = new Date();
         const item = {
@@ -69,11 +69,12 @@ export default function AdminLoginPage() {
 
         toast({
           title: "Login Successful",
-          description: "Redirecting to dashboard...",
+          description: "Redirecting to admin dashboard...",
         });
         router.push("/admin");
       } else {
-         await auth.signOut(); // Sign out non-admin users
+         // If the email doesn't match, it's a valid user but not an admin. Deny access.
+         await auth.signOut();
          toast({
           variant: "destructive",
           title: "Authorization Failed",
@@ -81,7 +82,7 @@ export default function AdminLoginPage() {
         });
       }
     } catch (error: any) {
-      // This catches Firebase Auth errors (wrong password, user not found, etc.)
+      // This block catches Firebase Authentication errors like wrong password, user not found, etc.
       let errorMessage = "An unknown error occurred.";
       if (error.code) {
         switch (error.code) {
