@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { handleLogin } from "../registrations/actions";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
+
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -47,30 +50,60 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await handleLogin({ email, password });
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        if (user) {
+             const result = await handleLogin({ email, password });
     
-    setIsLoading(false);
+            if (result.success && result.isAdmin) {
+                const sessionTTL = 60 * 60 * 1000; // 1 hour
+                const now = new Date();
+                const item = {
+                value: { loggedIn: true },
+                expiry: now.getTime() + sessionTTL,
+                };
+                localStorage.setItem("adminSession", JSON.stringify(item));
 
-    if (result.success && result.isAdmin) {
-        const sessionTTL = 60 * 60 * 1000; // 1 hour
-        const now = new Date();
-        const item = {
-          value: { loggedIn: true },
-          expiry: now.getTime() + sessionTTL,
-        };
-        localStorage.setItem("adminSession", JSON.stringify(item));
-
+                toast({
+                title: "Login Successful",
+                description: "Redirecting to dashboard...",
+                });
+                router.push("/admin");
+            } else {
+                 toast({
+                    variant: "destructive",
+                    title: "Login Failed",
+                    description: "You are not authorized to access this panel.",
+                });
+            }
+        }
+    } catch (error: any) {
+        let errorMessage = "An unknown error occurred.";
+        if (error.code) {
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = "No user found with this email.";
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = "Incorrect password. Please try again.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "The email address is not valid.";
+                    break;
+                default:
+                    errorMessage = "Failed to login. Please check your credentials.";
+                    break;
+            }
+        }
         toast({
-          title: "Login Successful",
-          description: "Redirecting to dashboard...",
+            variant: "destructive",
+            title: "Login Failed",
+            description: errorMessage,
         });
-        router.push("/admin");
-    } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: result.error || "Invalid email or password.",
-        });
+    } finally {
+        setIsLoading(false);
     }
   };
 

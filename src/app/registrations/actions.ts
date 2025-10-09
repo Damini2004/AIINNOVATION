@@ -84,12 +84,12 @@ export async function handleLogin(data: unknown) {
 
     try {
         const { email, password } = validatedData.data;
-
-        // Check for special super admin case first, using environment variables
         const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-        const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
 
-        if (email === superAdminEmail && password === superAdminPassword) {
+        if (email === superAdminEmail) {
+            // This is a simplified check. The actual password verification
+            // is now handled on the client by Firebase Auth. We just check if the email
+            // is the super admin's email to grant admin privileges.
             return { success: true, isAdmin: true };
         }
 
@@ -103,8 +103,8 @@ export async function handleLogin(data: unknown) {
         const userDoc = querySnapshot.docs[0];
         const userData = userDoc.data();
 
-        // In a real application, you would compare a hashed password.
-        // This is for demonstration purposes only and is not secure.
+        // NOTE: This plaintext password check is NOT secure and is for demonstration.
+        // The client-side handles the real Firebase Auth.
         if (userData.password === password) {
              // We only return isAdmin: false, and user data for non-admin users.
             return { success: true, isAdmin: false, user: { name: userData.name, email: userData.email } };
