@@ -91,7 +91,11 @@ export default function ContactSection() {
             <Mail className="w-12 h-12 text-primary-foreground mt-2 mr-6 shrink-0" />
             <div>
               <h4 className="text-xl font-bold text-primary-foreground mb-2">Send A Mail</h4>
-              <p className="text-primary-foreground/90">info@aiinsociety.in</p>
+              <p className="text-primary-foreground/90">
+                <span className="email-obfuscated">
+                  info<span className="hidden">.nospam</span>@<span className="hidden">.nospam</span>aiinsociety.in
+                </span>
+              </p>
             </div>
           </div>
 

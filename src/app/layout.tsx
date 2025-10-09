@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './animations.css';
 import './members.css';
-import { AppHeader } from '@/app/header';
+import { AppHeader } from '@/components/header';
 import { Footer } from '@/components/footer';
 import './footer.css';
 import { Suspense } from 'react';
@@ -31,7 +31,7 @@ const sourceCodePro = Source_Code_Pro({
 
 export const metadata: Metadata = {
   title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
-  description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
+  description: 'Your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
   keywords: ['AI', 'Artificial Intelligence', 'Machine Learning', 'AI Education', 'AI Research', 'Ethical AI', 'AI for Good', 'AIIS'],
   openGraph: {
     title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
@@ -70,9 +70,11 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background light flex flex-col')}>
         <AppHeader />
-        <Suspense fallback={<Loading />}>
-          <main className="flex-1">{children}</main>
-        </Suspense>
+        <main className="flex-1">
+          <Suspense fallback={<Loading />}>
+            {children}
+          </Suspense>
+        </main>
         <Footer />
         <Toaster />
       </body>

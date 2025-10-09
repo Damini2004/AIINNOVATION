@@ -15,3 +15,7 @@
 .link-gradient:hover {
   background-position: 0;
 }
+
+.email-obfuscated span.hidden {
+  display: none;
+}

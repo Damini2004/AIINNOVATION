@@ -81,7 +81,11 @@ export function Footer() {
             <h4 className="text-xl font-semibold mt-5 mb-4 text-foreground">Contact Us</h4>
         
             <p className="text-base text-muted-foreground mb-2">+91 7020892896</p>
-            <p className="text-base text-muted-foreground">info@aiinsociety.in</p>
+            <p className="text-base text-muted-foreground">
+                <span className="email-obfuscated">
+                  info<span className="hidden">.nospam</span>@<span className="hidden">.nospam</span>aiinsociety.in
+                </span>
+            </p>
         </div>
         </div>
 
