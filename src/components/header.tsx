@@ -137,7 +137,7 @@ export function AppHeader() {
                 alt="Datatech Logo Scrolled"
                 width={160}
                 height={40}
-                className="h-16 w-auto"
+                className="h-24 w-auto"
               />
             ) : (
               <Image
@@ -145,7 +145,7 @@ export function AppHeader() {
                 alt="Datatech Logo"
                 width={160}
                 height={40}
-                className="h-16 w-auto"
+                className="h-24 w-auto"
               />
             )}
           </Link>
