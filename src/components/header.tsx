@@ -136,7 +136,7 @@ export function AppHeader() {
                 alt="Datatech Logo"
                 width={160}
                 height={40}
-                className={cn("h-16 w-auto transition-all", { "brightness-[10] contrast-[10]": isScrolled })}
+                className={cn("h-16 w-auto transition-all")}
               />
           </Link>
 
