@@ -133,7 +133,7 @@ export function AppHeader() {
           <Link href="/" className="flex items-center relative z-20" title="datatech">
              {isScrolled ? (
               <Image
-                src="/assests/images/logo3.png"
+                src="/assests/images/logo.png"
                 alt="Datatech Logo Scrolled"
                 width={160}
                 height={40}
@@ -141,7 +141,7 @@ export function AppHeader() {
               />
             ) : (
               <Image
-                src="/assests/images/logo.png"
+                src="/assests/images/logo3.png"
                 alt="Datatech Logo"
                 width={160}
                 height={40}
