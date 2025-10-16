@@ -55,7 +55,7 @@ export default function ContactSection() {
 
   return (
     <section className="bg-blue-950 py-24">
-      <div className="max-w-6xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Contact Info */}
         <div className="bg-primary rounded-lg p-8 space-y-6">
           {/* Location */}
