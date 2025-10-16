@@ -48,7 +48,7 @@ export default function BecomeAMemberPage() {
             {/* Left Image */}
             <div className="flex justify-center">
               <Image
-                src="https://picsum.photos/seed/membership/600/500"
+                src="/assests/images/becomeamember.jpg"
                 alt="AI Membership illustration"
                 width={600}
                 height={500}

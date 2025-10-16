@@ -55,7 +55,7 @@ export default function HostJournalContent() {
             {/* Left Image */}
             <div className="flex justify-center">
               <Image
-                src="https://picsum.photos/seed/journal-host/600/500"
+                src="/assests/images/hostingajournal.jpeg"
                 alt="Hosting a Journal"
                 width={600}
                 height={500}

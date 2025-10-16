@@ -53,7 +53,7 @@ export default function JournalsContent() {
             </div>
              <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
                 <Image 
-                    src="https://picsum.photos/seed/benefits/600/500"
+                    src="/assests/images/BenefitsCollaboration.webp"
                     alt="Benefits Collaboration"
                     fill
                     className="rounded-lg object-cover"
@@ -65,7 +65,7 @@ export default function JournalsContent() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-card border rounded-lg p-8 shadow-sm">
              <div className="relative h-full min-h-[300px] lg:min-h-[400px] order-last lg:order-first">
                 <Image 
-                    src="https://picsum.photos/seed/pros/600/500"
+                    src="/assests/images/prosofcollaboaration.jpg"
                     alt="Pros of Collaboration"
                     fill
                     className="rounded-lg object-cover"
@@ -117,7 +117,7 @@ export default function JournalsContent() {
             </div>
             <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
                 <Image 
-                    src="https://picsum.photos/seed/cons/600/500"
+                    src="/assests/images/PotentialConsiderations.jpeg"
                     alt="Potential Considerations"
                     fill
                     className="rounded-lg object-cover"
