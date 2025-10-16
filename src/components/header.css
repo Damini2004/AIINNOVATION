@@ -1,6 +1,5 @@
 
 
-
 .datatech_nav_manu {
   background: #fff;
   position: sticky;
@@ -28,9 +27,11 @@
 .scrolled .datatech_menu ul li a {
     color: #fff; /* white text */
 }
+
 .scrolled .datatech_menu ul li button {
     color: #fff; /* white text */
 }
+
 .scrolled .datatech_menu ul li .sub-menu li a {
     color: #000;
 }
@@ -75,5 +76,3 @@
 .scrolled .datatech_menu ul li .sub-menu li a:hover {
     color: white;
 }
-
-    
