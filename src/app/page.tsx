@@ -59,8 +59,8 @@ function Showcase() {
       <CounterSection />
       <EventsSection />
       <QuickButtonArea />
-      <ContactSection />
       <MembersPage />
+      <ContactSection />
       <CodeSnippetView
         snippet={selectedSnippet}
         open={!!selectedSnippet}
