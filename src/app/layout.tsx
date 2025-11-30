@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,14 +32,17 @@ const sourceCodePro = Source_Code_Pro({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aiinsociety.in'),
-  title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+  title: {
+    default: 'AI Innovation Society',
+    template: '%s | AI Innovation Society',
+  },
   description: 'Your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
   keywords: ['AI', 'Artificial Intelligence', 'Machine Learning', 'AI Education', 'AI Research', 'Ethical AI', 'AI for Good', 'AIIS'],
   openGraph: {
-    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+    title: 'AI Innovation Society | Empowering the Future of AI',
     description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
     url: 'https://aiinsociety.in',
-    siteName: 'AI Innovation',
+    siteName: 'AI Innovation Society',
     images: [
       {
         url: '/assests/images/logo.png',
@@ -51,9 +55,9 @@ export const metadata: Metadata = {
   },
    twitter: {
     card: 'summary_large_image',
-    title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
+    title: 'AI Innovation Society | Empowering the Future of AI',
     description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
-    images: ['/assests/images/logo.png'],
+    images: ['https://aiinsociety.in/assests/images/logo.png'],
   },
   alternates: {
     canonical: 'https://aiinsociety.in',
