@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AI Innovation | Cutting-Edge AI Solutions for Smarter Businesses',
     description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
-    url: 'https://aiinnovation-zmoi.vercel.app',
+    url: 'https://aiinsociety.in',
     siteName: 'AI Innovation',
     images: [
       {
@@ -64,7 +64,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${sourceCodePro.variable}`}>
       <head>
-        <link rel="canonical" href="https://aiinnovation-zmoi.vercel.app/" />
+        <link rel="canonical" href="https://aiinsociety.in/" />
         <link rel="apple-touch-icon" href="/assests/images/apple-touch-icon.png" />
         {/* Add your Google Analytics script here */}
       </head>
