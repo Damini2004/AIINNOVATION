@@ -68,6 +68,13 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 }
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "AI Innovation Society",
+  "url": "https://aiinsociety.in",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -76,6 +83,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${sourceCodePro.variable}`}>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <link rel="apple-touch-icon" href="/assests/images/apple-touch-icon.png" />
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background light flex flex-col')}>
