@@ -131,7 +131,7 @@ export function AppHeader() {
           {/* Logo */}
           <Link href="/" className="flex items-center relative z-20" title="AI Innovation Society">
              <Image
-                src="/assests/images/Logo.png"
+                src="/assests/images/AIIS New Logo.png"
                 alt="AI Innovation Society Logo"
                 width={160}
                 height={40}

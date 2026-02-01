@@ -31,7 +31,7 @@ export function Footer() {
         <div>
             <div className="mb-10">
             <Image
-                    src="/assests/images/Logo.png" 
+                    src="/assests/images/AIIS New Logo.png" 
                     alt="AI Innovation Society Logo"
                     width={250} 
                     height={63}
