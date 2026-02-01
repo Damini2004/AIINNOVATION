@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -32,9 +31,9 @@ export function Footer() {
         <div>
             <div className="mb-10">
             <Image
-                    src="/assests/images/logo3.png" // replace with your logo path inside public folder
-                    alt="Datatech Logo"
-                    width={250} // adjust size
+                    src="/assests/images/Logo.png" 
+                    alt="AI Innovation Society Logo"
+                    width={250} 
                     height={63}
                 />
             </div>

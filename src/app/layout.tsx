@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -45,7 +44,7 @@ export const metadata: Metadata = {
     siteName: 'AI Innovation Society',
     images: [
       {
-        url: '/assests/images/logo.png',
+        url: '/assests/images/Logo.png',
         width: 1200,
         height: 630,
       },
@@ -57,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'AI Innovation Society | Empowering the Future of AI',
     description: 'Explore AI Innovation – your partner in harnessing Artificial Intelligence for business growth. From automation to analytics, we create smart AI-driven solutions that empower innovation and efficiency.',
-    images: ['https://aiinsociety.in/assests/images/logo.png'],
+    images: ['https://aiinsociety.in/assests/images/Logo.png'],
   },
   alternates: {
     canonical: 'https://aiinsociety.in',
